@@ -3,28 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ESTONE — Стільниці з каменю та керамограніту для ванної кімнати</title>
-<meta name="description" content="Виготовлення стільниць у ванну кімнату з натурального каменю та керамограніту. Індивідуальні розміри, вологостійкість на все життя.">
+<title>ESTONE — Стільниці та раковини з каменю й керамограніту для ванної</title>
+<meta name="description" content="Стільниці та раковини з натурального каменю, кварцу й керамограніту для ванної кімнати. Власне виробництво в Україні, під ваш розмір, гарантія 5 років.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
-<div class="cursor-glow" id="cursorGlow"></div>
-
 <header class="site-header" id="siteHeader">
   <div class="container header-inner">
-    <a href="#top" class="logo">ES<span>TONE</span></a>
+    <a href="#top" class="logo">
+      <svg class="logo-mark" viewBox="0 0 100 70" aria-hidden="true"><rect x="30" y="0" width="70" height="15"/><rect x="0" y="27.5" width="72" height="15"/><rect x="30" y="55" width="70" height="15"/></svg>
+      <span class="logo-word">ESTONE</span>
+    </a>
     <nav class="main-nav" id="mainNav">
-      <a href="#materials">Матеріали</a>
-      <a href="#process">Процес</a>
-      <a href="#gallery">Роботи</a>
-      <a href="#calc">Розрахунок</a>
-      <a href="#contacts">Контакти</a>
+      <a href="#philosophy">Філософія</a>
+      <a href="#collections">Колекції</a>
+      <a href="#drain">Деталі</a>
+      <a href="#why">Чому ми</a>
+      <a href="#order">Замовити</a>
     </nav>
-    <a href="tel:+380000000000" class="header-phone">+380 (00) 000-00-00</a>
+    <a href="tel:+380688647107" class="header-phone">+380 68 864 71 07</a>
     <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
   </div>
 </header>
@@ -33,158 +34,233 @@
 
   <!-- HERO -->
   <section class="hero" id="hero">
-    <div class="hero-canvas-wrap">
-      <canvas id="slabCanvas"></canvas>
+    <div class="hero-bg" data-parallax>
+      <img src="assets/img/cover.jpg" alt="Стільниця ESTONE з натурального каменю у ванній кімнаті">
     </div>
-    <div class="hero-grid"></div>
+    <div class="hero-scrim"></div>
     <div class="container hero-inner">
-      <p class="eyebrow" data-reveal>Камінь. Керамограніт. Довершеність.</p>
-      <h1 data-reveal>
-        Стільниці для ванної,<br>
-        <span class="accent">що переживуть ремонт&nbsp;двічі</span>
-      </h1>
+      <p class="eyebrow eyebrow-light" data-reveal>ESTONE · Collection 2026</p>
+      <h1 data-reveal>Камінь для ванної,<br>який не підведе через 10&nbsp;років</h1>
       <p class="hero-sub" data-reveal>
-        Виготовляємо стільниці з натурального каменю та керамограніту за вашими розмірами.
-        Без пор, без сколів, без компромісів.
+        Стільниці та раковини з натурального каменю, кварцу й керамограніту.
+        Власне виробництво в Україні, точний розмір під вашу ванну, гарантія 5 років.
       </p>
       <div class="hero-cta" data-reveal>
-        <a href="#calc" class="btn btn-primary">Розрахувати вартість</a>
-        <a href="#gallery" class="btn btn-ghost">Дивитись роботи</a>
+        <a href="#collections" class="btn btn-primary">Обрати колекцію</a>
+        <a href="#order" class="btn btn-ghost">Розрахувати вартість</a>
       </div>
     </div>
-    <div class="scroll-hint" data-reveal>
-      <span></span>
-      <p>Гортайте</p>
+    <div class="scroll-hint" data-reveal><span></span><p>Гортайте</p></div>
+  </section>
+
+  <!-- PAIN / PHILOSOPHY -->
+  <section class="philosophy" id="philosophy">
+    <div class="container philosophy-inner">
+      <p class="eyebrow" data-reveal>Collection 2026</p>
+      <h2 data-reveal>Камінь, у якого є автор</h2>
+      <p class="accent-italic" data-reveal>Stone with an author</p>
+      <div class="divider" data-reveal></div>
+      <p class="philosophy-text" data-reveal>
+        Каталожна раковина рідко сідає ідеально: то заважає стик, то колір не той, то за рік з'являються
+        плями й тріщини навколо зливу. Тому ми не продаємо типові форми — ми виготовляємо стільницю
+        під розмір вашої кімнати, з каменю, що не вбирає вологу і не темніє.
+      </p>
+      <p class="philosophy-text muted" data-reveal>
+        Чотири серії названі іменами тих, хто вчив камінь тримати форму. Кожна стільниця — як окрема
+        картина: передає характер інтер'єру і виготовляється під конкретне замовлення.
+      </p>
     </div>
   </section>
 
-  <!-- MATERIALS -->
-  <section class="materials" id="materials">
+  <!-- SERIES / COLLECTIONS -->
+  <section class="collections" id="collections">
     <div class="container">
-      <h2 data-reveal>Матеріал вирішує все</h2>
-      <p class="section-sub" data-reveal>Чотири фактури — один результат: стільниця без обслуговування на роки.</p>
+      <p class="eyebrow" data-reveal>Чотири серії</p>
+      <h2 data-reveal>Оберіть мову форми</h2>
+    </div>
 
-      <div class="material-grid">
-        <article class="material-card" data-tilt data-reveal>
-          <div class="material-swatch swatch-quartz"></div>
-          <h3>Кварцовий агломерат</h3>
-          <p>Нульова пористість, стійкість до вологи та плісняви. Ідеальний вибір саме для ванної.</p>
-        </article>
-        <article class="material-card" data-tilt data-reveal>
-          <div class="material-swatch swatch-granite"></div>
-          <h3>Натуральний граніт</h3>
-          <p>Максимальна твердість і унікальний малюнок — кожна стільниця існує в одному екземплярі.</p>
-        </article>
-        <article class="material-card" data-tilt data-reveal>
-          <div class="material-swatch swatch-marble"></div>
-          <h3>Мармуровий кварцит</h3>
-          <p>Благородна текстура мармуру з міцністю кварциту. Преміальний вигляд без крихкості.</p>
-        </article>
-        <article class="material-card" data-tilt data-reveal>
-          <div class="material-swatch swatch-ceramic"></div>
-          <h3>Керамограніт великого формату</h3>
-          <p>Плити до 3.2 м без стиків, стійкі до УФ, кислот і високих температур.</p>
-        </article>
+    <div class="series-list">
+
+      <article class="series-row" data-reveal>
+        <div class="series-photo">
+          <img src="assets/img/leonardo-hero.jpg" alt="Раковина серії Leonardo з мармуру">
+        </div>
+        <div class="series-text">
+          <span class="series-years">1452–1519</span>
+          <h3>Leonardo</h3>
+          <p class="series-tag">Інноваційні форми та рішення</p>
+          <p>Леонардо був передусім винахідником: його ідеї випереджали час, але завжди служили практиці.
+          Ця серія про те саме — форма, яка не тільки вражає, а й зручно працює щодня.</p>
+          <button class="btn btn-line" data-filter-open="leonardo">Дивитись моделі LE</button>
+        </div>
+      </article>
+
+      <article class="series-row reverse" data-reveal>
+        <div class="series-photo">
+          <img src="assets/img/monet-hero.jpg" alt="Раковина серії Monet з акрилового каменю">
+        </div>
+        <div class="series-text">
+          <span class="series-years">1840–1926</span>
+          <h3>Monet</h3>
+          <p class="series-tag">Класичні форми та естетика</p>
+          <p>Моне писав те, що бачив щодня, і зробив буденне гідним полотна. Класичні форми, які
+          пасують будь-якій ванній і не набридають з роками.</p>
+          <button class="btn btn-line" data-filter-open="monet">Дивитись моделі MO</button>
+        </div>
+      </article>
+
+      <article class="series-row" data-reveal>
+        <div class="series-photo">
+          <img src="assets/img/kazimir-hero.jpg" alt="Подвійна раковина серії Kazimir з мармуру">
+        </div>
+        <div class="series-text">
+          <span class="series-years">1879–1935</span>
+          <h3>Kazimir</h3>
+          <p class="series-tag">Прямі лінії, прямі кути</p>
+          <p>Малевич прибрав з картини все, крім прямокутника. Серія зроблена так само: прямі лінії,
+          прямий кут, жодного радіуса.</p>
+          <button class="btn btn-line" data-filter-open="kazimir">Дивитись моделі KA</button>
+        </div>
+      </article>
+
+      <article class="series-row reverse" data-reveal>
+        <div class="series-photo">
+          <img src="assets/img/salvador-hero.jpg" alt="Органічна раковина серії Salvador">
+        </div>
+        <div class="series-text">
+          <span class="series-years">1904–1989</span>
+          <h3>Salvador</h3>
+          <p class="series-tag">Форми без границь</p>
+          <p>Далі малював речі, які поводяться не так, як мають. Ця серія робить те саме — раковина,
+          що не виглядає раковиною, але працює бездоганно.</p>
+          <button class="btn btn-line" data-filter-open="salvador">Дивитись моделі SA</button>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- PRODUCT GALLERY -->
+  <section class="gallery-section" id="gallery">
+    <div class="container">
+      <p class="eyebrow" data-reveal>Каталог 2026</p>
+      <h2 data-reveal>23 моделі умивальників</h2>
+      <p class="section-sub" data-reveal>Кожну можна адаптувати під розмір, колір каменю та зону вашої ванної.</p>
+
+      <div class="filter-tabs" id="filterTabs" data-reveal>
+        <button class="filter-tab is-active" data-filter="all">Усі</button>
+        <button class="filter-tab" data-filter="leonardo">Leonardo</button>
+        <button class="filter-tab" data-filter="monet">Monet</button>
+        <button class="filter-tab" data-filter="kazimir">Kazimir</button>
+        <button class="filter-tab" data-filter="salvador">Salvador</button>
+      </div>
+
+      <div class="product-grid" id="productGrid"><!-- populated by JS --></div>
+    </div>
+  </section>
+
+  <!-- DRAIN OPTIONS -->
+  <section class="drain" id="drain">
+    <div class="container">
+      <p class="eyebrow" data-reveal>Деталі, що вирішують</p>
+      <h2 data-reveal>Оберіть злив</h2>
+      <p class="section-sub" data-reveal>Дрібниця, яку ви бачите й торкаєтесь щодня.</p>
+
+      <div class="drain-grid">
+        <figure class="drain-card" data-reveal>
+          <img src="assets/img/drain-invisible.jpg" alt="Прихований злив Invisible">
+          <figcaption>
+            <h4>Invisible</h4>
+            <p>Отвір під стандартний зливний клапан, який можна підібрати окремо.</p>
+          </figcaption>
+        </figure>
+        <figure class="drain-card" data-reveal>
+          <img src="assets/img/drain-cover.jpg" alt="Злив Cover з накривкою з каменю">
+          <figcaption>
+            <h4>Cover</h4>
+            <p>Накривка виточена з того самого каменю, що й чаша, і лежить урівень із дном.</p>
+          </figcaption>
+        </figure>
+        <figure class="drain-card" data-reveal>
+          <img src="assets/img/drain-clickclack.jpg" alt="Злив Click-Clack">
+          <figcaption>
+            <h4>Click-Clack</h4>
+            <p>Один «клік» відкриває, один «клак» закриває. Накривка в колір каменю.</p>
+          </figcaption>
+        </figure>
+        <figure class="drain-card" data-reveal>
+          <img src="assets/img/drain-black.jpg" alt="Прихований злив Black">
+          <figcaption>
+            <h4>Black</h4>
+            <p>Злив зміщений і прихований, без знімних деталей — просто в обслуговуванні.</p>
+          </figcaption>
+        </figure>
       </div>
     </div>
   </section>
 
-  <!-- ADVANTAGES / PARALLAX -->
-  <section class="advantages" id="advantages">
+  <!-- WHY ESTONE -->
+  <section class="why" id="why">
     <div class="parallax-bg" data-speed="0.3"></div>
     <div class="container">
-      <div class="adv-grid">
-        <div class="adv-item" data-reveal>
-          <span class="adv-num">01</span>
-          <h4>Розмір у притул</h4>
-          <p>Заміри й виготовлення під конкретну сантехніку — без зазорів і підрізки на місці.</p>
+      <p class="eyebrow" data-reveal>Чому ESTONE</p>
+      <h2 data-reveal>Впевненість, а не ризик</h2>
+
+      <div class="why-grid">
+        <div class="why-item" data-reveal>
+          <h4>Виготовлено в Україні</h4>
+          <p>Власне виробництво: форма, обробка, шліфування й контроль — на одному майданчику.</p>
         </div>
-        <div class="adv-item" data-reveal>
-          <span class="adv-num">02</span>
-          <h4>Вирізи під мийку</h4>
-          <p>Врізна, накладна або інтегрована мийка — форма й глибина вирізу на ваш вибір.</p>
+        <div class="why-item" data-reveal>
+          <h4>Гарантія 5 років</h4>
+          <p>На цілісність виробу й стійкість поверхні. Кожна раковина проходить контроль перед відправкою.</p>
         </div>
-        <div class="adv-item" data-reveal>
-          <span class="adv-num">03</span>
-          <h4>Без стиків і швів</h4>
-          <p>Монолітні плити великого формату — жодних клейових ліній на видимій поверхні.</p>
+        <div class="why-item" data-reveal>
+          <h4>Широкий вибір декорів</h4>
+          <p>Десятки кольорів і фактур каменю — від матового білого до глибокого мармуру з прожилкою.</p>
         </div>
-        <div class="adv-item" data-reveal>
-          <span class="adv-num">04</span>
-          <h4>Гарантія 10 років</h4>
-          <p>На матеріал і на роботу. Стільниця, яку не потрібно міняти разом з ремонтом.</p>
+        <div class="why-item" data-reveal>
+          <h4>Термін від 5 днів</h4>
+          <p>Прості моделі виготовляємо від п'яти робочих днів. Складні форми — за узгодженим графіком.</p>
+        </div>
+        <div class="why-item" data-reveal>
+          <h4>Індивідуальний розмір</h4>
+          <p>Каталожна модель — лише відправна точка. Довжина, чаша, отвори й злив задаються під ваш простір.</p>
+        </div>
+        <div class="why-item" data-reveal>
+          <h4>Непористий матеріал</h4>
+          <p>Не вбирає вологу, не темніє від косметики й не тримає запах. Витримує дезінфекцію спиртом.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PROCESS -->
-  <section class="process" id="process">
-    <div class="container">
-      <h2 data-reveal>Як ми працюємо</h2>
-      <div class="process-line">
-        <div class="process-step" data-reveal>
-          <div class="step-index">1</div>
-          <h4>Замір</h4>
-          <p>Виїзд на об'єкт, лазерний замір, підбір матеріалу за зразками.</p>
-        </div>
-        <div class="process-step" data-reveal>
-          <div class="step-index">2</div>
-          <h4>Проєкт</h4>
-          <p>3D-модель стільниці з вирізами під мийку, змішувач і плінтус.</p>
-        </div>
-        <div class="process-step" data-reveal>
-          <div class="step-index">3</div>
-          <h4>Виготовлення</h4>
-          <p>Розкрій на ЧПУ-станку, шліфування кромки, полірування поверхні.</p>
-        </div>
-        <div class="process-step" data-reveal>
-          <div class="step-index">4</div>
-          <h4>Монтаж</h4>
-          <p>Встановлення, герметизація стиків, здача під ключ за 1 виїзд.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- GALLERY -->
-  <section class="gallery" id="gallery">
-    <div class="container">
-      <h2 data-reveal>Останні роботи</h2>
-      <p class="section-sub" data-reveal>Реальні проєкти — реальні розміри приміщень.</p>
-    </div>
-    <div class="gallery-track" id="galleryTrack">
-      <div class="gallery-item item-1" data-reveal><span>Мармуровий кварцит · Ванна 4.2м²</span></div>
-      <div class="gallery-item item-2" data-reveal><span>Керамограніт Calacatta · Санвузол</span></div>
-      <div class="gallery-item item-3" data-reveal><span>Чорний граніт · Подвійна мийка</span></div>
-      <div class="gallery-item item-4" data-reveal><span>Кварц білосніжний · Ніша під душ</span></div>
-    </div>
-  </section>
-
-  <!-- CALCULATOR / CTA -->
-  <section class="calc" id="calc">
-    <div class="container calc-inner">
-      <div class="calc-text" data-reveal>
-        <h2>Отримайте розрахунок за 24 години</h2>
-        <p>Залиште розміри й побажання — надішлемо вартість, зразки матеріалу та термін виготовлення.</p>
-        <ul class="calc-points">
-          <li>Безкоштовний виїзд заміру по місту</li>
-          <li>Зразки матеріалу на вибір</li>
-          <li>Точна ціна без прихованих доплат</li>
+  <!-- ORDER / CTA -->
+  <section class="order" id="order">
+    <div class="container order-inner">
+      <div class="order-text" data-reveal>
+        <p class="eyebrow">Наступний крок простий</p>
+        <h2>Надішліть розміри — отримайте розрахунок за 24 години</h2>
+        <p>Підберемо серію, колір каменю та тип зливу під вашу ванну кімнату й порахуємо точну вартість
+        без прихованих доплат.</p>
+        <ul class="order-points">
+          <li>Безкоштовна консультація і підбір каменю за зразками</li>
+          <li>Заміри та 3D-модель стільниці перед виготовленням</li>
+          <li>Доставка та монтаж під ключ</li>
         </ul>
       </div>
-      <form class="calc-form" data-reveal>
+      <form class="order-form" data-reveal>
         <div class="form-row">
           <input type="text" placeholder="Ім'я" required>
           <input type="tel" placeholder="Телефон" required>
         </div>
         <div class="form-row">
-          <input type="text" placeholder="Розміри, см (наприклад 180x60)">
+          <input type="text" placeholder="Розміри, см (наприклад 120x50)">
           <select>
-            <option>Кварцовий агломерат</option>
-            <option>Натуральний граніт</option>
-            <option>Мармуровий кварцит</option>
-            <option>Керамограніт</option>
+            <option>Leonardo</option>
+            <option>Monet</option>
+            <option>Kazimir</option>
+            <option>Salvador</option>
             <option>Ще не визначився(лась)</option>
           </select>
         </div>
@@ -196,38 +272,54 @@
 
 </main>
 
-<footer class="site-footer" id="contacts">
+<footer class="site-footer">
   <div class="container footer-inner">
     <div class="footer-brand">
-      <a href="#top" class="logo">ES<span>TONE</span></a>
-      <p>Стільниці з каменю та керамограніту для ванної кімнати.</p>
+      <a href="#top" class="logo logo-light">
+        <svg class="logo-mark" viewBox="0 0 100 70" aria-hidden="true"><rect x="30" y="0" width="70" height="15"/><rect x="0" y="27.5" width="72" height="15"/><rect x="30" y="55" width="70" height="15"/></svg>
+        <span class="logo-word">ESTONE</span>
+      </a>
+      <p class="footer-tagline">STONE. DESIGNED FOR LIVING.</p>
     </div>
     <div class="footer-col">
       <h5>Контакти</h5>
-      <a href="tel:+380000000000">+380 (00) 000-00-00</a>
-      <a href="mailto:info@estone.ua">info@estone.ua</a>
-      <p>Київ, вул. Промислова, 1</p>
+      <a href="tel:+380688647107">+380 68 864 71 07</a>
+      <a href="tel:+34652692097">+34 652 69 20 97</a>
+      <a href="mailto:info@estone.com.ua">info@estone.com.ua</a>
     </div>
     <div class="footer-col">
-      <h5>Розклад</h5>
-      <p>Пн–Сб: 9:00–19:00</p>
-      <p>Виїзд заміру — щодня</p>
+      <h5>Виробництво</h5>
+      <p>Україна · м. Київ, вул. Волинська, 65</p>
+      <p>España · L'Estació de Novelda, Alicante</p>
     </div>
     <div class="footer-col">
-      <h5>Соцмережі</h5>
-      <a href="#">Instagram</a>
-      <a href="#">Facebook</a>
+      <h5>Сайти групи</h5>
+      <a href="https://estone.com.ua" target="_blank" rel="noopener">estone.com.ua</a>
+      <a href="https://keralini.com.ua" target="_blank" rel="noopener">keralini.com.ua</a>
+      <a href="https://evostone.es" target="_blank" rel="noopener">evostone.es</a>
     </div>
   </div>
   <div class="container footer-bottom">
-    <p>&copy; <span id="year"></span> ESTONE. Усі права захищено.</p>
+    <p>&copy; <span id="year"></span> ESTONE. Моделі, кольори та зображення є приблизними, не точними.</p>
   </div>
 </footer>
 
-<script src="assets/vendor/three.min.js"></script>
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose" aria-label="Закрити">&times;</button>
+  <div class="lightbox-inner">
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-text">
+      <span class="lightbox-code" id="lightboxCode"></span>
+      <p id="lightboxDesc"></p>
+      <p class="lightbox-material" id="lightboxMaterial"></p>
+    </div>
+  </div>
+</div>
+
 <script src="assets/vendor/gsap.min.js"></script>
 <script src="assets/vendor/ScrollTrigger.min.js"></script>
-<script src="assets/js/three-scene.js"></script>
+<script src="assets/js/products.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
