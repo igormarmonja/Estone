@@ -72,6 +72,62 @@
     if (cta && !phone) track('cta_click', { placement: cta.dataset.cta });
   });
 
+  /* ── Заглушки для фото, яких ще немає ───────────────────── */
+  /* Покладіть файл із вказаним іменем у assets/img/ — заглушка зникне сама. */
+  function makePlaceholder(img) {
+    const src = img.getAttribute('src') || '';
+    const file = src.split('/').pop();
+    const label = img.dataset.ph || 'Фото';
+    const box = document.createElement('div');
+    box.className = 'photo-ph';
+    box.innerHTML = `
+      <svg viewBox="0 0 100 70" aria-hidden="true"><rect x="30" y="0" width="70" height="15"/><rect x="0" y="27.5" width="72" height="15"/><rect x="30" y="55" width="70" height="15"/></svg>
+      <span class="photo-ph-label">${label}</span>
+      <code class="photo-ph-file">assets/img/${file}</code>`;
+    if (img.parentElement) img.parentElement.replaceChild(box, img);
+  }
+
+  document.querySelectorAll('img[data-ph]').forEach(img => {
+    img.addEventListener('error', () => makePlaceholder(img), { once: true });
+    if (img.complete && img.naturalWidth === 0) makePlaceholder(img);
+  });
+
+  /* ── Вибір продукту у формах ────────────────────────────── */
+  const PRODUCT_OPTIONS = [
+    'Кухонна стільниця',
+    'Мийка з каменю',
+    'Умивальник / ванна кімната',
+    'Підвіконня',
+    'Сходи',
+    'Камінний портал або стіл',
+    'Комерційний об’єкт',
+    'Інше / ще не визначився',
+  ];
+  document.querySelectorAll('[data-product-select]').forEach(sel => {
+    PRODUCT_OPTIONS.forEach(v => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = v;
+      sel.appendChild(o);
+    });
+  });
+
+  /* Кнопка «Прорахувати X» у секції продукту підставляє напрям у форму */
+  const CTA_TO_PRODUCT = {
+    kukhnia: 'Кухонна стільниця',
+    vanna: 'Умивальник / ванна кімната',
+    pidvikonnia: 'Підвіконня',
+    skhody: 'Сходи',
+    interier: 'Камінний портал або стіл',
+    komertsiia: 'Комерційний об’єкт',
+  };
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-cta]');
+    if (!el) return;
+    const product = CTA_TO_PRODUCT[el.dataset.cta];
+    if (!product) return;
+    document.querySelectorAll('[data-product-select]').forEach(sel => { sel.value = product; });
+  });
+
   /* ── UTM та джерело ─────────────────────────────────────── */
   const UTM_KEYS = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid'];
   function captureUtm() {
