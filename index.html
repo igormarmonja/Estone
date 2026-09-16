@@ -51,18 +51,23 @@
           <p class="label">ESTONE · своє виробництво, 14 років</p>
           <h1>Виробництво<br>виробів з каменю</h1>
           <p class="hero-motto">Чесно. Точно. Вчасно.</p>
+          <p class="hero-sub">Реалізуємо в камені те, що намалював дизайнер</p>
         </div>
-        <div class="hero-stats">
-          <div><strong>14</strong><span>років з каменем</span></div>
-          <div><strong>5</strong><span>років гарантії</span></div>
-          <div><strong>5</strong><span>днів і виріб готовий</span></div>
-        </div>
+        <ul class="hero-points">
+          <li>Точний замір під стіни: виріб стає без зазорів і допилювань на місці</li>
+          <li>Цілісні поверхні: без зайвих швів, у які забивається бруд і вода</li>
+          <li>Термін від 5 робочих днів · 5 років повної гарантії</li>
+        </ul>
       </div>
 
       <figure class="hero-media" id="heroBg">
-        <img src="assets/img/cover.jpg" alt="Стільниця з натурального каменю виробництва ESTONE" fetchpriority="high">
+        <img src="assets/img/hero.jpg" alt="Кухонна стільниця з каменю та логотип ESTONE" fetchpriority="high" data-fallback="assets/img/cover.jpg">
         <figcaption>
-          <span class="label label-light">Реалізуємо в камені те, що намалював дизайнер</span>
+          <div class="hero-stats">
+            <div><strong>14</strong><span>років з каменем</span></div>
+            <div><strong>5</strong><span>років гарантії</span></div>
+            <div><strong>5</strong><span>днів і виріб готовий</span></div>
+          </div>
           <a href="#lead" class="btn btn-primary" data-cta="hero">Порахувати вартість</a>
         </figcaption>
       </figure>
@@ -79,23 +84,11 @@
   <!-- VALUE BENTO + FORM -->
   <section class="bento-intro">
     <div class="container bento-intro-grid">
-      <div class="bento-col">
-        <article class="tile" data-reveal>
-          <span class="tile-arrow">↗</span>
-          <h3>Замір по факту</h3>
-          <p class="tile-meta">Виріб стає без зазорів і допилювань на місці</p>
-        </article>
-        <article class="tile tile-dark" data-reveal>
-          <span class="tile-arrow">↗</span>
-          <h3>Цілісні поверхні</h3>
-          <p class="tile-meta">Без зайвих швів, у які забивається бруд і вода</p>
-        </article>
-        <article class="tile" data-reveal>
-          <span class="tile-arrow">↗</span>
-          <h3>Своє виробництво</h3>
-          <p class="tile-meta">Київ та Alicante · без посередників</p>
-        </article>
-      </div>
+      <figure class="tile tile-photo tile-tall" data-reveal>
+        <img src="assets/img/ka-08.jpg" alt="Подвійна стільниця з каменю на дерев'яній тумбі" loading="lazy">
+        <h3>Своє виробництво</h3>
+        <p class="tile-meta">Київ та Alicante · без посередників</p>
+      </figure>
 
       <aside class="form-card" data-reveal>
         <p class="label">Прорахунок за 1 годину</p>
@@ -131,22 +124,26 @@
           <h3>Кухня</h3>
           <p class="tile-meta">Стільниці · мийки · фартух · острів</p>
         </a>
-        <a href="#vanna" class="tile" data-reveal data-cta="ov-vanna">
+        <a href="#vanna" class="tile tile-photo" data-reveal data-cta="ov-vanna">
+          <img src="assets/img/ka-06.jpg" alt="Умивальник з каменю" loading="lazy">
           <span class="tile-arrow">↗</span>
           <h3>Ванна кімната</h3>
           <p class="tile-meta">23 моделі умивальників · піддони · панелі</p>
         </a>
-        <a href="#pidvikonnia" class="tile tile-dark" data-reveal data-cta="ov-pidvikonnia">
+        <a href="#pidvikonnia" class="tile tile-photo" data-reveal data-cta="ov-pidvikonnia">
+          <img src="assets/img/pidvikonnia-01.jpg" alt="Підвіконня з каменю" loading="lazy" data-ph="Підвіконня">
           <span class="tile-arrow">↗</span>
           <h3>Підвіконня</h3>
           <p class="tile-meta">Будь-яка довжина без стику · підвіконня-стіл</p>
         </a>
-        <a href="#skhody" class="tile" data-reveal data-cta="ov-skhody">
+        <a href="#skhody" class="tile tile-photo" data-reveal data-cta="ov-skhody">
+          <img src="assets/img/skhody-01.jpg" alt="Сходи з каменю" loading="lazy" data-ph="Сходи">
           <span class="tile-arrow">↗</span>
           <h3>Сходи</h3>
           <p class="tile-meta">Сходинки · підступенці · облицювання</p>
         </a>
-        <a href="#interier" class="tile" data-reveal data-cta="ov-interier">
+        <a href="#interier" class="tile tile-photo" data-reveal data-cta="ov-interier">
+          <img src="assets/img/interier-01.jpg" alt="Облицювання каміна каменем" loading="lazy" data-ph="Камін / інтер'єр">
           <span class="tile-arrow">↗</span>
           <h3>Інтер'єр</h3>
           <p class="tile-meta">Каміни · столи · стінові панелі</p>
@@ -159,6 +156,18 @@
         </a>
       </div>
     </div>
+  </section>
+
+  <!-- WORKS CAROUSEL -->
+  <section class="works" id="works">
+    <div class="container works-head">
+      <p class="label">Наші роботи</p>
+      <div class="works-nav">
+        <button class="works-btn" data-works="prev" aria-label="Назад">←</button>
+        <button class="works-btn" data-works="next" aria-label="Вперед">→</button>
+      </div>
+    </div>
+    <div class="works-viewport" id="worksTrack"><div class="works-line"></div></div>
   </section>
 
   <!-- BAND 1 -->
@@ -175,7 +184,6 @@
     <div class="container">
       <div class="sec-head" data-reveal>
         <div>
-          <p class="label">01 · Кухня</p>
           <h2>Кухня</h2>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="kukhnia">Порахувати кухню</a>
@@ -202,7 +210,6 @@
     <div class="container">
       <div class="sec-head" data-reveal>
         <div>
-          <p class="label">02 · Ванна кімната</p>
           <h2>Ванна кімната</h2>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="vanna">Порахувати ванну</a>
@@ -256,7 +263,6 @@
     <div class="container">
       <div class="sec-head" data-reveal>
         <div>
-          <p class="label">03 · Підвіконня</p>
           <h2>Підвіконня</h2>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="pidvikonnia">Порахувати підвіконня</a>
@@ -282,7 +288,6 @@
     <div class="container">
       <div class="sec-head" data-reveal>
         <div>
-          <p class="label">04 · Сходи</p>
           <h2>Сходи</h2>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="skhody">Порахувати сходи</a>
@@ -317,7 +322,6 @@
     <div class="container">
       <div class="sec-head" data-reveal>
         <div>
-          <p class="label">05 · Інтер'єр</p>
           <h2>Індивідуальні кам'яні вироби під ваш простір</h2>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="interier">Обговорити проєкт</a>
@@ -344,7 +348,6 @@
     <div class="container">
       <div class="sec-head" data-reveal>
         <div>
-          <p class="label">06 · Комерція</p>
           <h2>Комерційні вироби</h2>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="komertsiia">Порахувати об'єкт</a>

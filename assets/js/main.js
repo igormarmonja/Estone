@@ -90,9 +90,17 @@
     parent.replaceChild(box, img);
   }
 
-  document.querySelectorAll('img[data-ph]').forEach(img => {
-    img.addEventListener('error', () => makePlaceholder(img), { once: true });
-    if (img.complete && img.naturalWidth === 0) makePlaceholder(img);
+  document.querySelectorAll('img[data-ph],img[data-fallback]').forEach(img => {
+    const onFail = () => {
+      const fallback = img.dataset.fallback;
+      if (fallback && img.getAttribute('src') !== fallback) {
+        img.src = fallback;          /* є запасне фото — ставимо його */
+        return;
+      }
+      if (img.dataset.ph) makePlaceholder(img);
+    };
+    img.addEventListener('error', onFail);
+    if (img.complete && img.naturalWidth === 0) onFail();
   });
 
   /* ── Вибір продукту у формах ────────────────────────────── */
@@ -188,6 +196,38 @@
   const grid = document.getElementById('productGrid');
   const products = window.PRODUCTS || [];
 
+  /* Лайтбокс моделі: спільний для каталогу і каруселі */
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  const lbCode = document.getElementById('lightboxCode');
+  const lbDesc = document.getElementById('lightboxDesc');
+  const lbMat = document.getElementById('lightboxMaterial');
+  let lastModel = '';
+
+  const closeLb = () => { lb.classList.remove('is-open'); document.body.style.overflow = ''; };
+
+  function openModel(p) {
+    if (!p) return;
+    lastModel = p.code;
+    lbImg.src = 'assets/img/' + p.img;
+    lbImg.alt = 'Умивальник ' + p.code;
+    lbCode.textContent = p.code;
+    lbDesc.textContent = p.desc;
+    lbMat.textContent = p.material;
+    lb.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    track('model_view', { model: p.code, series: p.series });
+  }
+
+  document.getElementById('lightboxClose').addEventListener('click', closeLb);
+  document.getElementById('lightboxCta').addEventListener('click', () => {
+    const field = document.querySelector('.lead-form-main [name="comment"]');
+    if (field && lastModel) field.value = `Цікавить модель ${lastModel}`;
+    closeLb();
+  });
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLb(); });
+
   if (grid && products.length) {
     grid.innerHTML = products.map((p, i) => `
       <button class="product-card" type="button" data-series="${p.series}" data-index="${i}" data-reveal>
@@ -210,38 +250,43 @@
       });
     });
 
-    /* Lightbox */
-    const lb = document.getElementById('lightbox');
-    const lbImg = document.getElementById('lightboxImg');
-    const lbCode = document.getElementById('lightboxCode');
-    const lbDesc = document.getElementById('lightboxDesc');
-    const lbMat = document.getElementById('lightboxMaterial');
-    let lastModel = '';
-
     grid.addEventListener('click', (e) => {
       const card = e.target.closest('.product-card');
-      if (!card) return;
-      const p = products[Number(card.dataset.index)];
-      lastModel = p.code;
-      lbImg.src = 'assets/img/' + p.img;
-      lbImg.alt = 'Умивальник ' + p.code;
-      lbCode.textContent = p.code;
-      lbDesc.textContent = p.desc;
-      lbMat.textContent = p.material;
-      lb.classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-      track('model_view', { model: p.code, series: p.series });
+      if (card) openModel(products[Number(card.dataset.index)]);
+    });
+  }
+
+  /* ── Карусель робіт ─────────────────────────────────────── */
+  const worksViewport = document.getElementById('worksTrack');
+  if (worksViewport && products.length) {
+    const line = worksViewport.querySelector('.works-line');
+    const slide = (p, i) => `
+      <button class="works-item" type="button" data-index="${i}" aria-label="${p.code}">
+        <img src="assets/img/${p.img}" alt="Умивальник ${p.code} з каменю" loading="lazy">
+        <span class="works-code">${p.code}</span>
+      </button>`;
+    /* двічі — щоб стрічка зациклювалась без стрибка */
+    line.innerHTML = products.map(slide).join('') + products.map(slide).join('');
+
+    const step = () => worksViewport.clientWidth * 0.6;
+    document.querySelectorAll('[data-works]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dir = btn.dataset.works === 'next' ? 1 : -1;
+        worksViewport.scrollBy({ left: dir * step(), behavior: 'smooth' });
+      });
     });
 
-    const closeLb = () => { lb.classList.remove('is-open'); document.body.style.overflow = ''; };
-    document.getElementById('lightboxClose').addEventListener('click', closeLb);
-    document.getElementById('lightboxCta').addEventListener('click', () => {
-      const field = document.querySelector('.lead-form-main [name="comment"]');
-      if (field && lastModel) field.value = `Цікавить модель ${lastModel}`;
-      closeLb();
+    /* безкінечна прокрутка: на межі перескакуємо на копію */
+    worksViewport.addEventListener('scroll', () => {
+      const half = line.scrollWidth / 2;
+      if (worksViewport.scrollLeft >= half) worksViewport.scrollLeft -= half;
+      else if (worksViewport.scrollLeft <= 0) worksViewport.scrollLeft += half;
+    }, { passive: true });
+
+    line.addEventListener('click', (e) => {
+      const item = e.target.closest('.works-item');
+      if (item) openModel(products[Number(item.dataset.index)]);
     });
-    lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
-    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLb(); });
   }
 
   /* ── Форми ──────────────────────────────────────────────── */

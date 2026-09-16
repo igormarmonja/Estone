@@ -76,13 +76,20 @@ section h2{
   transition:transform .3s var(--ease),background .25s,color .25s,border-color .25s;
   white-space:nowrap;
 }
+.btn{position:relative;overflow:hidden;isolation:isolate;}
+.btn::before{
+  content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;
+  background:var(--rust);transform:translateY(101%);
+  transition:transform .4s var(--ease);
+}
+.btn:hover::before{transform:translateY(0);}
 .btn-primary{background:var(--dark);color:#fdf9f3;}
 .btn-primary::after{content:"↗";font-size:14px;transition:transform .3s var(--ease);}
-.btn-primary:hover{background:var(--rust);transform:translateY(-2px);}
+.btn-primary:hover{transform:translateY(-2px);}
 .btn-primary:hover::after{transform:translate(3px,-3px);}
 .btn-primary:disabled{opacity:.7;cursor:default;transform:none;}
 .btn-light{background:#fdf9f3;color:var(--dark);}
-.btn-light:hover{background:#fff;transform:translateY(-2px);}
+.btn-light:hover{color:#fff;transform:translateY(-2px);}
 .btn-sm{padding:11px 20px;font-size:13px;}
 .btn-full{width:100%;}
 
@@ -115,13 +122,17 @@ section h2{
   font-size:clamp(17px,2vw,24px);text-transform:uppercase;letter-spacing:.08em;
   color:var(--rust);margin-top:12px;
 }
+.hero-sub{font-size:16px;color:var(--muted);margin-top:14px;max-width:520px;}
+.hero-points{display:flex;flex-direction:column;gap:9px;max-width:440px;}
+.hero-points li{position:relative;padding-left:22px;font-size:13.5px;line-height:1.5;color:var(--text);}
+.hero-points li::before{content:"";position:absolute;left:0;top:7px;width:9px;height:9px;border:1px solid var(--rust);border-radius:50%;}
 .hero-stats{display:flex;gap:38px;}
 .hero-stats strong{display:block;font-size:34px;font-weight:500;line-height:1;}
 .hero-stats span{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);}
 
 .hero-media{
   position:relative;margin:0;border-radius:var(--r-lg);overflow:hidden;
-  aspect-ratio:21/9;box-shadow:var(--shadow);
+  aspect-ratio:16/9;box-shadow:var(--shadow);
 }
 .hero-media img{width:100%;height:100%;object-fit:cover;object-position:center 34%;transform:scale(1.12);will-change:transform;}
 .hero-media figcaption{
@@ -129,9 +140,11 @@ section h2{
   display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;
   background:linear-gradient(to top,rgba(30,22,14,.78),transparent);
 }
-.hero-media .label{margin:0;max-width:420px;font-size:12px;letter-spacing:.1em;}
+.hero-media .hero-stats{gap:34px;}
+.hero-media .hero-stats strong{color:#fdf9f3;font-size:30px;}
+.hero-media .hero-stats span{color:rgba(253,249,243,.7);}
 .hero-media .btn-primary{background:#fdf9f3;color:var(--dark);}
-.hero-media .btn-primary:hover{background:var(--rust);color:#fff;}
+.hero-media .btn-primary:hover{color:#fff;}
 
 /* ── Заява ───────────────────────────────────────────── */
 .statement{padding:90px 0 20px;}
@@ -150,7 +163,9 @@ section h2{
   padding:24px;min-height:210px;overflow:hidden;
   transition:transform .35s var(--ease),border-color .35s,box-shadow .35s;
 }
-.tile:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(161,92,60,.35);}
+.tile:hover{transform:translateY(-6px);box-shadow:0 24px 50px -26px rgba(47,38,28,.55);border-color:rgba(161,92,60,.3);}
+.tile h3,.tile .tile-meta{transition:transform .35s var(--ease);}
+.tile:hover h3{transform:translateX(3px);}
 .tile h3{
   font-size:16px;text-transform:uppercase;letter-spacing:.045em;line-height:1.25;
   max-width:88%;margin-bottom:12px;
@@ -162,22 +177,30 @@ section h2{
   color:var(--muted);text-align:right;line-height:1.55;
 }
 .tile-arrow{
-  position:absolute;top:22px;right:22px;font-size:17px;color:var(--rust);
-  transition:transform .3s var(--ease);
+  position:absolute;top:18px;right:18px;z-index:3;
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;color:var(--rust);border:1px solid rgba(161,92,60,.35);border-radius:50%;
+  transition:transform .35s var(--ease),background .35s var(--ease),color .35s,border-color .35s;
 }
-.tile:hover .tile-arrow{transform:translate(3px,-3px);}
+.tile:hover .tile-arrow{
+  transform:translate(3px,-3px) rotate(45deg);
+  background:var(--rust);color:#fff;border-color:var(--rust);
+}
 .tile-dark{background:var(--dark);border-color:transparent;}
 .tile-dark h3{color:#fdf9f3;}
 .tile-dark p{color:rgba(253,249,243,.66);}
 .tile-dark .tile-meta{color:rgba(253,249,243,.5);}
-.tile-dark .tile-arrow{color:var(--rust-2);}
+.tile-dark .tile-arrow{color:var(--rust-2);border-color:rgba(185,119,72,.45);}
+.tile-dark:hover .tile-arrow{background:var(--rust-2);color:var(--dark);border-color:var(--rust-2);}
 
 .tile-photo{min-height:280px;justify-content:flex-end;padding:22px;}
 .tile-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;transition:transform .7s var(--ease);}
 .tile-photo::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(30,22,14,.82),rgba(30,22,14,.1) 60%);}
-.tile-photo:hover img{transform:scale(1.05);}
+.tile-photo:hover img{transform:scale(1.07);}
 .tile-photo h3,.tile-photo p{position:relative;z-index:2;color:#fdf9f3;}
-.tile-photo .tile-arrow{z-index:3;color:#fdf9f3;}
+.tile-photo .tile-arrow{z-index:3;color:#fdf9f3;border-color:rgba(255,255,255,.45);}
+.tile-photo:hover .tile-arrow{background:#fdf9f3;color:var(--dark);border-color:#fdf9f3;}
+.tile-photo:hover::after{background:linear-gradient(to top,rgba(30,22,14,.9),rgba(30,22,14,.2) 65%);}
 .tile-photo .tile-meta{color:rgba(253,249,243,.72);}
 .tile-photo .tile-arrow{color:#fdf9f3;}
 .tile-photo .photo-ph{position:absolute;inset:0;z-index:0;}
@@ -185,6 +208,7 @@ section h2{
 .tile-photo.has-ph h3{color:var(--text);}
 .tile-photo.has-ph .tile-meta{color:var(--muted);}
 .tile-photo.has-ph .tile-arrow{color:var(--rust);}
+.tile-tall{min-height:340px;}
 .tile-wide{grid-column:span 2;}
 
 /* ── Вступний бенто з формою ─────────────────────────── */
@@ -239,6 +263,38 @@ section h2{
 .photo-ph svg{width:24px;height:16px;fill:rgba(161,92,60,.5);}
 .photo-ph-label{font-size:13px;color:var(--text);}
 .photo-ph-file{font-family:ui-monospace,monospace;font-size:11px;color:var(--rust);background:rgba(255,255,255,.65);padding:4px 9px;border-radius:var(--r-pill);}
+
+/* ── Карусель робіт ──────────────────────────────────── */
+.works{padding:10px 0 70px;}
+.works-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.works-head .label{margin:0;}
+.works-nav{display:flex;gap:8px;}
+.works-btn{
+  width:38px;height:38px;border-radius:50%;border:1px solid var(--line);
+  background:var(--card);color:var(--text);font-size:15px;cursor:pointer;
+  transition:background .25s,color .25s,border-color .25s,transform .25s var(--ease);
+}
+.works-btn:hover{background:var(--dark);color:#fdf9f3;border-color:var(--dark);transform:translateY(-2px);}
+.works-viewport{
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  mask-image:linear-gradient(to right,transparent,#000 40px,#000 calc(100% - 40px),transparent);
+}
+.works-viewport::-webkit-scrollbar{display:none;}
+.works-line{display:flex;gap:12px;padding:0 28px;width:max-content;}
+.works-item{
+  position:relative;flex:0 0 auto;width:210px;height:150px;padding:0;border:0;
+  border-radius:14px;overflow:hidden;cursor:pointer;background:var(--dark);
+  transition:transform .35s var(--ease);
+}
+.works-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease);}
+.works-item:hover{transform:translateY(-4px);}
+.works-item:hover img{transform:scale(1.08);}
+.works-code{
+  position:absolute;left:10px;bottom:10px;
+  background:rgba(253,249,243,.92);color:var(--dark);
+  font-size:10.5px;letter-spacing:.06em;padding:5px 10px;border-radius:var(--r-pill);
+}
 
 /* ── Смуга з фото ────────────────────────────────────── */
 .band{position:relative;min-height:62vh;display:flex;align-items:center;overflow:hidden;}
@@ -376,6 +432,7 @@ section h2{
 .tile-photo.has-ph h3{color:var(--text);}
 .tile-photo.has-ph .tile-meta{color:var(--muted);}
 .tile-photo.has-ph .tile-arrow{color:var(--rust);}
+.tile-tall{min-height:340px;}
 .tile-wide{grid-column:span 2;}
   .bento-intro-grid{grid-template-columns:1fr;}
   .bento-col{grid-template-rows:none;}
