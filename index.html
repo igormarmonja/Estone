@@ -45,54 +45,29 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="container">
-      <div class="hero-top">
-        <div class="hero-title">
-          <p class="label">ESTONE · своє виробництво, 14 років</p>
-          <h1>Виробництво<br>виробів з каменю</h1>
-          <p class="hero-motto">Чесно. Точно. Вчасно.</p>
-          <p class="hero-sub">Реалізуємо в камені те, що намалював дизайнер</p>
-        </div>
+    <div class="hero-bg" id="heroBg">
+      <img src="assets/img/hero.jpg" alt="Кухонна стільниця з каменю та логотип ESTONE" fetchpriority="high" data-fallback="assets/img/cover.jpg">
+    </div>
+    <div class="hero-scrim"></div>
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <p class="label label-light">ESTONE · своє виробництво, 14 років</p>
+        <h1>Виробництво виробів з каменю.<br>Чесно. Точно. Вчасно.</h1>
+        <p class="hero-sub">Реалізуємо в камені те, що намалював дизайнер.</p>
         <ul class="hero-points">
           <li>Точний замір під стіни: виріб стає без зазорів і допилювань на місці</li>
           <li>Цілісні поверхні: без зайвих швів, у які забивається бруд і вода</li>
           <li>Термін від 5 робочих днів · 5 років повної гарантії</li>
         </ul>
+        <div class="hero-cta">
+          <a href="#lead" class="btn btn-primary" data-cta="hero">Порахувати вартість</a>
+          <a href="#produktsiia" class="btn btn-ghost" data-cta="hero-catalog">Що ми робимо</a>
+        </div>
       </div>
 
-      <figure class="hero-media" id="heroBg">
-        <img src="assets/img/hero.jpg" alt="Кухонна стільниця з каменю та логотип ESTONE" fetchpriority="high" data-fallback="assets/img/cover.jpg">
-        <figcaption>
-          <div class="hero-stats">
-            <div><strong>14</strong><span>років з каменем</span></div>
-            <div><strong>5</strong><span>років гарантії</span></div>
-            <div><strong>5</strong><span>днів і виріб готовий</span></div>
-          </div>
-          <a href="#lead" class="btn btn-primary" data-cta="hero">Порахувати вартість</a>
-        </figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- INTRO STATEMENT -->
-  <section class="statement">
-    <div class="container">
-      <h2 data-reveal>Точний замір під ваші стіни,<br><em>цілісні поверхні без зайвих швів</em><br>і термін, який ми називаємо до початку роботи</h2>
-    </div>
-  </section>
-
-  <!-- VALUE BENTO + FORM -->
-  <section class="bento-intro">
-    <div class="container bento-intro-grid">
-      <figure class="tile tile-photo tile-tall" data-reveal>
-        <img src="assets/img/ka-08.jpg" alt="Подвійна стільниця з каменю на дерев'яній тумбі" loading="lazy">
-        <h3>Своє виробництво</h3>
-        <p class="tile-meta">Київ та Alicante · без посередників</p>
-      </figure>
-
-      <aside class="form-card" data-reveal>
+      <aside class="hero-form-card">
         <p class="label">Прорахунок за 1 годину</p>
-        <h3 class="form-title">Напишіть, що вам потрібно</h3>
+        <h2 class="form-title">Напишіть, що вам потрібно</h2>
         <form class="lead-form" data-form="hero" novalidate>
           <input type="text" name="name" placeholder="Ім'я" autocomplete="name" required>
           <input type="tel" name="phone" placeholder="Телефон" autocomplete="tel" required>
@@ -103,6 +78,23 @@
           <p class="form-note">Передзвонимо в робочий час. Без розсилок.</p>
         </form>
       </aside>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="trustbar">
+    <div class="container trustbar-grid">
+      <div><strong>14 років</strong><span>працюємо з каменем</span></div>
+      <div><strong>Своє виробництво</strong><span>Київ та Alicante</span></div>
+      <div><strong>5 років</strong><span>повної гарантії</span></div>
+      <div><strong>Від 5 днів</strong><span>і виріб готовий</span></div>
+    </div>
+  </section>
+
+  <!-- INTRO STATEMENT -->
+  <section class="statement">
+    <div class="container">
+      <h2 data-reveal>Точний замір під ваші стіни,<br><em>цілісні поверхні без зайвих швів</em><br>і термін, який ми називаємо до початку роботи</h2>
     </div>
   </section>
 
