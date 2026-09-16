@@ -84,7 +84,10 @@
       <svg viewBox="0 0 100 70" aria-hidden="true"><rect x="30" y="0" width="70" height="15"/><rect x="0" y="27.5" width="72" height="15"/><rect x="30" y="55" width="70" height="15"/></svg>
       <span class="photo-ph-label">${label}</span>
       <code class="photo-ph-file">assets/img/${file}</code>`;
-    if (img.parentElement) img.parentElement.replaceChild(box, img);
+    const parent = img.parentElement;
+    if (!parent) return;
+    parent.classList.add('has-ph');
+    parent.replaceChild(box, img);
   }
 
   document.querySelectorAll('img[data-ph]').forEach(img => {
@@ -144,13 +147,13 @@
   /* ── Header + sticky CTA ────────────────────────────────── */
   const header = document.getElementById('siteHeader');
   const sticky = document.getElementById('stickyCta');
-  const heroBg = document.getElementById('heroBg');
+  const heroImg = document.querySelector('#heroBg img');
 
   function onScroll() {
     const y = window.scrollY;
     header.classList.toggle('scrolled', y > 40);
     if (sticky) sticky.classList.toggle('is-visible', y > window.innerHeight * 0.6);
-    if (heroBg && y < window.innerHeight) heroBg.style.transform = `translateY(${y * 0.22}px)`;
+    if (heroImg && y < window.innerHeight) heroImg.style.transform = `scale(1.12) translateY(${y * 0.05}px)`;
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();

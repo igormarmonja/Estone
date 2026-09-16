@@ -14,8 +14,8 @@
 <meta property="og:image" content="https://estone.com.ua/assets/img/cover.jpg">
 <meta property="og:locale" content="uk_UA">
 
-<link rel="preload" href="assets/fonts/onest-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/onest-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/madefor-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/madefor-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -45,29 +45,61 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-bg" id="heroBg">
-      <img src="assets/img/cover.jpg" alt="Стільниця з натурального каменю виробництва ESTONE" fetchpriority="high">
-    </div>
-    <div class="hero-scrim"></div>
-    <div class="container hero-grid">
-      <div class="hero-text">
-        <p class="eyebrow eyebrow-light">ESTONE · своє виробництво, 14 років</p>
-        <h1>Виробництво виробів з каменю.<br>Чесно. Точно. Вчасно.</h1>
-        <p class="hero-sub">Реалізуємо в камені те, що намалював дизайнер.</p>
-        <ul class="hero-points">
-          <li>Точний замір під стіни: виріб стає без зазорів і допилювань на місці</li>
-          <li>Цілісні поверхні: без зайвих швів, у які забивається бруд і вода</li>
-          <li>Термін від 5 робочих днів · 5 років повної гарантії</li>
-        </ul>
-        <div class="hero-cta">
-          <a href="#lead" class="btn btn-primary" data-cta="hero">Порахувати вартість</a>
-          <a href="#produktsiia" class="btn btn-ghost" data-cta="hero-catalog">Що ми робимо</a>
+    <div class="container">
+      <div class="hero-top">
+        <div class="hero-title">
+          <p class="label">ESTONE · своє виробництво, 14 років</p>
+          <h1>Виробництво<br>виробів з каменю</h1>
+          <p class="hero-motto">Чесно. Точно. Вчасно.</p>
+        </div>
+        <div class="hero-stats">
+          <div><strong>14</strong><span>років з каменем</span></div>
+          <div><strong>5</strong><span>років гарантії</span></div>
+          <div><strong>5</strong><span>днів і виріб готовий</span></div>
         </div>
       </div>
 
-      <aside class="hero-form-card">
-        <h2 class="form-title">Прорахунок за 1 годину</h2>
-        <p class="form-lead">Напишіть, що вам потрібно. Передзвонимо і назвемо ціну.</p>
+      <figure class="hero-media" id="heroBg">
+        <img src="assets/img/cover.jpg" alt="Стільниця з натурального каменю виробництва ESTONE" fetchpriority="high">
+        <figcaption>
+          <span class="label label-light">Реалізуємо в камені те, що намалював дизайнер</span>
+          <a href="#lead" class="btn btn-primary" data-cta="hero">Порахувати вартість</a>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- INTRO STATEMENT -->
+  <section class="statement">
+    <div class="container">
+      <h2 data-reveal>Точний замір під ваші стіни,<br><em>цілісні поверхні без зайвих швів</em><br>і термін, який ми називаємо до початку роботи</h2>
+    </div>
+  </section>
+
+  <!-- VALUE BENTO + FORM -->
+  <section class="bento-intro">
+    <div class="container bento-intro-grid">
+      <div class="bento-col">
+        <article class="tile" data-reveal>
+          <span class="tile-arrow">↗</span>
+          <h3>Замір по факту</h3>
+          <p class="tile-meta">Виріб стає без зазорів і допилювань на місці</p>
+        </article>
+        <article class="tile tile-dark" data-reveal>
+          <span class="tile-arrow">↗</span>
+          <h3>Цілісні поверхні</h3>
+          <p class="tile-meta">Без зайвих швів, у які забивається бруд і вода</p>
+        </article>
+        <article class="tile" data-reveal>
+          <span class="tile-arrow">↗</span>
+          <h3>Своє виробництво</h3>
+          <p class="tile-meta">Київ та Alicante · без посередників</p>
+        </article>
+      </div>
+
+      <aside class="form-card" data-reveal>
+        <p class="label">Прорахунок за 1 годину</p>
+        <h3 class="form-title">Напишіть, що вам потрібно</h3>
         <form class="lead-form" data-form="hero" novalidate>
           <input type="text" name="name" placeholder="Ім'я" autocomplete="name" required>
           <input type="tel" name="phone" placeholder="Телефон" autocomplete="tel" required>
@@ -81,55 +113,86 @@
     </div>
   </section>
 
-  <!-- TRUST -->
-  <section class="trustbar">
-    <div class="container trustbar-grid">
-      <div><strong>14 років</strong><span>працюємо з каменем</span></div>
-      <div><strong>Своє виробництво</strong><span>Київ та Alicante</span></div>
-      <div><strong>5 років</strong><span>повної гарантії</span></div>
-      <div><strong>Від 5 днів</strong><span>і виріб готовий</span></div>
+  <!-- PRODUCT BENTO -->
+  <section class="overview" id="produktsiia">
+    <div class="container">
+      <div class="sec-head" data-reveal>
+        <div>
+          <p class="label">Продукція</p>
+          <h2>Що ми робимо</h2>
+        </div>
+        <p class="sec-note">Можна замовити одну стільницю, а можна всю квартиру чи об'єкт в одному камені</p>
+      </div>
+
+      <div class="bento">
+        <a href="#kukhnia" class="tile tile-photo tile-wide" data-reveal data-cta="ov-kukhnia">
+          <img src="assets/img/kukhnia-01.jpg" alt="Кухонна стільниця з каменю" loading="lazy" data-ph="Кухня: загальний план">
+          <span class="tile-arrow">↗</span>
+          <h3>Кухня</h3>
+          <p class="tile-meta">Стільниці · мийки · фартух · острів</p>
+        </a>
+        <a href="#vanna" class="tile" data-reveal data-cta="ov-vanna">
+          <span class="tile-arrow">↗</span>
+          <h3>Ванна кімната</h3>
+          <p class="tile-meta">23 моделі умивальників · піддони · панелі</p>
+        </a>
+        <a href="#pidvikonnia" class="tile tile-dark" data-reveal data-cta="ov-pidvikonnia">
+          <span class="tile-arrow">↗</span>
+          <h3>Підвіконня</h3>
+          <p class="tile-meta">Будь-яка довжина без стику · підвіконня-стіл</p>
+        </a>
+        <a href="#skhody" class="tile" data-reveal data-cta="ov-skhody">
+          <span class="tile-arrow">↗</span>
+          <h3>Сходи</h3>
+          <p class="tile-meta">Сходинки · підступенці · облицювання</p>
+        </a>
+        <a href="#interier" class="tile" data-reveal data-cta="ov-interier">
+          <span class="tile-arrow">↗</span>
+          <h3>Інтер'єр</h3>
+          <p class="tile-meta">Каміни · столи · стінові панелі</p>
+        </a>
+        <a href="#komertsiia" class="tile tile-photo" data-reveal data-cta="ov-komertsiia">
+          <img src="assets/img/komertsiia-01.jpg" alt="Ресепшн-стійка з каменю" loading="lazy" data-ph="Ресепшн-стійка">
+          <span class="tile-arrow">↗</span>
+          <h3>Комерція</h3>
+          <p class="tile-meta">Ресепшн · бари · прилавки · HoReCa</p>
+        </a>
+      </div>
     </div>
   </section>
 
-  <!-- PRODUCT OVERVIEW -->
-  <section class="overview" id="produktsiia">
-    <div class="container">
-      <p class="eyebrow" data-reveal>Продукція</p>
-      <h2 data-reveal>Що ми робимо</h2>
-      <p class="section-sub" data-reveal>Можна замовити одну стільницю, а можна всю квартиру чи об'єкт в одному камені.</p>
-      <div class="overview-grid">
-        <a href="#kukhnia" class="ov-card" data-reveal data-cta="ov-kukhnia"><span>01</span><h3>Кухня</h3><p>Стільниці, мийки, фартух, острів</p></a>
-        <a href="#vanna" class="ov-card" data-reveal data-cta="ov-vanna"><span>02</span><h3>Ванна кімната</h3><p>Умивальники, стільниці, піддони, панелі</p></a>
-        <a href="#pidvikonnia" class="ov-card" data-reveal data-cta="ov-pidvikonnia"><span>03</span><h3>Підвіконня</h3><p>Будь-яка довжина, підвіконня-стіл</p></a>
-        <a href="#skhody" class="ov-card" data-reveal data-cta="ov-skhody"><span>04</span><h3>Сходи</h3><p>Сходинки, підступенці, облицювання</p></a>
-        <a href="#interier" class="ov-card" data-reveal data-cta="ov-interier"><span>05</span><h3>Інтер'єр</h3><p>Каміни, столи, стінові панелі</p></a>
-        <a href="#komertsiia" class="ov-card" data-reveal data-cta="ov-komertsiia"><span>06</span><h3>Комерційні вироби</h3><p>Ресепшн, бари, прилавки, HoReCa</p></a>
-      </div>
+  <!-- BAND 1 -->
+  <section class="band">
+    <img src="assets/img/ka-07.jpg" alt="Інтер'єр ванної кімнати з каменем ESTONE" loading="lazy">
+    <div class="band-inner container">
+      <p class="label label-light">Одна відповідальність</p>
+      <h2>Заміряємо, робимо<br>і встановлюємо самі</h2>
     </div>
   </section>
 
   <!-- KITCHEN -->
   <section class="prod" id="kukhnia">
     <div class="container">
-      <div class="prod-head" data-reveal>
+      <div class="sec-head" data-reveal>
         <div>
+          <p class="label">01 · Кухня</p>
           <h2>Кухня</h2>
-          <p class="prod-lead">Стільниця з інтегрованою чашею та фартухом в один матеріал: суцільна герметична зона без зазорів і брудних кромок.</p>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="kukhnia">Порахувати кухню</a>
       </div>
+      <p class="prod-lead" data-reveal>Стільниця з інтегрованою чашею та фартухом в один матеріал: суцільна герметична зона без зазорів і брудних кромок.</p>
 
       <div class="prod-media" data-reveal>
         <figure class="media-main"><img src="assets/img/kukhnia-01.jpg" alt="Кухонна стільниця з каменю" loading="lazy" data-ph="Кухня: загальний план стільниці"></figure>
-        <figure class="media-side"><img src="assets/img/kukhnia-02.jpg" alt="Інтегрована мийка з каменю" loading="lazy" data-ph="Інтегрована мийка, крупний план"></figure>
-        <figure class="media-side"><img src="assets/img/kukhnia-03.jpg" alt="Стіновий фартух з каменю" loading="lazy" data-ph="Фартух і кут стільниці"></figure>
+        <figure><img src="assets/img/kukhnia-02.jpg" alt="Інтегрована мийка з каменю" loading="lazy" data-ph="Інтегрована мийка, крупний план"></figure>
+        <figure><img src="assets/img/kukhnia-03.jpg" alt="Стіновий фартух з каменю" loading="lazy" data-ph="Фартух і кут стільниці"></figure>
       </div>
 
-      <div class="prod-list">
-        <div class="prod-item" data-reveal><h3>Стільниці</h3><p>Кварц, акрил, керамограніт або натуральний камінь. Виріжемо під варильну поверхню і змішувач.</p></div>
-        <div class="prod-item" data-reveal><h3>Мийки</h3><p>Чашу робимо з того ж каменю, урівень зі стільницею. Ні бортика, ні шва, ні місця, де збирається бруд.</p></div>
-        <div class="prod-item" data-reveal><h3>Фартух</h3><p>Суцільний кам'яний фартух: поверхня без затирки, яка не вбирає жир і нагар. Точні вирізи під електрику та монтаж без розтягування ремонту.</p></div>
-        <div class="prod-item" data-reveal><h3>Острів та барна стійка</h3><p>Жодних зайвих швів на видимій зоні, акуратна підклейка торця потрібної товщини, перехід малюнка під 45° та підсилений каркас для надійності.</p></div>
+      <div class="bento bento-4">
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Стільниці</h3><p>Кварц, акрил, керамограніт або натуральний камінь. Виріжемо під варильну поверхню і змішувач.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Мийки</h3><p>Чашу робимо з того ж каменю, урівень зі стільницею. Ні бортика, ні шва, ні місця, де збирається бруд.</p></article>
+        <article class="tile tile-dark" data-reveal><span class="tile-arrow">↗</span><h3>Фартух</h3><p>Суцільний кам'яний фартух: поверхня без затирки, яка не вбирає жир і нагар. Точні вирізи під електрику та монтаж без розтягування ремонту.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Острів та барна стійка</h3><p>Жодних зайвих швів на видимій зоні, акуратна підклейка торця потрібної товщини, перехід малюнка під 45° та підсилений каркас для надійності.</p></article>
       </div>
     </div>
   </section>
@@ -137,21 +200,24 @@
   <!-- BATHROOM -->
   <section class="prod prod-alt" id="vanna">
     <div class="container">
-      <div class="prod-head" data-reveal>
+      <div class="sec-head" data-reveal>
         <div>
+          <p class="label">02 · Ванна кімната</p>
           <h2>Ванна кімната</h2>
-          <p class="prod-lead">У каталозі 23 моделі умивальників. Якщо жодна не підходить, зробимо за вашим ескізом. Камінь не боїться води, і грибок у ньому не заводиться.</p>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="vanna">Порахувати ванну</a>
       </div>
+      <p class="prod-lead" data-reveal>У каталозі 23 моделі умивальників. Якщо жодна не підходить, зробимо за вашим ескізом. Камінь не боїться води, і грибок у ньому не заводиться.</p>
 
       <div class="catalog-block">
-        <h3 class="sub-h" data-reveal>Каталог умивальників, 23 моделі</h3>
-        <div class="series-legend" data-reveal>
-          <span><b>Leonardo</b> — незвичні форми</span>
-          <span><b>Monet</b> — класика</span>
-          <span><b>Kazimir</b> — прямі кути</span>
-          <span><b>Salvador</b> — вільна форма</span>
+        <div class="catalog-head" data-reveal>
+          <h3 class="sub-h">Каталог умивальників, 23 моделі</h3>
+          <div class="series-legend">
+            <span><b>Leonardo</b> незвичні форми</span>
+            <span><b>Monet</b> класика</span>
+            <span><b>Kazimir</b> прямі кути</span>
+            <span><b>Salvador</b> вільна форма</span>
+          </div>
         </div>
         <div class="filter-tabs" data-reveal>
           <button class="filter-tab is-active" data-filter="all">Усі 23</button>
@@ -164,23 +230,23 @@
       </div>
 
       <h3 class="sub-h" data-reveal>Злив на вибір</h3>
-      <div class="drain-grid">
-        <figure class="drain-card" data-reveal>
+      <div class="bento bento-4">
+        <article class="tile tile-photo" data-reveal>
           <img src="assets/img/drain-invisible.jpg" alt="Злив Invisible" loading="lazy">
-          <figcaption><h3>Invisible</h3><p>Отвір під звичайний зливний клапан, який ви оберете самі.</p></figcaption>
-        </figure>
-        <figure class="drain-card" data-reveal>
+          <h3>Invisible</h3><p class="tile-meta">Отвір під звичайний клапан</p>
+        </article>
+        <article class="tile tile-photo" data-reveal>
           <img src="assets/img/drain-cover.jpg" alt="Злив Cover" loading="lazy">
-          <figcaption><h3>Cover</h3><p>Накривка з того ж каменю, лежить урівень з дном чаші.</p></figcaption>
-        </figure>
-        <figure class="drain-card" data-reveal>
+          <h3>Cover</h3><p class="tile-meta">Накривка з того ж каменю</p>
+        </article>
+        <article class="tile tile-photo" data-reveal>
           <img src="assets/img/drain-clickclack.jpg" alt="Злив Click-Clack" loading="lazy">
-          <figcaption><h3>Click-Clack</h3><p>Натиснули — відкрився, натиснули ще раз — закрився.</p></figcaption>
-        </figure>
-        <figure class="drain-card" data-reveal>
+          <h3>Click-Clack</h3><p class="tile-meta">Натиснув і закрився</p>
+        </article>
+        <article class="tile tile-photo" data-reveal>
           <img src="assets/img/drain-black.jpg" alt="Прихований злив Black" loading="lazy">
-          <figcaption><h3>Black</h3><p>Зміщений і прихований, знімати нічого не треба.</p></figcaption>
-        </figure>
+          <h3>Black</h3><p class="tile-meta">Зміщений і прихований</p>
+        </article>
       </div>
     </div>
   </section>
@@ -188,24 +254,25 @@
   <!-- WINDOWSILLS -->
   <section class="prod" id="pidvikonnia">
     <div class="container">
-      <div class="prod-head" data-reveal>
+      <div class="sec-head" data-reveal>
         <div>
+          <p class="label">03 · Підвіконня</p>
           <h2>Підвіконня</h2>
-          <p class="prod-lead">Суцільне підвіконня без стиків: ідеальне входження у відкоси без зазорів, фабричні прорізи під вентиляцію радіаторів і будь-яка форма торця.</p>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="pidvikonnia">Порахувати підвіконня</a>
       </div>
+      <p class="prod-lead" data-reveal>Суцільне підвіконня без стиків: ідеальне входження у відкоси без зазорів, фабричні прорізи під вентиляцію радіаторів і будь-яка форма торця.</p>
 
       <div class="prod-media two" data-reveal>
         <figure><img src="assets/img/pidvikonnia-01.jpg" alt="Підвіконня з каменю" loading="lazy" data-ph="Підвіконня: загальний план"></figure>
         <figure><img src="assets/img/pidvikonnia-02.jpg" alt="Підвіконня-стіл з каменю" loading="lazy" data-ph="Підвіконня-стіл або крупний план торця"></figure>
       </div>
 
-      <div class="prod-list">
-        <div class="prod-item" data-reveal><h3>Без стиків навіть на великих прольотах</h3><p>Використовуємо великоформатний камінь на повну довжину: ідеальна цілісна лінія замість двох зістикованих частин.</p></div>
-        <div class="prod-item" data-reveal><h3>Жодних слідів від сонця й нагріву</h3><p>На відміну від пластикових чи дерев'яних підвіконь, камінь не вигорає на панорамних вікнах і не псується від гарячої батареї під ним.</p></div>
-        <div class="prod-item" data-reveal><h3>Підвіконня, що переходить у стіл</h3><p>Нуль зайвих опор, приховані кронштейни та монолітне полотно без стиків.</p></div>
-        <div class="prod-item" data-reveal><h3>Жодних пластикових кутиків і накладок</h3><p>Коли підвіконня вирізане строго під фактичний розворот укосів, лінія примикання виглядає монолітно і не потребує маскування планками.</p></div>
+      <div class="bento bento-4">
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Без стиків навіть на великих прольотах</h3><p>Використовуємо великоформатний камінь на повну довжину: ідеальна цілісна лінія замість двох зістикованих частин.</p></article>
+        <article class="tile tile-dark" data-reveal><span class="tile-arrow">↗</span><h3>Жодних слідів від сонця й нагріву</h3><p>На відміну від пластикових чи дерев'яних підвіконь, камінь не вигорає на панорамних вікнах і не псується від гарячої батареї під ним.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Підвіконня, що переходить у стіл</h3><p>Нуль зайвих опор, приховані кронштейни та монолітне полотно без стиків.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Жодних пластикових кутиків і накладок</h3><p>Коли підвіконня вирізане строго під фактичний розворот укосів, лінія примикання виглядає монолітно і не потребує маскування планками.</p></article>
       </div>
     </div>
   </section>
@@ -213,50 +280,61 @@
   <!-- STAIRS -->
   <section class="prod prod-alt" id="skhody">
     <div class="container">
-      <div class="prod-head" data-reveal>
+      <div class="sec-head" data-reveal>
         <div>
+          <p class="label">04 · Сходи</p>
           <h2>Сходи</h2>
-          <p class="prod-lead">Облицювання сходів каменем: сходинки та підсходинки за фактичними розмірами кожного підйому — вирівнюємо марш і прибираємо похибки бетону.</p>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="skhody">Порахувати сходи</a>
       </div>
+      <p class="prod-lead" data-reveal>Облицювання сходів каменем: сходинки та підсходинки за фактичними розмірами кожного підйому, вирівнюємо марш і прибираємо похибки бетону.</p>
 
       <div class="prod-media two" data-reveal>
         <figure><img src="assets/img/skhody-01.jpg" alt="Сходи з каменю" loading="lazy" data-ph="Сходи: загальний план маршу"></figure>
         <figure><img src="assets/img/skhody-02.jpg" alt="Облицювання сходів каменем" loading="lazy" data-ph="Крупний план сходинки й підступенця"></figure>
       </div>
 
-      <div class="prod-list">
-        <div class="prod-item" data-reveal><h3>Облицювання бетонних маршів</h3><p>Виправляємо похибки будівельної заливки: кожна сходинка виготовляється за фактичним заміром, а не підганяється під шаблон.</p></div>
-        <div class="prod-item" data-reveal><h3>Плавний перехід прожилок</h3><p>Проєктуємо карту розкрою ще до порізки каменю: природний візерунок плавно підіймається маршем без різких зрізів і випадкових фрагментів.</p></div>
-        <div class="prod-item" data-reveal><h3>Протиковзні рішення</h3><p>Фрезеровані насічки або матова фактура проступи для безпечного кроку на ганку, у басейні чи громадських місцях.</p></div>
-        <div class="prod-item" data-reveal><h3>Захист стін під час прибирання</h3><p>Пристінний плінтус із каменю захищає фарбу чи декоративну штукатурку від води та взуття, а ідеально оброблений торець закриває внутрішню структуру матеріалу.</p></div>
+      <div class="bento bento-4">
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Облицювання бетонних маршів</h3><p>Виправляємо похибки будівельної заливки: кожна сходинка виготовляється за фактичним заміром, а не підганяється під шаблон.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Плавний перехід прожилок</h3><p>Проєктуємо карту розкрою ще до порізки каменю: природний візерунок плавно підіймається маршем без різких зрізів і випадкових фрагментів.</p></article>
+        <article class="tile tile-dark" data-reveal><span class="tile-arrow">↗</span><h3>Протиковзні рішення</h3><p>Фрезеровані насічки або матова фактура проступи для безпечного кроку на ганку, у басейні чи громадських місцях.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Захист стін під час прибирання</h3><p>Пристінний плінтус із каменю захищає фарбу чи декоративну штукатурку від води та взуття, а ідеально оброблений торець закриває внутрішню структуру матеріалу.</p></article>
       </div>
+    </div>
+  </section>
+
+  <!-- BAND 2 -->
+  <section class="band">
+    <img src="assets/img/le-06.jpg" alt="Мармурова чаша на постаменті ESTONE" loading="lazy">
+    <div class="band-inner container">
+      <p class="label label-light">Будь-яка складність</p>
+      <h2>Те, що не роблять<br>на потоці</h2>
     </div>
   </section>
 
   <!-- INTERIOR -->
   <section class="prod" id="interier">
     <div class="container">
-      <div class="prod-head" data-reveal>
+      <div class="sec-head" data-reveal>
         <div>
+          <p class="label">05 · Інтер'єр</p>
           <h2>Індивідуальні кам'яні вироби під ваш простір</h2>
-          <p class="prod-lead">Каміни, обідні столи, акцентні стіни й консолі. Беремо в роботу проєкти будь-якої складності: самі проєктуємо конструктив, вузли підвісу та приховані каркаси.</p>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="interier">Обговорити проєкт</a>
       </div>
+      <p class="prod-lead" data-reveal>Каміни, обідні столи, акцентні стіни й консолі. Беремо в роботу проєкти будь-якої складності: самі проєктуємо конструктив, вузли підвісу та приховані каркаси.</p>
 
       <div class="prod-media" data-reveal>
         <figure class="media-main"><img src="assets/img/interier-01.jpg" alt="Облицювання каміна каменем" loading="lazy" data-ph="Камін, облицювання"></figure>
-        <figure class="media-side"><img src="assets/img/interier-02.jpg" alt="Стіл з каменю" loading="lazy" data-ph="Стіл або консоль з каменю"></figure>
-        <figure class="media-side"><img src="assets/img/interier-03.jpg" alt="Стінові панелі з каменю" loading="lazy" data-ph="Стінове облицювання / ТВ-зона"></figure>
+        <figure><img src="assets/img/interier-02.jpg" alt="Стіл з каменю" loading="lazy" data-ph="Стіл або консоль з каменю"></figure>
+        <figure><img src="assets/img/interier-03.jpg" alt="Стінові панелі з каменю" loading="lazy" data-ph="Стінове облицювання / ТВ-зона"></figure>
       </div>
 
-      <div class="prod-list">
-        <div class="prod-item" data-reveal><h3>Облицювання камінів</h3><p>Матеріали, що не бояться жару, будь-яка складність рельєфу та безпечна посадка на топку.</p></div>
-        <div class="prod-item" data-reveal><h3>Столи з каменю</h3><p>Обідні, журнальні та консолі: підбір розкладки прожилок, торець будь-якої товщини під 45° та посилена основа.</p></div>
-        <div class="prod-item" data-reveal><h3>Стінові панелі та ТВ-зони</h3><p>Великий формат від підлоги до стелі, мінімум швів і надійне приховане кріплення.</p></div>
-        <div class="prod-item" data-reveal><h3>Нестандарт за ескізом</h3><p>Складна геометрія, радіуси, нестандартні вирізи — те, що не роблять інші.</p></div>
+      <div class="bento bento-4">
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Облицювання камінів</h3><p>Матеріали, що не бояться жару, будь-яка складність рельєфу та безпечна посадка на топку.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Столи з каменю</h3><p>Обідні, журнальні та консолі: підбір розкладки прожилок, торець будь-якої товщини під 45° та посилена основа.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Стінові панелі та ТВ-зони</h3><p>Великий формат від підлоги до стелі, мінімум швів і надійне приховане кріплення.</p></article>
+        <article class="tile tile-dark" data-reveal><span class="tile-arrow">↗</span><h3>Нестандарт за ескізом</h3><p>Складна геометрія, радіуси, нестандартні вирізи — те, що не роблять інші.</p></article>
       </div>
     </div>
   </section>
@@ -264,13 +342,14 @@
   <!-- COMMERCIAL -->
   <section class="prod prod-alt" id="komertsiia">
     <div class="container">
-      <div class="prod-head" data-reveal>
+      <div class="sec-head" data-reveal>
         <div>
+          <p class="label">06 · Комерція</p>
           <h2>Комерційні вироби</h2>
-          <p class="prod-lead">Об'єкти, де поверхню миють щодня і не шкодують. Тут важливо, що буде з каменем через рік, а не як він виглядає на фото.</p>
         </div>
         <a href="#lead" class="btn btn-primary" data-cta="komertsiia">Порахувати об'єкт</a>
       </div>
+      <p class="prod-lead" data-reveal>Об'єкти, де поверхню миють щодня і не шкодують. Тут важливо, що буде з каменем через рік, а не як він виглядає на фото.</p>
 
       <div class="prod-media four" data-reveal>
         <figure><img src="assets/img/komertsiia-01.jpg" alt="Ресепшн-стійка з каменю" loading="lazy" data-ph="Ресепшн-стійка"></figure>
@@ -279,67 +358,53 @@
         <figure><img src="assets/img/komertsiia-04.jpg" alt="Груповий умивальник з каменю" loading="lazy" data-ph="Груповий умивальник або прилавок"></figure>
       </div>
 
-      <div class="prod-list">
-        <div class="prod-item" data-reveal><h3>Ресепшн і бари</h3><p>Складна криволінійна геометрія, логотип у тілі каменю та довгі прольоти без видимих стиків.</p></div>
-        <div class="prod-item" data-reveal><h3>Столи для HoReCa</h3><p>Стійкість до пошкоджень, хімії, гарячого посуду та швидка локальна реставрація без заміни стільниці.</p></div>
-        <div class="prod-item" data-reveal><h3>Торгові прилавки</h3><p>Готове серійне рішення, що тиражується на всю мережу за єдиним кресленням і декором.</p></div>
-        <div class="prod-item" data-reveal><h3>Групові умивальники</h3><p>Суцільне полотно на 2–6 чаш без проміжних стиків і в антивандальному виконанні.</p></div>
+      <div class="bento bento-4">
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Ресепшн і бари</h3><p>Складна криволінійна геометрія, логотип у тілі каменю та довгі прольоти без видимих стиків.</p></article>
+        <article class="tile tile-dark" data-reveal><span class="tile-arrow">↗</span><h3>Столи для HoReCa</h3><p>Стійкість до пошкоджень, хімії, гарячого посуду та швидка локальна реставрація без заміни стільниці.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Торгові прилавки</h3><p>Готове серійне рішення, що тиражується на всю мережу за єдиним кресленням і декором.</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Групові умивальники</h3><p>Суцільне полотно на 2–6 чаш без проміжних стиків і в антивандальному виконанні.</p></article>
       </div>
     </div>
   </section>
 
   <!-- MATERIALS -->
-  <section class="materials" id="materialy">
+  <section class="prod" id="materialy">
     <div class="container">
-      <p class="eyebrow" data-reveal>Матеріали</p>
-      <h2 data-reveal>З чого робимо</h2>
-      <p class="section-sub" data-reveal>Підкажемо, що підійде під вашу задачу і бюджет. Дорожче не завжди означає краще.</p>
-      <div class="mat-grid">
-        <div class="mat-item" data-reveal>
-          <h3>Акриловий камінь</h3>
-          <p>Тримає суцільну поверхню без видимих швів і гнеться в будь-яку форму. Подряпину можна відшліфувати прямо на місці.</p>
-          <span class="mat-note">Ванна, складні форми</span>
+      <div class="sec-head" data-reveal>
+        <div>
+          <p class="label">Матеріали</p>
+          <h2>З чого робимо</h2>
         </div>
-        <div class="mat-item" data-reveal>
-          <h3>Кварцовий камінь</h3>
-          <p>Твердіший за акрил. Не боїться абразиву й побутової хімії, не вигорає на сонці.</p>
-          <span class="mat-note">Кухня, підвіконня</span>
-        </div>
-        <div class="mat-item" data-reveal>
-          <h3>Керамограніт</h3>
-          <p>Спокійно переживе гарячу каструлю, кислоту і пряме сонце. Плита тонка, але міцна, і буває дуже великого формату.</p>
-          <span class="mat-note">Кухня, панелі</span>
-        </div>
-        <div class="mat-item" data-reveal>
-          <h3>Натуральний камінь</h3>
-          <p>Кожен блок зі своїм малюнком, другого такого не буде. Догляд потрібен акуратніший, і ми кажемо про це до замовлення, а не після.</p>
-          <span class="mat-note">Сходи, каміни, акценти</span>
-        </div>
+        <p class="sec-note">Підкажемо, що підійде під вашу задачу і бюджет. Дорожче не завжди означає краще</p>
+      </div>
+      <div class="bento bento-4">
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Акриловий камінь</h3><p>Тримає суцільну поверхню без видимих швів і гнеться в будь-яку форму. Подряпину можна відшліфувати прямо на місці.</p><p class="tile-meta">Ванна · складні форми</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Кварцовий камінь</h3><p>Твердіший за акрил. Не боїться абразиву й побутової хімії, не вигорає на сонці.</p><p class="tile-meta">Кухня · підвіконня</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Керамограніт</h3><p>Спокійно переживе гарячу каструлю, кислоту і пряме сонце. Плита тонка, але міцна, і буває дуже великого формату.</p><p class="tile-meta">Кухня · панелі</p></article>
+        <article class="tile" data-reveal><span class="tile-arrow">↗</span><h3>Натуральний камінь</h3><p>Кожен блок зі своїм малюнком, другого такого не буде. Догляд потрібен акуратніший, і ми кажемо про це до замовлення, а не після.</p><p class="tile-meta">Сходи · каміни · акценти</p></article>
       </div>
     </div>
   </section>
 
   <!-- PRICE -->
-  <section class="price" id="price">
-    <div class="container price-inner">
-      <div class="price-text" data-reveal>
-        <p class="eyebrow">Ціна</p>
-        <h2>Від чого залежить вартість</h2>
-        <p>Точну суму скажемо після заміру. Але порядок цифр назвемо протягом години, щойно дасте розміри. Без зустрічей і без зобов'язань.</p>
-        <ul class="price-list">
-          <li>Матеріал і декор</li>
-          <li>Розмір виробу й товщина плити</li>
-          <li>Складність форми</li>
-          <li>Вирізи, отвори, тип кромки</li>
-          <li>Скільки буде стиків</li>
-          <li>Доставка та монтаж</li>
-        </ul>
+  <section class="prod prod-alt" id="price">
+    <div class="container">
+      <div class="sec-head" data-reveal>
+        <div>
+          <p class="label">Ціна</p>
+          <h2>Від чого залежить вартість</h2>
+        </div>
+        <a href="#lead" class="btn btn-primary" data-cta="price">Дізнатись ціну</a>
       </div>
-      <div class="price-cta" data-reveal>
-        <h3>Порахуємо безкоштовно</h3>
-        <p>Надішліть розміри або креслення. У відповідь отримаєте ціну, варіанти матеріалу і термін.</p>
-        <a href="#lead" class="btn btn-primary btn-full" data-cta="price">Дізнатись ціну</a>
-      </div>
+      <p class="prod-lead" data-reveal>Точну суму скажемо після заміру. Але порядок цифр назвемо протягом години, щойно дасте розміри. Без зустрічей і без зобов'язань.</p>
+      <ul class="chips" data-reveal>
+        <li>Матеріал і декор</li>
+        <li>Розмір і товщина плити</li>
+        <li>Складність форми</li>
+        <li>Вирізи, отвори, кромка</li>
+        <li>Кількість стиків</li>
+        <li>Доставка та монтаж</li>
+      </ul>
     </div>
   </section>
 
@@ -347,23 +412,24 @@
   <section class="b2b" id="b2b">
     <div class="container b2b-inner">
       <div data-reveal>
-        <p class="eyebrow">Для бізнесу</p>
-        <h2>Студіям, дизайнерам і забудовникам</h2>
-        <p>Робимо за вашими кресленнями і тримаємо терміни. Дамо зразки під проєкт і приїдемо на об'єкт, якщо треба.
-        Для постійних і великих замовлень умови окремі, обговоримо.</p>
+        <p class="label label-light">Для бізнесу</p>
+        <h2>Студіям, дизайнерам<br>і забудовникам</h2>
+        <p>Робимо за вашими кресленнями і тримаємо терміни. Дамо зразки під проєкт і приїдемо на об'єкт, якщо треба. Для постійних і великих замовлень умови окремі, обговоримо.</p>
       </div>
       <div class="b2b-actions" data-reveal>
-        <a href="#lead" class="btn btn-ghost-dark" data-cta="b2b">Обговорити співпрацю</a>
-        <a href="#" class="b2b-phone" data-phone-link data-cta="b2b-phone">Подзвонити: <span data-phone-display></span></a>
+        <a href="#lead" class="btn btn-light" data-cta="b2b">Обговорити співпрацю</a>
+        <a href="#" class="b2b-phone" data-phone-link data-cta="b2b-phone"><span data-phone-display></span></a>
       </div>
     </div>
   </section>
 
   <!-- FAQ -->
   <section class="faq" id="faq">
-    <div class="container">
-      <p class="eyebrow" data-reveal>Питання</p>
-      <h2 data-reveal>Що питають найчастіше</h2>
+    <div class="container faq-inner">
+      <div class="faq-head" data-reveal>
+        <p class="label">Питання</p>
+        <h2>Що питають<br>найчастіше</h2>
+      </div>
       <div class="faq-list" data-reveal>
         <details>
           <summary>Скільки чекати?</summary>
@@ -397,8 +463,8 @@
   <section class="lead" id="lead">
     <div class="container lead-inner">
       <div class="lead-text" data-reveal>
-        <p class="eyebrow">Залишилось найпростіше</p>
-        <h2>Напишіть розміри, порахуємо за годину</h2>
+        <p class="label">Залишилось найпростіше</p>
+        <h2>Напишіть розміри,<br>порахуємо за годину</h2>
         <ul class="lead-points">
           <li>Підберемо матеріал і декор під вашу задачу</li>
           <li>Ціна одразу з доставкою і монтажем</li>
@@ -433,7 +499,7 @@
         <svg class="logo-mark" viewBox="0 0 100 70" aria-hidden="true"><rect x="30" y="0" width="70" height="15"/><rect x="0" y="27.5" width="72" height="15"/><rect x="30" y="55" width="70" height="15"/></svg>
         <span class="logo-word">ESTONE</span>
       </a>
-      <p class="footer-tagline">STONE. DESIGNED FOR LIVING.</p>
+      <p class="footer-tagline">Stone. Designed for living.</p>
     </div>
     <div class="footer-col">
       <h4>Контакти</h4>
