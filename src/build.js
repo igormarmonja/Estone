@@ -35,11 +35,11 @@ const jsonld = `<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "GeneralContractor",
-  "name": "Gridalta Reformas",
+  "name": "Gridalta Grupo",
   "description": "Empresa de reformas integrales, cocinas, baños y mantenimiento en Valencia y su provincia.",
   "url": "https://www.gridalta.es/",
-  "logo": "https://www.gridalta.es/assets/img/logo.svg",
-  "image": "https://www.gridalta.es/assets/img/og.svg",
+  "logo": "https://www.gridalta.es/assets/img/marca.png",
+  "image": "https://www.gridalta.es/assets/img/hero.jpg",
   "telephone": "+34600000000",
   "email": "hola@gridalta.es",
   "priceRange": "$$",
@@ -76,7 +76,9 @@ pages.forEach(function (page) {
     .replace(/{{CANON}}/g, page.canon);
 
   if (page.out === 'index.html') {
-    html = html.replace('</head>', jsonld + '\n</head>');
+    // Функція-замінник, а не рядок: інакше JS тлумачить $$ у JSON-LD
+    // як екранований $ і псує значення (наприклад, priceRange).
+    html = html.replace('</head>', () => jsonld + '\n</head>');
   }
 
   // Todas las páginas abren con hero o banner oscuro: texto claro hasta que la
