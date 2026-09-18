@@ -1285,16 +1285,19 @@ body.is-locked { overflow: hidden; }
 
 /* Замість затемнення — світла вуаль зліва, під колонкою тексту */
 .hero--light .hero__media::after {
+  /* Кадр світлий і дрібнодетальний по всій площі, тож вуаль тримаємо
+     щільною до самого краю текстової колонки і лише потім відпускаємо. */
   background:
     linear-gradient(90deg,
-      rgba(251,249,245,.94) 0%,
-      rgba(251,249,245,.78) 34%,
-      rgba(251,249,245,.28) 62%,
-      rgba(251,249,245,.05) 100%),
+      rgba(251,249,245,.88) 0%,
+      rgba(251,249,245,.76) 38%,
+      rgba(251,249,245,.48) 58%,
+      rgba(251,249,245,.16) 78%,
+      rgba(251,249,245,0) 96%),
     linear-gradient(180deg,
-      rgba(251,249,245,.62) 0%,
-      rgba(251,249,245,.10) 28%,
-      rgba(251,249,245,.42) 100%);
+      rgba(251,249,245,.55) 0%,
+      rgba(251,249,245,.12) 26%,
+      rgba(251,249,245,.38) 100%);
 }
 
 .hero--light .overline { color: var(--clay); }
@@ -1320,3 +1323,34 @@ body.is-locked { overflow: hidden; }
 .masthead--over-light .wordmark i { color: var(--clay); }
 .masthead--over-light .wordmark__mark { filter: none; }
 .masthead--over-light .wordmark b { text-shadow: none; }
+
+/* --------------------------------------------------------------------------
+   Банер на вузькому екрані
+   Кадр «до/після» ділиться по горизонталі, тож вертикальне обрізання
+   з'їдало б половину задуму. Замість повноекранної підкладки показуємо
+   знімок смугою 16:10 — він видно майже цілком — а текст кладемо під ним
+   на чистому тлі.
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .hero {
+    display: block;
+    min-height: 0;
+    background: var(--paper);
+    padding-top: clamp(4.75rem, 21vw, 6.5rem);   /* місце під фіксовану шапку */
+  }
+
+  .hero__media {
+    position: relative;
+    inset: auto;
+    aspect-ratio: 16 / 9;
+  }
+  .hero--light .hero__media::after,
+  .hero__media::after { display: none; }         /* вуаль більше не потрібна */
+
+  .hero__inner {
+    padding-top: clamp(2rem, 7vw, 2.75rem);
+    padding-bottom: clamp(2.5rem, 9vw, 3.5rem);
+  }
+
+  .hero__meta { margin-top: 2.25rem; padding-top: 1.5rem; }
+}
