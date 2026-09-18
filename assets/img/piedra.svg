@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="g8" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5c6265"/>
+      <stop offset="45%" stop-color="#434849"/>
+      <stop offset="78%" stop-color="#2f3335"/>
+      <stop offset="100%" stop-color="#1d2021"/>
+    </linearGradient>
+    <radialGradient id="l8" cx="25%" cy="20%" r="85%">
+      <stop offset="0%" stop-color="#fff" stop-opacity=".28"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="n8" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" seed="8"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g8)"/>
+  
+    <g stroke="rgba(255,255,255,.30)" stroke-width="2.5" fill="none">
+      <path d="M-50 340C220 250 420 460 700 380S1180 180 1680 300"/>
+      <path d="M-50 620C260 540 460 730 760 650S1240 470 1680 580"/>
+    </g>
+    <g stroke="rgba(0,0,0,.16)" stroke-width="4" fill="none">
+      <path d="M-50 430C280 350 500 560 800 470S1300 280 1680 400"/>
+      <path d="M-50 760C230 700 520 860 820 780S1300 640 1680 730"/>
+    </g>
+  <rect width="1600" height="1000" fill="url(#l8)"/>
+  <rect width="1600" height="1000" filter="url(#n8)" opacity=".13" style="mix-blend-mode:overlay"/>
+</svg>

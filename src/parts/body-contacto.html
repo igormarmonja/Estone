@@ -1,0 +1,159 @@
+<main id="main">
+
+  <section class="banner">
+    <div class="banner__media surface finish-ink"><img src="assets/img/detalle.svg" alt="" aria-hidden="true"></div>
+    <div class="shell banner__inner">
+      <nav class="crumbs" aria-label="Migas de pan">
+        <a href="index.html">Inicio</a><span>/</span><span>Contacto</span>
+      </nav>
+      <h1 class="display-l reveal">Pide tu presupuesto</h1>
+      <p class="lede reveal" data-delay="1" style="margin-top:1.5rem">
+        Rellena el formulario o llámanos. Te visitamos en 48 horas y recibes un presupuesto
+        cerrado, sin coste ni compromiso.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell contact-grid">
+
+      <div class="reveal">
+        <p class="overline">Formulario</p>
+        <h2 class="display-s" style="margin-bottom:2.5rem">Cuéntanos qué necesitas</h2>
+
+        <form class="form" data-form novalidate>
+          <div class="form__grid">
+            <div class="field">
+              <label for="nombre">Nombre y apellidos <span class="req">*</span></label>
+              <input type="text" id="nombre" name="nombre" autocomplete="name" required>
+              <span class="field__error"></span>
+            </div>
+            <div class="field">
+              <label for="telefono">Teléfono <span class="req">*</span></label>
+              <input type="tel" id="telefono" name="telefono" autocomplete="tel" placeholder="+34 600 000 000" required>
+              <span class="field__error"></span>
+            </div>
+          </div>
+
+          <div class="form__grid">
+            <div class="field">
+              <label for="email">Correo electrónico <span class="req">*</span></label>
+              <input type="email" id="email" name="email" autocomplete="email" required>
+              <span class="field__error"></span>
+            </div>
+            <div class="field">
+              <label for="localidad">Localidad de la obra <span class="req">*</span></label>
+              <input type="text" id="localidad" name="localidad" placeholder="Alicante, Jávea…" required>
+              <span class="field__error"></span>
+            </div>
+          </div>
+
+          <div class="form__grid">
+            <div class="field">
+              <label for="servicio">Tipo de trabajo <span class="req">*</span></label>
+              <select id="servicio" name="servicio" required>
+                <option value="">Selecciona una opción</option>
+                <option>Reforma integral</option>
+                <option>Cocina</option>
+                <option>Baño</option>
+                <option>Mantenimiento o reparación</option>
+                <option>Exteriores y fachada</option>
+                <option>Instalaciones</option>
+                <option>Otro</option>
+              </select>
+              <span class="field__error"></span>
+            </div>
+            <div class="field">
+              <label for="plazo">¿Cuándo querrías empezar?</label>
+              <select id="plazo" name="plazo">
+                <option value="">Sin preferencia</option>
+                <option>Lo antes posible</option>
+                <option>En 1–3 meses</option>
+                <option>En 3–6 meses</option>
+                <option>Solo estoy informándome</option>
+              </select>
+              <span class="field__error"></span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="mensaje">Describe el proyecto <span class="req">*</span></label>
+            <textarea id="mensaje" name="mensaje" rows="5" placeholder="Superficie aproximada, estancias a reformar, ideas que tengas…" required></textarea>
+            <span class="field__error"></span>
+          </div>
+
+          <label class="consent">
+            <input type="checkbox" id="rgpd" name="rgpd" required>
+            <span>He leído y acepto la <a href="privacidad.html">política de privacidad</a>. Mis datos se usarán únicamente para responder a esta solicitud. <span class="req">*</span></span>
+          </label>
+
+          <div class="form__status" data-form-status role="status" aria-live="polite"></div>
+
+          <div>
+            <button class="btn btn--primary" type="submit">
+              <span>Enviar solicitud</span>
+              <svg class="arrow" width="16" height="10" viewBox="0 0 16 10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M0 5h14M10 1l4 4-4 4"/></svg>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="reveal" data-delay="1">
+        <p class="overline">Contacto directo</p>
+        <dl class="contact-list">
+          <div class="contact-item">
+            <dt>Teléfono</dt>
+            <dd><a href="tel:+34600000000">+34 600 000 000</a><span>Lunes a viernes, 8:00–18:00</span></dd>
+          </div>
+          <div class="contact-item">
+            <dt>WhatsApp</dt>
+            <dd><a href="https://wa.me/34600000000" target="_blank" rel="noopener">+34 600 000 000</a><span>Para avisos y urgencias</span></dd>
+          </div>
+          <div class="contact-item">
+            <dt>Correo</dt>
+            <dd><a href="mailto:hola@gridalta.es">hola@gridalta.es</a><span>Respondemos en menos de 24 h laborables</span></dd>
+          </div>
+          <div class="contact-item">
+            <dt>Taller y oficina</dt>
+            <dd>Avda. de la Constitución 24<span>03001 Alicante</span></dd>
+          </div>
+          <div class="contact-item">
+            <dt>Idiomas</dt>
+            <dd>Español · English · Українська</dd>
+          </div>
+        </dl>
+
+        <div class="surface finish-travertine" style="aspect-ratio:4/3;margin-top:2.5rem">
+          <img src="assets/img/taller.svg" alt="Taller de Gridalta en Alicante">
+        </div>
+
+        <p class="muted" style="margin-top:1.5rem;font-size:.9375rem">
+          ¿Una urgencia fuera de horario? Escríbenos por WhatsApp y el equipo de guardia
+          te contactará lo antes posible.
+        </p>
+      </aside>
+
+    </div>
+  </section>
+
+  <section class="section section--stone section--tight">
+    <div class="shell">
+      <div class="sec-head reveal">
+        <div>
+          <p class="overline">Cobertura</p>
+          <h2 class="display-m">Municipios donde trabajamos</h2>
+        </div>
+        <p class="lede">Si el tuyo no aparece, pregúntanos igualmente.</p>
+      </div>
+      <div class="zones reveal">
+        <span class="zone">Alicante</span><span class="zone">San Juan</span><span class="zone">Mutxamel</span>
+        <span class="zone">Elche</span><span class="zone">Santa Pola</span><span class="zone">Guardamar</span>
+        <span class="zone">Torrevieja</span><span class="zone">Orihuela Costa</span><span class="zone">Pilar de la Horadada</span>
+        <span class="zone">Villajoyosa</span><span class="zone">Benidorm</span><span class="zone">Altea</span>
+        <span class="zone">Calpe</span><span class="zone">Moraira</span><span class="zone">Jávea</span>
+        <span class="zone">Dénia</span><span class="zone">Pego</span><span class="zone">Murcia</span>
+      </div>
+    </div>
+  </section>
+
+</main>
