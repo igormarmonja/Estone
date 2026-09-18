@@ -1,7 +1,7 @@
 # Gridalta — sitio web
 
-Sitio corporativo de **Gridalta**, empresa de reformas y mantenimiento en Alicante y
-la Costa Blanca (España). HTML, CSS y JavaScript estáticos: sin framework, sin
+Sitio corporativo de **Gridalta**, empresa de reformas y mantenimiento en Valencia
+y su provincia (España). HTML, CSS y JavaScript estáticos: sin framework, sin
 dependencias y sin paso de compilación obligatorio.
 
 ---
@@ -59,12 +59,13 @@ Estos datos son **de ejemplo** y hay que sustituirlos:
 
 - Teléfono `+34 600 000 000` (aparece en cabecera, pie, contacto y enlace de WhatsApp)
 - Correo `hola@gridalta.es`
-- Dirección `Avda. de la Constitución 24, 03001 Alicante`
+- Dirección `Avda. del Puerto 142, 46022 Valencia`
 - CIF, tomo y folio del Registro Mercantil en `aviso-legal.html`
 - Dominio `https://www.gridalta.es` en `sitemap.xml`, `robots.txt` y las etiquetas
   `canonical` / `og:` de `src/parts/head.html`
 - Enlaces de redes sociales en el pie (ahora apuntan a `#`)
 - Las cifras de la portada (12 años, 480 obras, 4,9 de valoración) y los testimonios
+- Los municipios de la sección de cobertura, si trabajáis en otros
 
 Búsqueda rápida de lo que falta por cambiar:
 
