@@ -1277,3 +1277,46 @@ body.is-locked { overflow: hidden; }
 .masthead--over-hero .wordmark b { text-shadow: 0 1px 6px rgba(10, 9, 6, 0.4); }
 .masthead.is-stuck .wordmark__mark { filter: none; }
 .masthead.is-stuck .wordmark b { text-shadow: none; }
+
+/* ==========================================================================
+   Світлий варіант банера — темний текст на світлому кадрі
+   ========================================================================== */
+.hero--light { color: var(--ink); background: var(--limestone); }
+
+/* Замість затемнення — світла вуаль зліва, під колонкою тексту */
+.hero--light .hero__media::after {
+  background:
+    linear-gradient(90deg,
+      rgba(251,249,245,.94) 0%,
+      rgba(251,249,245,.78) 34%,
+      rgba(251,249,245,.28) 62%,
+      rgba(251,249,245,.05) 100%),
+    linear-gradient(180deg,
+      rgba(251,249,245,.62) 0%,
+      rgba(251,249,245,.10) 28%,
+      rgba(251,249,245,.42) 100%);
+}
+
+.hero--light .overline { color: var(--clay); }
+.hero--light .hero__title em { color: var(--clay); font-style: italic; }
+.hero--light .hero__lede { color: var(--graphite); }
+
+.hero--light .hero__meta { border-top-color: var(--line); }
+.hero--light .hero__meta dt { color: var(--clay); }
+.hero--light .hero__meta dd { color: var(--ink); }
+.hero--light .hero__meta dd small { color: var(--graphite); }
+
+.hero--light .scroll-cue { color: var(--stone); }
+
+/* Друга кнопка була розрахована на темне тло */
+.hero--light .btn--light {
+  --btn-fg: var(--ink);
+  border-color: var(--line);
+}
+.hero--light .btn--light:hover { --btn-bg: var(--ink); --btn-fg: var(--paper); }
+
+/* Шапка над світлим банером: темні написи від самого верху */
+.masthead--over-light { color: var(--ink); }
+.masthead--over-light .wordmark i { color: var(--clay); }
+.masthead--over-light .wordmark__mark { filter: none; }
+.masthead--over-light .wordmark b { text-shadow: none; }

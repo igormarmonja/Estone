@@ -9,7 +9,7 @@ const pages = [
   { out: 'index.html',       body: 'body-index.html',      canon: '',                active: null,
     title: 'Gridalta | Reformas integrales en Valencia y su provincia',
     desc: 'Empresa de reformas en Valencia: reformas integrales, cocinas, baños, mantenimiento y fachadas. Equipo propio, presupuesto cerrado y 3 años de garantía.',
-    hero: true },
+    hero: true, heroLight: true },
   { out: 'servicios.html',   body: 'body-servicios.html',  canon: 'servicios.html',  active: 'A_SERV',
     title: 'Servicios de reforma y mantenimiento | Gridalta',
     desc: 'Reformas integrales, cocinas a medida, baños, mantenimiento y urgencias, fachadas e instalaciones en Valencia y su provincia.' },
@@ -83,7 +83,8 @@ pages.forEach(function (page) {
 
   // Todas las páginas abren con hero o banner oscuro: texto claro hasta que la
   // cabecera se fija sobre fondo papel (is-stuck).
-  let nav = header.replace('{{HEROCLASS}}', 'masthead--over-hero');
+  let nav = header.replace('{{HEROCLASS}}',
+    page.heroLight ? 'masthead--over-light' : 'masthead--over-hero');
   ['A_SERV', 'A_PROY', 'A_EMP', 'A_CON'].forEach(function (token) {
     nav = nav.replace('{{' + token + '}}', page.active === token ? ' aria-current="page"' : '');
   });
