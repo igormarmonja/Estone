@@ -399,7 +399,8 @@ body.is-locked { overflow: hidden; }
   pointer-events: none;
 }
 .surface > img,
-.surface > svg { width: 100%; height: 100%; object-fit: cover; }
+.surface > svg,
+.surface > video { width: 100%; height: 100%; object-fit: cover; }
 
 /* Named stone finishes */
 .finish-travertine { background: linear-gradient(145deg, #d9cdbb 0%, #c4b39c 45%, #e3dacb 100%); }
@@ -1239,6 +1240,7 @@ body.is-locked { overflow: hidden; }
    під палітру, щоб кадри читалися як один комплект. */
 .surface > img,
 .hero__media img,
+.hero__media video,
 .banner__media img,
 .cta__media img,
 .project__media img {

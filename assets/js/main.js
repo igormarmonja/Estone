@@ -198,6 +198,27 @@
     });
   }
 
+  /* ------------------------------------------------- animación del hero */
+  // El hero carga primero un fotograma fijo y sólo después cambia al GIF:
+  // así la primera pintada es inmediata y quien pide menos movimiento
+  // se queda con la imagen quieta.
+  var motion = doc.querySelector('[data-motion]');
+
+  if (motion && !reduceMotion) {
+    Array.prototype.forEach.call(motion.querySelectorAll('source'), function (s) {
+      s.src = s.getAttribute('data-src');
+    });
+    if (typeof motion.play === 'function') {
+      motion.load();
+      var started = motion.play();
+      // Safari en iOS con ahorro de batería rechaza la reproducción:
+      // el póster se queda visible y no hay nada que arreglar.
+      if (started && typeof started.catch === 'function') {
+        started.catch(function () {});
+      }
+    }
+  }
+
   /* ------------------------------------------------------------------ año */
   Array.prototype.forEach.call(doc.querySelectorAll('[data-year]'), function (el) {
     el.textContent = String(new Date().getFullYear());
