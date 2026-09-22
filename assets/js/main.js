@@ -197,6 +197,8 @@
   /* ── Каталог ────────────────────────────────────────────── */
   const grid = document.getElementById('productGrid');
   const products = window.PRODUCTS || [];
+  /* на внутрішніх сторінках шлях до фото інший — задається в IMG_BASE */
+  const imgBase = window.IMG_BASE || 'assets/img/';
 
   /* Лайтбокс моделі: спільний для каталогу і каруселі */
   const lb = document.getElementById('lightbox');
@@ -215,7 +217,7 @@
     if (!lb) return;
     if (!p) return;
     lastModel = p.code;
-    lbImg.src = 'assets/img/' + p.img;
+    lbImg.src = imgBase + p.img;
     lbImg.alt = 'Умивальник ' + p.code;
     lbCode.textContent = p.code;
     lbDesc.textContent = p.desc;
@@ -241,7 +243,7 @@
     grid.innerHTML = products.map((p, i) => `
       <button class="product-card" type="button" data-series="${p.series}" data-index="${i}" data-reveal>
         <span class="product-card-code">${p.code}</span>
-        <img src="assets/img/${p.img}" alt="Умивальник ${p.code} з каменю" loading="lazy">
+        <img src="${imgBase}${p.img}" alt="Умивальник ${p.code} з каменю" loading="lazy">
         <span class="product-card-overlay"><span>${p.desc}</span></span>
       </button>
     `).join('');
@@ -271,7 +273,7 @@
     const line = worksViewport.querySelector('.works-line');
     const slide = (p, i) => `
       <button class="works-item" type="button" data-index="${i}" aria-label="${p.code}">
-        <img src="assets/img/${p.img}" alt="Умивальник ${p.code} з каменю" loading="lazy">
+        <img src="${imgBase}${p.img}" alt="Умивальник ${p.code} з каменю" loading="lazy">
         <span class="works-code">${p.code}</span>
       </button>`;
     /* двічі — щоб стрічка зациклювалась без стрибка */
