@@ -54,7 +54,7 @@ function head({ title, desc, canon, jsonld = '' }) {
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-<meta name="theme-color" content="#1d1b17">
+<meta name="theme-color" content="#1f2631">
 <link rel="canonical" href="${SITE}${canon}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Gridalta">
