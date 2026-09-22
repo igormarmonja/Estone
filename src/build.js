@@ -214,7 +214,7 @@ const STEPS = [
   ['Presupuesto fijo y plazo', 'Recibes el presupuesto cerrado con la fecha de entrega. Sin sorpresas después.'],
   ['Obra y entrega a tiempo', 'Fotos y vídeos cada semana, entrega en el plazo acordado y garantía oficial.'],
 ];
-const stepsBlock = (waKey = 'general') => `
+const stepsBlock = () => `
   <section class="section" id="proceso">
     <div class="wrap">
       ${sectionHead('Cómo trabajamos', 'De tu mensaje a la entrega, en <em>4 pasos</em>', '', 'head--center')}
@@ -222,7 +222,6 @@ const stepsBlock = (waKey = 'general') => `
         ${STEPS.map(([t, d]) => `
         <div class="step reveal"><h3>${t}</h3><p>${d}</p></div>`).join('')}
       </div>
-      <div class="gallery-cta">${waBtn(waKey, 'Empezar por WhatsApp', 'btn--lg')}</div>
     </div>
   </section>`;
 
@@ -236,11 +235,10 @@ const packsBlock = () => `
     <div class="wrap">
       ${sectionHead('Para propietarios e inversores', 'Paquetes con <em>precio y plazo claros</em>', 'Soluciones cerradas para obra nueva, venta y alquiler. Sabes desde el primer día qué pagas y cuándo está listo.', 'head--split')}
       <div class="packs">
-        ${PACKS.map(([t, time, d, k]) => `
+        ${PACKS.map(([t, time, d]) => `
         <div class="pack reveal">
           <div class="pack__top"><h3>Paquete «${t}»</h3><span class="pack__time">${time}</span></div>
           <p>${d}</p>
-          ${waBtn(k, 'Me interesa', 'btn--sm')}
         </div>`).join('')}
       </div>
     </div>
@@ -317,10 +315,7 @@ function svcCard(s) {
             <h3>${s.title}</h3>
             <p>${s.text}</p>
             <div class="chips">${s.chips.map((c) => `<span class="chip">${c}</span>`).join('')}</div>
-            <div class="svc__foot">
-              ${waBtn(s.key, 'Pedir precio', 'btn--sm')}
-              ${s.href ? `<a class="link-more" href="${s.href}">Ver más ${I.arrow}</a>` : ''}
-            </div>
+            ${s.href ? `<div class="svc__foot"><a class="link-more" href="${s.href}">Ver más ${I.arrow}</a></div>` : ''}
           </div>
         </article>`;
 }
@@ -396,7 +391,6 @@ function homeBody() {
               <div><b>1–2 días</b><span>de montaje</span></div>
               <div><b>−30 %</b><span>en materiales y mano de obra</span></div>
             </div>
-            <div class="svc__foot">${waBtn('paneles', 'Quiero paneles')}</div>
           </div>
         </article>
       </div>
@@ -412,10 +406,10 @@ function homeBody() {
         ${PRICES.map(([t, v, d, k, hl]) => `
         <div class="price${hl ? ' price--hl' : ''} reveal">
           <h3>${t}</h3><div class="price__val">${v}</div><p>${d}</p>
-          ${waBtn(k, 'Mi precio exacto', 'btn--sm btn--block')}
         </div>`).join('')}
       </div>
       <p class="note">${I.info}<span>Rangos habituales del mercado en Valencia (2026). El presupuesto final depende de metros, estado del inmueble y materiales, y queda fijado antes de empezar.</span></p>
+      <div class="gallery-cta">${waBtn('precio', 'Mi precio exacto por WhatsApp', 'btn--lg')}</div>
     </div>
   </section>
 
@@ -460,13 +454,12 @@ function homeBody() {
         ['assets/img/taller.jpg', 'Revestimiento de mármol'],
       ])}
       <div class="gallery-cta">
-        ${waBtn('general', 'Quiero algo así')}
         <a class="btn btn--line" href="https://www.instagram.com/${INSTAGRAM}/" target="_blank" rel="noopener">${I.ig}<span>Más obras en Instagram</span></a>
       </div>
     </div>
   </section>
 
-  ${stepsBlock('presupuesto')}
+  ${stepsBlock()}
   ${faqBlock(HOME_FAQ)}
   ${ctaBlock()}
 
@@ -650,12 +643,11 @@ function servicePage(p) {
     <div class="wrap">
       ${sectionHead('Obras', 'Trabajos <em>reales</em> de nuestro equipo', '', '')}
       ${gallery(p.gallery)}
-      <div class="gallery-cta">${waBtn(p.key, 'Quiero algo así')}</div>
     </div>
   </section>
 
   ${p.agent ? `<section class="section section--dark"><div class="wrap">${agentBlock()}</div></section>` : whyBlock()}
-  ${stepsBlock(p.key)}
+  ${stepsBlock()}
   ${faqBlock(p.faq)}
 
   <section class="section" style="padding-bottom:0">
