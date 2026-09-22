@@ -50,16 +50,16 @@
       if (!el.textContent.trim()) el.textContent = CFG.email;
     });
 
-    const box = document.getElementById('messengers');
-    if (!box) return;
     const list = [
       { key: 'telegram', label: 'Telegram' },
       { key: 'viber',    label: 'Viber' },
       { key: 'whatsapp', label: 'WhatsApp' },
     ].filter(m => CFG[m.key]);
-    box.innerHTML = list.map(m =>
+    const html = list.map(m =>
       `<a class="messenger" href="${CFG[m.key]}" target="_blank" rel="noopener" data-messenger="${m.key}">${m.label}</a>`
     ).join('');
+    /* месенджерів на сторінці може бути кілька блоків */
+    document.querySelectorAll('.messengers').forEach(box => { box.innerHTML = html; });
   }
   fillContacts();
 
