@@ -169,6 +169,7 @@
   /* ── Мобільне меню ──────────────────────────────────────── */
   const burger = document.getElementById('burger');
   const nav = document.getElementById('mainNav');
+  if (burger && nav) {
   burger.addEventListener('click', () => {
     const open = nav.classList.toggle('is-open');
     burger.classList.toggle('is-open', open);
@@ -177,6 +178,7 @@
     nav.classList.remove('is-open');
     burger.classList.remove('is-open');
   }));
+  }
 
   /* ── Поява блоків ───────────────────────────────────────── */
   const io = new IntersectionObserver((entries) => {
@@ -204,9 +206,13 @@
   const lbMat = document.getElementById('lightboxMaterial');
   let lastModel = '';
 
-  const closeLb = () => { lb.classList.remove('is-open'); document.body.style.overflow = ''; };
+  const closeLb = () => {
+    if (lb) lb.classList.remove('is-open');
+    document.body.style.overflow = '';
+  };
 
   function openModel(p) {
+    if (!lb) return;
     if (!p) return;
     lastModel = p.code;
     lbImg.src = 'assets/img/' + p.img;
@@ -219,14 +225,17 @@
     track('model_view', { model: p.code, series: p.series });
   }
 
-  document.getElementById('lightboxClose').addEventListener('click', closeLb);
-  document.getElementById('lightboxCta').addEventListener('click', () => {
-    const field = document.querySelector('.lead-form-main [name="comment"]');
-    if (field && lastModel) field.value = `Цікавить модель ${lastModel}`;
-    closeLb();
-  });
-  lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLb(); });
+  /* лайтбокса немає на внутрішніх сторінках — тому все за умовою */
+  if (lb) {
+    document.getElementById('lightboxClose').addEventListener('click', closeLb);
+    document.getElementById('lightboxCta').addEventListener('click', () => {
+      const field = document.querySelector('.lead-form-main [name="comment"]');
+      if (field && lastModel) field.value = `Цікавить модель ${lastModel}`;
+      closeLb();
+    });
+    lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLb(); });
+  }
 
   if (grid && products.length) {
     grid.innerHTML = products.map((p, i) => `
