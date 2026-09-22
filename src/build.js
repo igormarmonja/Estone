@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { wa, WA_PHONE } = require('./wa.js');
 const P = __dirname + '/parts/';
 
 const head   = fs.readFileSync(P + 'head.html', 'utf8');
@@ -90,6 +91,13 @@ pages.forEach(function (page) {
   });
 
   const body = fs.readFileSync(P + page.body, 'utf8');
-  fs.writeFileSync(__dirname + '/../' + page.out, html + nav + '\n' + body + '\n' + footer);
+  let out = html + nav + '\n' + body + '\n' + footer;
+
+  // {{WA:clave}} → enlace de WhatsApp con el mensaje ya escrito.
+  // Se resuelve al final, así vale en cualquier parcial.
+  out = out.replace(/\{\{WA:([a-z]+)\}\}/g, (_, key) => wa(key));
+  out = out.replace(/\{\{WA_PHONE\}\}/g, WA_PHONE);
+
+  fs.writeFileSync(__dirname + '/../' + page.out, out);
   console.log('→', page.out);
 });

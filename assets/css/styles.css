@@ -1354,3 +1354,86 @@ body.is-locked { overflow: hidden; }
 
   .hero__meta { margin-top: 2.25rem; padding-top: 1.5rem; }
 }
+
+/* ==========================================================================
+   WhatsApp як головний канал звернення
+   ========================================================================== */
+
+/* Іконка всередині кнопок */
+.ico-wa { width: 17px; height: 17px; flex: none; }
+
+/* Зелений залишаємо лише для WhatsApp — це впізнаваний сигнал каналу,
+   решта акцентів на сайті теракотові. */
+.btn--wa {
+  --btn-bg: #1f8f4e;
+  --btn-fg: #ffffff;
+  border-color: #1f8f4e;
+}
+.btn--wa:hover { --btn-bg: #17713e; border-color: #17713e; }
+
+/* ---- Заклик усередині картки послуги ---------------------------------- */
+.service__cta {
+  margin-top: auto;
+  padding-top: 1.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+.service__wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(31, 143, 78, 0.10);
+  color: #17713e;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background .35s var(--ease), color .35s var(--ease);
+}
+.service__wa:hover { background: #1f8f4e; color: #fff; }
+.service__more {
+  margin-top: 0;
+  padding-top: 0;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+
+/* ---- Липка панель дій -------------------------------------------------- */
+.action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 95;
+  display: none;                    /* вмикається лише на вузьких екранах */
+  gap: 1px;
+  background: var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: 0 -6px 24px rgba(23, 21, 15, .12);
+}
+.action-bar a {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 1rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.action-bar svg { width: 19px; height: 19px; flex: none; }
+.action-bar__wa   { background: #1f8f4e; color: #fff; flex: 1.6; }
+.action-bar__call { background: var(--ink); color: var(--paper); }
+
+@media (max-width: 900px) {
+  .action-bar { display: flex; }
+  /* Щоб панель не перекривала підвал і кінець сторінки */
+  body { padding-bottom: calc(3.55rem + env(safe-area-inset-bottom, 0px)); }
+  /* Плаваюча кнопка дублювала б панель */
+  .float-wa { display: none; }
+}
