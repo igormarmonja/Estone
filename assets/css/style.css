@@ -550,3 +550,21 @@ section h2{
   .footer-inner{grid-template-columns:1fr;}
   .band{min-height:48vh;}
 }
+
+/* Пропозиція */
+.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.offer-card{
+  padding:26px 24px 24px;border:1px solid var(--line);border-radius:var(--r);background:var(--card);
+  transition:transform .4s var(--ease),box-shadow .4s var(--ease),border-color .4s var(--ease);
+}
+.offer-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(138,79,42,.45);}
+.offer-tag{
+  display:inline-block;margin-bottom:14px;padding:5px 12px;border-radius:var(--r-pill);
+  background:var(--brand);color:var(--paper);
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+}
+.offer-card h3{font-size:20px;margin-bottom:8px;}
+.offer-card p{font-size:14.5px;color:var(--muted);}
+.offer-note{margin-top:22px;font-size:13.5px;color:var(--muted);max-width:780px;}
+.offer-note b{color:var(--text);font-weight:500;}
+@media (max-width:900px){.offer-grid{grid-template-columns:1fr;}}
