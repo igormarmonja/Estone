@@ -25,6 +25,7 @@ const GOALS_90 = `
 🇪🇸 Іспанська: 450 нових слів (5 на день), 60 хв активного навчання щодня + подкасти фоном.
    Слабкі місця: минулі часи, неправильні дієслова, llevar/traer/tomar/coger/poner/quitar.
    Фінал 23.12: телефонна розмова іспанською + повторний тест рівня.
+🇬🇧 Англійська: 15 хв щодня (105 хв на тиждень) — підтримувати й розвивати. Подкасти, серіали, розмова.
 💪 Спорт: 3 тренування на тиждень (36+ за челендж). Вага з ~80,5 до 77,5 кг.
    10 підтягувань за підхід. Видимий прес і сильна спина.
 🔥 Навіщо: впевненість у собі і доказ, що можна працювати віддалено на Україну та відкрити autónomo.
@@ -55,6 +56,7 @@ const REVIEW_HOUR  = 19;   // недільний огляд
 const DEV_TARGETS = {
   'Дотик': 130, 'Відповідь': 26, 'Дзвінок': 20, 'Розмова': 13, 'Прорахунок': 8,
   'Іспанська': 420,   // активних хвилин (60 на день)
+  'Англійська': 105,  // активних хвилин (15 на день)
   'Слова': 35,        // 5 на день
   'Спорт': 3,         // тренувань
 };
@@ -68,6 +70,7 @@ const DEV_ALIASES = {
   'Прорахунок': ['прорахунок', 'прорахунки', 'кп', 'quote'],
   'Угода':      ['угода', 'угоди', 'продаж', 'deal'],
   'Іспанська':  ['іспанська', 'іспан', 'es', 'español', 'espanol'],
+  'Англійська': ['англійська', 'англ', 'en', 'english', 'інгліш'],
   'Спорт':      ['спорт', 'тренування', 'sport', 'gym'],
   'Слова':      ['слова', 'words'],
   'Вага':       ['вага', 'вес', 'weight'],
@@ -96,7 +99,7 @@ const WORD_TOPICS = [
 ];
 const WORD_INTERVALS = [1, 3, 7, 14];   // повторення через 1, 3, 7, 14 днів
 const ICONS = { 'Дотик': '📨', 'Відповідь': '💬', 'Дзвінок': '📞', 'Розмова': '🤝', 'Прорахунок': '📐',
-  'Угода': '🎉', 'Іспанська': '🇪🇸', 'Слова': '📚', 'Спорт': '💪', 'Вага': '⚖️', 'Підтягування': '🏋️',
+  'Угода': '🎉', 'Іспанська': '🇪🇸', 'Англійська': '🇬🇧', 'Слова': '📚', 'Спорт': '💪', 'Вага': '⚖️', 'Підтягування': '🏋️',
   'Instagram': '📸', 'Сайт': '🌐' };
 
 // ======================= ВХІД ВІД TELEGRAM =======================
@@ -229,7 +232,8 @@ function handleTag_(chatId, text) {
     case 'Прорахунок': e.value = nums[0] || null; break;
     case 'Угода': e.value = nums[0] || null; if (e.margin === null && nums.length > 1) e.margin = nums[1]; break;
     case 'Іспанська':
-      if (!nums.length) { send_(chatId, 'Напиши хвилини: #іспанська 20'); return; }
+    case 'Англійська':
+      if (!nums.length) { send_(chatId, 'Напиши хвилини: #' + tag + ' 20'); return; }
       e.qty = nums[0]; break;
     case 'Спорт': e.value = nums[0] || null; break;
     case 'Вага': case 'Підтягування': case 'Instagram': case 'Сайт':
@@ -247,11 +251,11 @@ function handleTag_(chatId, text) {
 const HELP =
   '🎯 Челендж 90 днів\n\n' +
   '🎙 Просто надиктуй голосом або напиши, що зробив:\n' +
-  '«написав 15 дизайнерам, двоє відповіли, 20 хвилин іспанської, був у залі»\n' +
+  '«написав 15 дизайнерам, двоє відповіли, 20 хвилин іспанської, 15 англійської, був у залі»\n' +
   'Можна і про вчора: «вчора зробив прорахунок на 2400»\n\n' +
   '⚡ Швидко: #дотик 20 · #відповідь 2 · #дзвінок 3 · #розмова 1\n' +
   '#прорахунок 2400 · #угода 3500 маржа 700\n' +
-  '#іспанська 20 · #слова 5 · #слово desagüe\n' +
+  '#іспанська 20 · #слова 5 · #слово desagüe · #англ 15\n' +
   '#спорт 45 · #вага 80.5 · #підтягування 4\n#інста 520 · #сайт 140\n\n' +
   '/today — сьогодні\n/week — тиждень\n/plan — задати план дня\n/coach — порада коуча\n' +
   '/words — слова на сьогодні\n/goals — цілі челенджу\n/dash — дашборд\n/undo — скасувати останній запис\n/skip — скасувати очікування плану чи огляду';
@@ -358,7 +362,7 @@ function morningPush() {
 function middayNudge() {
   const today = today_();
   if (devRows_().some(r => r.day === today)) return;
-  send_(OWNER_ID, '👀 Сьогодні ще жодного запису.\nОдин маленький крок прямо зараз: 5 повідомлень клієнтам або 10 хвилин іспанської. Що обираєш?');
+  send_(OWNER_ID, '👀 Сьогодні ще жодного запису.\nОдин маленький крок прямо зараз: 5 повідомлень клієнтам, 10 хвилин іспанської або англійський подкаст. Що обираєш?');
 }
 
 function eveningPush() {
@@ -396,6 +400,7 @@ const PARSE_PROMPT =
   '- Прорахунок: зроблений прорахунок чи КП. qty = кількість, value = сума в євро, якщо названа.\n' +
   '- Угода: оплачене замовлення. value = сума, margin = маржа, якщо названа.\n' +
   '- Іспанська: заняття іспанською (Duolingo, урок, розмова). qty = хвилини (години × 60). Якщо тривалість не названа, qty = 15.\n' +
+  '- Англійська: заняття англійською (урок, подкаст, серіал англійською, розмова). qty = хвилини. Якщо тривалість не названа, qty = 15.\n' +
   '- Спорт: тренування, зал, біг. qty = 1 за кожне, value = хвилини, якщо названі.\n' +
   '- Слова: вивчені іспанські слова. qty = кількість.\n' +
   '- Вага: зважування. value = кг (наприклад 80.5).\n' +
@@ -451,14 +456,14 @@ function coach_(reviewAnswer) {
   const ctx = {
     день_челенджу: dayNum_(), всього_днів: CHALLENGE_DAYS, цілі_на_90_днів: GOALS_90.trim(),
     тиждень: { з: d.ws, по: d.we, бал: d.score, відсотки_цілей: d.goals, дії_факт_ціль: d.actions,
-      іспанська_хв: d.spanish, спорт: d.sport },
+      іспанська_хв: d.spanish, англійська_хв: d.english, спорт: d.sport },
     місяць: d.month, воронка_4_тижні: d.funnel, тренд_8_тижнів: d.trend,
     план_дня_виконано: planStats_(d.ws, d.we), попередній_огляд: lastReview_(),
   };
   const prompt =
     'Ти — чесний і доброзичливий коуч Ігоря в 90-денному челенджі. Ігор працює оператором ЧПУ в Іспанії, ' +
     'паралельно розвиває Estone (декоративний камінь і кераміка для дизайнерів та архітекторів в Україні й Іспанії), ' +
-    'вчить іспанську (рівень A2) і займається спортом. Його відома пастка: будувати інструменти й «упаковку» замість продажів.\n' +
+    'вчить іспанську (рівень A2), підтримує англійську і займається спортом. Його відома пастка: будувати інструменти й «упаковку» замість продажів.\n' +
     'Дай відповідь українською, до 150 слів, простим текстом без markdown: ' +
     '1) що добре (одне речення з цифрою); 2) головне вузьке місце (з цифрою); 3) три конкретні дії на наступні 7 днів. ' +
     'Не хвали без причини. Якщо даних мало, так і скажи і порадь почати записувати.\n\nДані: ' + JSON.stringify(ctx) +
@@ -475,7 +480,7 @@ function cleanEntry_(e) {
   const n = x => (x === null || x === undefined || x === '' || isNaN(Number(x))) ? null : Number(x);
   const out = { metric: e.metric, qty: n(e.qty), value: n(e.value), margin: n(e.margin),
     note: String(e.note || '').slice(0, 80), days_ago: Math.max(0, Math.min(6, n(e.days_ago) || 0)) };
-  if (out.metric === 'Іспанська' && !(out.qty > 0)) out.qty = 15;
+  if ((out.metric === 'Іспанська' || out.metric === 'Англійська') && !(out.qty > 0)) out.qty = 15;
   if (['Спорт', 'Прорахунок', 'Угода'].concat(SNAPSHOTS).indexOf(out.metric) !== -1 && !(out.qty > 0)) out.qty = 1;
   if (out.metric === 'Спорт') out.qty = Math.max(1, Math.round(out.qty));
   if (SNAPSHOTS.indexOf(out.metric) !== -1) { out.qty = 1; if (out.value === null) return null; }
@@ -501,6 +506,9 @@ function confirm_(entries) {
       case 'Іспанська':
         return ic + ' +' + e.qty + ' хв' + when + ' · тиждень ' + q_(s, 'Іспанська') + '/' + DEV_TARGETS['Іспанська'] +
           ' · серія ' + streak_(rows, 'Іспанська') + ' дн. 🔥';
+      case 'Англійська':
+        return ic + ' +' + e.qty + ' хв' + when + ' · тиждень ' + q_(s, 'Англійська') + '/' + DEV_TARGETS['Англійська'] +
+          ' · серія ' + streak_(rows, 'Англійська') + ' дн.';
       case 'Спорт':
         return ic + ' Тренування' + (e.value ? ' ' + e.value + ' хв' : '') + when + ' · тиждень ' + q_(s, 'Спорт') + '/' + DEV_TARGETS['Спорт'];
       case 'Угода':
@@ -699,7 +707,7 @@ function sumLine_(s) {
   const out = [];
   METRICS.forEach(k => {
     if (!s[k]) return;
-    if (k === 'Іспанська') out.push('іспанська ' + q_(s, k) + ' хв');
+    if (k === 'Іспанська' || k === 'Англійська') out.push(k.toLowerCase() + ' ' + q_(s, k) + ' хв');
     else if (k === 'Спорт') out.push('спорт ' + q_(s, k));
     else if (k === 'Слова') out.push('слова ' + q_(s, k));
     else if (SNAPSHOTS.indexOf(k) !== -1) return;
@@ -723,9 +731,10 @@ function devReport_() {
   d.actions.forEach(a => lines.push(a.k + ': ' + a.v + '/' + a.t + '  ' + bar_(a.v, a.t)));
   if (d.month.turnoverT) lines.push('Місяць: оборот ' + fmt_(d.month.turnover) + ' з ' + fmt_(d.month.turnoverT) + ' (мін. ' + fmt_(d.month.turnoverMin) + '), угод ' + d.month.deals);
   lines.push('Челендж: ' + fmt_(d.challenge.turnover) + ' з ' + fmt_(d.challenge.goal) + '  ' + bar_(d.challenge.turnover, d.challenge.goal));
-  lines.push('', '🇪🇸 Іспанська · ' + d.goals.es + '%',
-    d.spanish.min + '/' + d.spanish.t + ' хв  ' + bar_(d.spanish.min, d.spanish.t) + ' · серія ' + d.spanish.streak + ' дн.',
-    'Слова: ' + d.words.week + '/' + d.words.t + ' · всього ' + d.words.total + '/' + d.words.goal);
+  lines.push('', '🗣 Мови · ' + d.goals.es + '%',
+    '🇪🇸 ' + d.spanish.min + '/' + d.spanish.t + ' хв  ' + bar_(d.spanish.min, d.spanish.t) + ' · серія ' + d.spanish.streak + ' дн.',
+    'Слова: ' + d.words.week + '/' + d.words.t + ' · всього ' + d.words.total + '/' + d.words.goal,
+    '🇬🇧 ' + d.english.min + '/' + d.english.t + ' хв  ' + bar_(d.english.min, d.english.t) + ' · серія ' + d.english.streak + ' дн.');
   lines.push('', '💪 Спорт · ' + d.goals.sport + '%', d.sport.n + '/' + d.sport.t + ' тренувань  ' + bar_(d.sport.n, d.sport.t));
   if (d.body.weight) lines.push('Вага: ' + d.body.weight.value + ' кг (ціль ' + WEIGHT_GOAL + ')');
   if (d.body.pullups) lines.push('Підтягування: ' + d.body.pullups.value + '/' + PULLUP_GOAL);
@@ -749,7 +758,7 @@ function devData_(ws) {
   const days = [];
   for (let i = 0; i < 7; i++) {
     const d = addDays_(ws, i), ds = devSum_(rows, d, d);
-    days.push({ d: d, es: q_(ds, 'Іспанська'), sport: q_(ds, 'Спорт') });
+    days.push({ d: d, es: q_(ds, 'Іспанська'), en: q_(ds, 'Англійська'), sport: q_(ds, 'Спорт') });
   }
   const trend = [];
   for (let i = 7; i >= 0; i--) {
@@ -764,6 +773,7 @@ function devData_(ws) {
     score: Math.round((g.fin + g.es + g.sport) / 3), goals: g,
     actions: FIN_KEYS.map(k => ({ k: k, v: q_(s, k), t: DEV_TARGETS[k] })),
     spanish: { min: q_(s, 'Іспанська'), t: DEV_TARGETS['Іспанська'], streak: streak_(rows, 'Іспанська') },
+    english: { min: q_(s, 'Англійська'), t: DEV_TARGETS['Англійська'], streak: streak_(rows, 'Англійська') },
     sport: { n: q_(s, 'Спорт'), t: DEV_TARGETS['Спорт'], min: q_(s, 'Спорт', 'value') },
     days: days, trend: trend,
     funnel: FUNNEL.map(k => ({ k: k, v: q_(f4, k) })),
@@ -811,7 +821,9 @@ function q_(s, k, f) { return s[k] ? Math.round(s[k][f || 'qty'] * 100) / 100 : 
 function pct_(v, t) { return t ? Math.min(100, Math.round(v / t * 100)) : 0; }
 function goalPct_(s) {
   const fin = Math.round(FIN_KEYS.reduce((a, k) => a + pct_(q_(s, k), DEV_TARGETS[k]), 0) / FIN_KEYS.length);
-  const es = Math.round((pct_(q_(s, 'Іспанська'), DEV_TARGETS['Іспанська']) + pct_(q_(s, 'Слова'), DEV_TARGETS['Слова'])) / 2);
+  // Мови: іспанська (хвилини + слова) важить 2/3, англійська — 1/3
+  const es = Math.round((pct_(q_(s, 'Іспанська'), DEV_TARGETS['Іспанська']) + pct_(q_(s, 'Слова'), DEV_TARGETS['Слова']) +
+    pct_(q_(s, 'Англійська'), DEV_TARGETS['Англійська'])) / 3);
   return { fin: fin, es: es, sport: pct_(q_(s, 'Спорт'), DEV_TARGETS['Спорт']) };
 }
 function firstSnap_(rows, metric) {

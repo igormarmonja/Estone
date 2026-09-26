@@ -172,10 +172,10 @@
       <div class="fn" id="funnel"></div>
     </div>
     <div class="card">
-      <h2>🇪🇸 Іспанська по днях <span class="pill" id="streak"></span></h2>
+      <h2>🗣 Мови по днях <span class="pill" id="streak"></span></h2>
       <div class="row"><div class="bignum" id="esMin"></div><div class="muted" id="esAvg"></div></div>
       <div class="chart sm"><canvas id="esChart"></canvas></div>
-      <div class="tiles" id="words" style="grid-template-columns:1fr 1fr;margin-top:14px"></div>
+      <div class="tiles" id="words" style="margin-top:14px"></div>
     </div>
   </div>
 
@@ -258,7 +258,7 @@
     const touches = d.actions[0];
     const cards = [
       { cls: 'k-blue', name: 'Estone<br>дії з клієнтами', num: num(touches.v), of: '/ ' + touches.t + ' дотиків', p: d.goals.fin, prev: prev.fin },
-      { cls: 'k-orange', name: 'Іспанська<br>мова', num: num(d.spanish.min), of: '/ ' + d.spanish.t + ' хв', p: d.goals.es, prev: prev.es },
+      { cls: 'k-orange', name: 'Мови<br>🇪🇸 + 🇬🇧', num: num(d.spanish.min + d.english.min), of: '/ ' + (d.spanish.t + d.english.t) + ' хв', p: d.goals.es, prev: prev.es },
       { cls: 'k-cyan', name: 'Спорт<br>тренування', num: d.sport.n, of: '/ ' + d.sport.t, p: d.goals.sport, prev: prev.sport },
     ];
     $('kpis').innerHTML = cards.map(c => {
@@ -303,27 +303,26 @@
     }).join('');
 
     // Spanish
-    $('esMin').innerHTML = num(d.spanish.min) + ' <small>/ ' + d.spanish.t + ' хв</small>';
+    $('esMin').innerHTML = num(d.spanish.min) + ' <small>/ ' + d.spanish.t + ' хв 🇪🇸</small>';
     $('streak').textContent = d.spanish.streak ? '🔥 ' + d.spanish.streak + ' дн. поспіль' : 'серії ще немає';
     $('esAvg').textContent = d.days.filter(x => x.es > 0).length + ' з 7 днів';
-    const wp = pct(d.words.total, d.words.goal), ww = pct(d.words.week, d.words.t);
+    const wp = pct(d.words.total, d.words.goal), ww = pct(d.words.week, d.words.t), ep = pct(d.english.min, d.english.t);
     $('words').innerHTML =
       '<div class="tile"><div class="l">Слова за тиждень</div><div class="v">' + d.words.week + ' <span class="muted">/ ' + d.words.t + '</span></div>' +
         '<div class="mini"><div style="width:' + ww + '%;background:' + barColor(ww) + '"></div></div></div>' +
       '<div class="tile"><div class="l">Словник</div><div class="v">' + d.words.total + ' <span class="muted">/ ' + d.words.goal + '</span></div>' +
-        '<div class="mini"><div style="width:' + wp + '%;background:linear-gradient(90deg,#ffb01f,#ff7a00)"></div></div></div>';
+        '<div class="mini"><div style="width:' + wp + '%;background:linear-gradient(90deg,#ffb01f,#ff7a00)"></div></div></div>' +
+      '<div class="tile"><div class="l">🇬🇧 Англійська</div><div class="v">' + num(d.english.min) + ' <span class="muted">/ ' + d.english.t + '</span></div>' +
+        '<div class="mini"><div style="width:' + ep + '%;background:linear-gradient(90deg,#a66bff,#1e8bff)"></div></div></div>';
     drawChart('esChart', {
       type: 'bar',
-      data: { labels: DAYS, datasets: [{ data: d.days.map(x => x.es), borderRadius: 6, maxBarThickness: 26,
-        backgroundColor: ctx => {
-          const a = ctx.chart.chartArea; if (!a) return '#ff9a1f';
-          const g = ctx.chart.ctx.createLinearGradient(0, a.top, 0, a.bottom);
-          g.addColorStop(0, '#ffb01f'); g.addColorStop(1, '#ff7a00'); return g;
-        } }] },
+      data: { labels: DAYS, datasets: [
+        { label: 'Іспанська', data: d.days.map(x => x.es), borderRadius: 6, maxBarThickness: 26, backgroundColor: '#ff9a1f' },
+        { label: 'Англійська', data: d.days.map(x => x.en || 0), borderRadius: 6, maxBarThickness: 26, backgroundColor: '#a66bff' }] },
       options: { maintainAspectRatio: false, plugins: { legend: { display: false },
-          tooltip: { callbacks: { label: c => ' ' + c.parsed.y + ' хв' } } },
-        scales: { x: { grid: { display: false }, ticks: { color: '#8391ad', font: { weight: 700 } } },
-                  y: { beginAtZero: true, grid: { color: '#243049' }, ticks: { color: '#8391ad', maxTicksLimit: 4 } } } },
+          tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + c.parsed.y + ' хв' } } },
+        scales: { x: { stacked: true, grid: { display: false }, ticks: { color: '#8391ad', font: { weight: 700 } } },
+                  y: { stacked: true, beginAtZero: true, grid: { color: '#243049' }, ticks: { color: '#8391ad', maxTicksLimit: 4 } } } },
     });
 
     // Sport
@@ -350,7 +349,7 @@
         '<div class="mini"><div style="width:' + pp + '%;background:' + barColor(pp) + '"></div></div></div>';
 
     // Trend (area)
-    const series = [['Estone', 'fin', '#1e8bff'], ['Іспанська', 'es', '#ff9a1f'], ['Спорт', 'sport', '#10c6d4']];
+    const series = [['Estone', 'fin', '#1e8bff'], ['Мови', 'es', '#ff9a1f'], ['Спорт', 'sport', '#10c6d4']];
     drawChart('trend', {
       type: 'line',
       data: { labels: d.trend.map(t => dm(t.w)), datasets: series.map(s => ({
