@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0b1020; --card: #141b2e; --card2: #1a2238; --line: #243049; --text: #eef2fa; --muted: #8391ad;
+    --blue: #1e8bff; --orange: #ff9a1f; --cyan: #10c6d4; --green: #22c55e; --red: #ff5a5f; --yellow: #ffc83d; --purple: #a66bff;
+    --font: 'Manrope', -apple-system, Roboto, 'Segoe UI', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); }
+  body { color: var(--text); font-family: var(--font); padding: 18px 14px 44px; max-width: 1180px; margin: 0 auto;
+         -webkit-tap-highlight-color: transparent; }
+
+  header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+  h1 { font-size: 22px; font-weight: 800; letter-spacing: -.3px; }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 3px; font-weight: 600; }
+  .btns { display: flex; gap: 6px; }
+  button { background: var(--card); border: 1px solid var(--line); color: var(--text); border-radius: 12px;
+           height: 40px; min-width: 40px; font-size: 17px; cursor: pointer; font-family: var(--font); }
+  button:disabled { opacity: .3; }
+  .spin { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
+  .err { color: var(--red); font-size: 13px; text-align: center; margin-bottom: 10px; display: none; }
+
+  .card { background: var(--card); border-radius: 18px; padding: 18px; }
+  .card h2 { font-size: 15px; font-weight: 800; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .card h2 .tag { font-size: 11px; font-weight: 700; color: var(--muted); background: var(--card2); padding: 4px 9px; border-radius: 20px; white-space: nowrap; }
+  .grid { display: grid; gap: 12px; margin-bottom: 12px; }
+  @media (min-width: 820px) {
+    .g3 { grid-template-columns: repeat(3, 1fr); }
+    .g2 { grid-template-columns: 1fr 1fr; }
+    .top { grid-template-columns: repeat(3, 1fr); grid-template-areas: "g t t" "k1 k2 k3"; }
+    .top .hero { grid-area: g; } .top .trendc { grid-area: t; }
+    .top .kcard:nth-of-type(1) { grid-area: k1; } .top .kcard:nth-of-type(2) { grid-area: k2; } .top .kcard:nth-of-type(3) { grid-area: k3; }
+  }
+
+  /* HERO */
+  .hero { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .gauge { position: relative; width: 220px; height: 128px; }
+  .gauge .val { position: absolute; left: 0; right: 0; bottom: 4px; font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+  .hero .cap { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; margin-top: 6px; }
+  .delta { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 8px; margin-top: 8px; }
+  .delta.up { background: rgba(34,197,94,.15); color: var(--green); }
+  .delta.down { background: rgba(255,90,95,.15); color: var(--red); }
+  .delta.eq { background: var(--card2); color: var(--muted); }
+
+  /* KPI gradient cards */
+  .kcard { position: relative; border-radius: 18px; padding: 18px; min-height: 132px; overflow: hidden;
+           display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .kcard::after { content: ''; position: absolute; right: -40px; top: -40px; width: 150px; height: 150px; border-radius: 50%;
+                  background: rgba(255,255,255,.08); }
+  .k-blue { background: linear-gradient(135deg, #1e8bff, #0057d9); box-shadow: 0 10px 28px rgba(30,139,255,.25); }
+  .k-orange { background: linear-gradient(135deg, #ffb01f, #ff7a00); box-shadow: 0 10px 28px rgba(255,154,31,.25); }
+  .k-cyan { background: linear-gradient(135deg, #18d6d6, #0aa3c2); box-shadow: 0 10px 28px rgba(16,198,212,.25); }
+  .kcard .name { font-size: 15px; font-weight: 800; line-height: 1.25; }
+  .kcard .num { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-top: 8px; line-height: 1; }
+  .kcard .num small { font-size: 15px; font-weight: 700; opacity: .8; letter-spacing: 0; }
+  .kcard .foot { font-size: 12px; font-weight: 700; opacity: .9; margin-top: 8px; }
+  .ring { position: relative; width: 84px; height: 84px; flex: none; z-index: 1; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .p { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; }
+
+  /* Money tiles */
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .tile { background: var(--card2); border-radius: 14px; padding: 12px; min-width: 0; }
+  .tile .l { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  .tile .v { font-size: 20px; font-weight: 800; margin-top: 6px; white-space: nowrap; letter-spacing: -.5px; overflow: hidden; text-overflow: ellipsis; }
+  .tile .s { color: var(--muted); font-size: 11px; font-weight: 600; margin-top: 3px; }
+  .mini { height: 5px; background: var(--line); border-radius: 3px; margin-top: 9px; overflow: hidden; }
+  .mini div { height: 100%; border-radius: 3px; transition: width .6s; }
+  .chal { margin-bottom: 14px; }
+  .chal .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .chal .top b { font-size: 26px; font-weight: 800; letter-spacing: -.6px; }
+  .cbar { position: relative; height: 12px; background: var(--card2); border-radius: 6px; margin-top: 10px; }
+  .cbar .f { height: 100%; border-radius: 6px; background: linear-gradient(90deg,#1e8bff,#10c6d4); transition: width .6s; }
+  .cbar .mk { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--yellow); }
+  .cbar .ml { position: absolute; top: 16px; font-size: 10px; color: var(--yellow); font-weight: 700; transform: translateX(-50%); white-space: nowrap; }
+  .cfoot { display: flex; justify-content: space-between; margin-top: 22px; }
+
+  /* Horizontal bars */
+  .hb { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; font-size: 13px; font-weight: 700; }
+  .hb:last-child { margin-bottom: 0; }
+  .hb .n { width: 88px; flex: none; color: #c9d2e6; }
+  .hb .b { flex: 1; height: 26px; background: var(--card2); border-radius: 7px; overflow: hidden; position: relative; }
+  .hb .b div { height: 100%; border-radius: 7px; transition: width .6s; min-width: 3px; }
+  .hb .b span { position: absolute; right: 9px; top: 0; bottom: 0; display: flex; align-items: center; font-size: 12px; color: #c9d2e6; }
+  .hb .b span b { color: #fff; margin-right: 3px; }
+
+  /* Funnel */
+  .fn { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .fs { height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;
+        padding: 0 12px; font-size: 13px; font-weight: 800; color: #04131a; transition: width .6s; min-width: 150px; }
+  .fc { font-size: 11px; font-weight: 800; color: var(--muted); }
+  .fc b { color: var(--yellow); }
+
+  .chart { position: relative; height: 220px; }
+  .chart.sm { height: 150px; }
+  .row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
+  .bignum { font-size: 30px; font-weight: 800; letter-spacing: -.8px; }
+  .bignum small { font-size: 14px; color: var(--muted); font-weight: 700; letter-spacing: 0; }
+  .pill { font-size: 12px; font-weight: 800; padding: 6px 10px; border-radius: 20px; background: rgba(255,154,31,.15); color: var(--orange); white-space: nowrap; }
+  .dots { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; }
+  .dots .d { font-size: 11px; font-weight: 700; color: var(--muted); }
+  .dots .d.today { color: var(--text); }
+  .dots .c { width: 38px; height: 38px; border-radius: 50%; margin: 0 auto 6px; background: var(--card2);
+             display: flex; align-items: center; justify-content: center; font-weight: 800; }
+  .dots .c.on { background: linear-gradient(135deg, #18d6d6, #0aa3c2); color: #fff; box-shadow: 0 4px 14px rgba(16,198,212,.35); }
+  .dots .d.today .c:not(.on) { border: 2px dashed #3a4868; }
+  .muted { color: var(--muted); font-size: 12px; font-weight: 600; }
+  .up { color: var(--green); } .down { color: var(--red); }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1 id="title">90 днів</h1>
+      <div class="sub" id="updated"></div>
+    </div>
+    <div class="btns">
+      <button id="prev" aria-label="Попередній тиждень">‹</button>
+      <button id="next" aria-label="Наступний тиждень">›</button>
+      <button id="refresh" aria-label="Оновити">↻</button>
+    </div>
+  </header>
+  <div class="err" id="err">Не вдалося оновити. Перевір інтернет.</div>
+
+  <div class="grid top" id="top">
+    <div class="card hero">
+      <div class="gauge">
+        <svg width="220" height="128" viewBox="0 0 220 128">
+          <defs>
+            <linearGradient id="gg" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stop-color="#ff5a5f"/><stop offset=".5" stop-color="#ffc83d"/><stop offset="1" stop-color="#22c55e"/>
+            </linearGradient>
+          </defs>
+          <path d="M20 115 A90 90 0 0 1 200 115" fill="none" stroke="#1a2238" stroke-width="18" stroke-linecap="round"/>
+          <path id="gArc" d="M20 115 A90 90 0 0 1 200 115" fill="none" stroke="url(#gg)" stroke-width="18" stroke-linecap="round"
+                stroke-dasharray="282.7" stroke-dashoffset="282.7" style="transition: stroke-dashoffset .8s"/>
+        </svg>
+        <div class="val" id="score"></div>
+      </div>
+      <div class="cap">Бал тижня</div>
+      <div class="delta eq" id="scoreDelta"></div>
+    </div>
+    <div id="kpis" style="display:contents"></div>
+    <div class="card trendc">
+      <h2>Динаміка, % від цілі <span class="tag">8 тижнів</span></h2>
+      <div class="chart"><canvas id="trend"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h2>💰 Оборот Estone <span class="tag" id="monthTag"></span></h2>
+      <div id="chal"></div>
+      <div class="tiles" id="tiles"></div>
+    </div>
+    <div class="card">
+      <h2>⚡ Дії за тиждень <span class="tag">факт / ціль</span></h2>
+      <div id="actions"></div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h2>🔻 Воронка продажів <span class="tag">4 тижні</span></h2>
+      <div class="fn" id="funnel"></div>
+    </div>
+    <div class="card">
+      <h2>🇪🇸 Іспанська по днях <span class="pill" id="streak"></span></h2>
+      <div class="row"><div class="bignum" id="esMin"></div><div class="muted" id="esAvg"></div></div>
+      <div class="chart sm"><canvas id="esChart"></canvas></div>
+      <div class="tiles" id="words" style="grid-template-columns:1fr 1fr;margin-top:14px"></div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h2>💪 Тренування <span class="tag" id="sportTag"></span></h2>
+      <div class="row"><div class="bignum" id="sportN"></div><div class="muted" id="sportMin"></div></div>
+      <div class="dots" id="sportWeek"></div>
+      <div class="tiles" id="body" style="grid-template-columns:1fr 1fr;margin-top:16px"></div>
+    </div>
+    <div class="card">
+      <h2>👀 Видимість <span class="tag">#інста · #сайт</span></h2>
+      <div class="tiles" id="vis" style="grid-template-columns:1fr 1fr"></div>
+    </div>
+  </div>
+
+<script>
+  const KEY = <?!= keyJson ?>;
+  let state = <?!= dataJson ?>;
+  const MON = ['січ', 'лют', 'бер', 'кві', 'тра', 'чер', 'лип', 'сер', 'вер', 'жов', 'лис', 'гру'];
+  const MONTHS = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
+  const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+  const NAMES = { 'Дотик': 'Дотики', 'Відповідь': 'Відповіді', 'Дзвінок': 'Дзвінки', 'Розмова': 'Розмови', 'Прорахунок': 'Прорахунки', 'Угода': 'Угоди' };
+  const charts = {};
+  let loading = false;
+
+  const $ = id => document.getElementById(id);
+  const eur = x => Math.round(x).toLocaleString('uk-UA') + ' €';
+  const num = x => (Math.round(x * 10) / 10).toLocaleString('uk-UA');
+  const dm = s => Number(s.slice(8, 10)) + ' ' + MON[Number(s.slice(5, 7)) - 1];
+  const pct = (v, t) => t ? Math.min(100, Math.round(v / t * 100)) : 0;
+  const barColor = p => p >= 100 ? 'linear-gradient(90deg,#10c6d4,#22c55e)' : p >= 50 ? 'linear-gradient(90deg,#1e8bff,#10c6d4)' : 'linear-gradient(90deg,#ff5a5f,#ff9a1f)';
+  const addDays = (s, n) => new Date(Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10) + n)).toISOString().slice(0, 10);
+
+  function delta(now, prev, suffix) {
+    const d = now - prev;
+    return { cls: d > 0 ? 'up' : d < 0 ? 'down' : 'eq', text: (d > 0 ? '▲ +' : d < 0 ? '▼ ' : '• ') + d + (suffix || '') };
+  }
+
+  function ring(p) {
+    const c = 2 * Math.PI * 34;
+    return '<div class="ring"><svg width="84" height="84" viewBox="0 0 84 84">' +
+      '<circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="9"/>' +
+      '<circle cx="42" cy="42" r="34" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" ' +
+      'stroke-dasharray="' + c + '" stroke-dashoffset="' + (c * (1 - p / 100)) + '"/></svg><div class="p">' + p + '%</div></div>';
+  }
+
+  function areaFill(hex) {
+    return ctx => {
+      const a = ctx.chart.chartArea;
+      if (!a) return hex + '33';
+      const g = ctx.chart.ctx.createLinearGradient(0, a.top, 0, a.bottom);
+      g.addColorStop(0, hex + '66'); g.addColorStop(1, hex + '00');
+      return g;
+    };
+  }
+
+  function drawChart(id, cfg) {
+    if (!window.Chart) return;
+    if (charts[id]) { charts[id].data = cfg.data; charts[id].update(); return; }
+    charts[id] = new Chart($(id), cfg);
+  }
+
+  function render(d) {
+    state = d;
+    $('title').textContent = d.isCurrent ? '90 днів' : 'Тиждень ' + dm(d.ws);
+    $('updated').textContent = (d.day ? 'День ' + d.day + '/' + d.days_total + ' · ' : '') + dm(d.ws) + ' – ' + dm(d.we) + ' · оновлено ' + d.updated;
+    $('next').disabled = d.isCurrent;
+    const prev = d.trend[d.trend.length - 2] || { fin: 0, es: 0, sport: 0 };
+    const prevScore = Math.round((prev.fin + prev.es + prev.sport) / 3);
+
+    // Gauge
+    $('score').textContent = d.score + '%';
+    $('gArc').style.strokeDashoffset = 282.7 * (1 - d.score / 100);
+    const sd = delta(d.score, prevScore, '% до мин. тижня');
+    $('scoreDelta').className = 'delta ' + sd.cls;
+    $('scoreDelta').textContent = sd.text;
+
+    // KPI cards
+    const touches = d.actions[0];
+    const cards = [
+      { cls: 'k-blue', name: 'Estone<br>дії з клієнтами', num: num(touches.v), of: '/ ' + touches.t + ' дотиків', p: d.goals.fin, prev: prev.fin },
+      { cls: 'k-orange', name: 'Іспанська<br>мова', num: num(d.spanish.min), of: '/ ' + d.spanish.t + ' хв', p: d.goals.es, prev: prev.es },
+      { cls: 'k-cyan', name: 'Спорт<br>тренування', num: d.sport.n, of: '/ ' + d.sport.t, p: d.goals.sport, prev: prev.sport },
+    ];
+    $('kpis').innerHTML = cards.map(c => {
+      const dl = delta(c.p, c.prev, '%');
+      return '<div class="kcard ' + c.cls + '"><div style="z-index:1"><div class="name">' + c.name + '</div>' +
+        '<div class="num">' + c.num + ' <small>' + c.of + '</small></div>' +
+        '<div class="foot">' + dl.text + ' до мин. тижня</div></div>' + ring(c.p) + '</div>';
+    }).join('');
+
+    // Money tiles
+    const mo = d.month, ch = d.challenge;
+    $('monthTag').textContent = '90 днів';
+    const cp = pct(ch.turnover, ch.goal), minPos = Math.round(ch.min / ch.goal * 100);
+    $('chal').innerHTML = '<div class="chal"><div class="top"><b>' + eur(ch.turnover) + '</b><span class="muted">з ' + eur(ch.goal) +
+      ' · угод ' + ch.deals + '</span></div><div class="cbar"><div class="f" style="width:' + cp + '%"></div>' +
+      '<div class="mk" style="left:' + minPos + '%"></div><div class="ml" style="left:' + minPos + '%">мін. ' + eur(ch.min) + '</div></div>' +
+      '<div class="cfoot"></div></div>';
+    const mp = pct(mo.turnover, mo.turnoverT);
+    const mname = MONTHS[Number(mo.key.slice(5, 7)) - 1];
+    $('tiles').innerHTML =
+      '<div class="tile"><div class="l">' + mname + '</div><div class="v">' + eur(mo.turnover) + '</div>' +
+        '<div class="s">ціль ' + eur(mo.turnoverT) + ' · мін. ' + eur(mo.turnoverMin) + '</div><div class="mini"><div style="width:' + mp + '%;background:' + barColor(mp) + '"></div></div></div>' +
+      '<div class="tile"><div class="l">Угоди</div><div class="v">' + mo.deals + '</div>' +
+        '<div class="s">маржа ' + eur(mo.margin) + '</div><div class="mini"><div style="width:' + (mo.deals ? 100 : 0) + '%;background:linear-gradient(90deg,#10c6d4,#22c55e)"></div></div></div>' +
+      '<div class="tile"><div class="l">Прорахунки</div><div class="v">' + mo.quotes + '</div>' +
+        '<div class="s">на ' + eur(mo.quotesSum) + '</div><div class="mini"><div style="width:' + (mo.quotes ? 100 : 0) + '%;background:linear-gradient(90deg,#a66bff,#1e8bff)"></div></div></div>';
+
+    // Actions
+    $('actions').innerHTML = d.actions.map(a => {
+      const p = pct(a.v, a.t);
+      return '<div class="hb"><span class="n">' + NAMES[a.k] + '</span><div class="b"><div style="width:' + p +
+        '%;background:' + barColor(p) + '"></div><span><b>' + num(a.v) + '</b> / ' + a.t + '</span></div></div>';
+    }).join('');
+
+    // Funnel
+    const f = d.funnel, top = Math.max(1, f[0].v);
+    const shades = ['#10c6d4', '#22b8d8', '#3aa6e6', '#5b8ff2', '#a66bff'];
+    $('funnel').innerHTML = f.map((s, i) => {
+      const conv = i > 0 ? '<div class="fc">↓ <b>' + (f[i - 1].v ? Math.round(s.v / f[i - 1].v * 100) : 0) + '%</b></div>' : '';
+      const w = Math.max(38, Math.round(s.v / top * 100));
+      return conv + '<div class="fs" style="width:' + w + '%;background:' + shades[i] + '"><span>' + NAMES[s.k] + '</span><span>' + num(s.v) + '</span></div>';
+    }).join('');
+
+    // Spanish
+    $('esMin').innerHTML = num(d.spanish.min) + ' <small>/ ' + d.spanish.t + ' хв</small>';
+    $('streak').textContent = d.spanish.streak ? '🔥 ' + d.spanish.streak + ' дн. поспіль' : 'серії ще немає';
+    $('esAvg').textContent = d.days.filter(x => x.es > 0).length + ' з 7 днів';
+    const wp = pct(d.words.total, d.words.goal), ww = pct(d.words.week, d.words.t);
+    $('words').innerHTML =
+      '<div class="tile"><div class="l">Слова за тиждень</div><div class="v">' + d.words.week + ' <span class="muted">/ ' + d.words.t + '</span></div>' +
+        '<div class="mini"><div style="width:' + ww + '%;background:' + barColor(ww) + '"></div></div></div>' +
+      '<div class="tile"><div class="l">Словник</div><div class="v">' + d.words.total + ' <span class="muted">/ ' + d.words.goal + '</span></div>' +
+        '<div class="mini"><div style="width:' + wp + '%;background:linear-gradient(90deg,#ffb01f,#ff7a00)"></div></div></div>';
+    drawChart('esChart', {
+      type: 'bar',
+      data: { labels: DAYS, datasets: [{ data: d.days.map(x => x.es), borderRadius: 6, maxBarThickness: 26,
+        backgroundColor: ctx => {
+          const a = ctx.chart.chartArea; if (!a) return '#ff9a1f';
+          const g = ctx.chart.ctx.createLinearGradient(0, a.top, 0, a.bottom);
+          g.addColorStop(0, '#ffb01f'); g.addColorStop(1, '#ff7a00'); return g;
+        } }] },
+      options: { maintainAspectRatio: false, plugins: { legend: { display: false },
+          tooltip: { callbacks: { label: c => ' ' + c.parsed.y + ' хв' } } },
+        scales: { x: { grid: { display: false }, ticks: { color: '#8391ad', font: { weight: 700 } } },
+                  y: { beginAtZero: true, grid: { color: '#243049' }, ticks: { color: '#8391ad', maxTicksLimit: 4 } } } },
+    });
+
+    // Sport
+    $('sportTag').textContent = d.goals.sport + '% цілі';
+    $('sportN').innerHTML = d.sport.n + ' <small>/ ' + d.sport.t + ' за тиждень</small>';
+    $('sportMin').textContent = d.sport.min ? d.sport.min + ' хв' : '';
+    $('sportWeek').innerHTML = d.days.map((x, i) =>
+      '<div class="d' + (x.d === d.today ? ' today' : '') + '"><div class="c' + (x.sport ? ' on' : '') + '">' +
+      (x.sport ? '✓' : '') + '</div>' + DAYS[i] + '</div>').join('');
+
+    const b = d.body;
+    const wNow = b.weight ? b.weight.value : null;
+    const wDelta = wNow !== null && b.weightStart !== null ? Math.round((wNow - b.weightStart) * 10) / 10 : null;
+    const wProg = wNow !== null && b.weightStart !== null && b.weightStart > b.weightGoal
+      ? pct(b.weightStart - wNow, b.weightStart - b.weightGoal) : 0;
+    const pNow = b.pullups ? b.pullups.value : null;
+    const pp = pNow !== null ? pct(pNow, b.pullupGoal) : 0;
+    $('body').innerHTML =
+      '<div class="tile"><div class="l">Вага</div><div class="v">' + (wNow !== null ? num(wNow) + ' <span class="muted">кг</span>' : '—') + '</div>' +
+        '<div class="s">' + (wDelta !== null ? '<span class="' + (wDelta <= 0 ? 'up' : 'down') + '">' + (wDelta > 0 ? '+' : '') + num(wDelta) + ' кг</span> · ' : '') +
+        'ціль ' + num(b.weightGoal) + '</div><div class="mini"><div style="width:' + wProg + '%;background:linear-gradient(90deg,#10c6d4,#22c55e)"></div></div></div>' +
+      '<div class="tile"><div class="l">Підтягування</div><div class="v">' + (pNow !== null ? pNow : '—') + ' <span class="muted">/ ' + b.pullupGoal + '</span></div>' +
+        '<div class="s">' + (b.pullupsStart !== null ? 'старт ' + b.pullupsStart : '#підтягування 4') + '</div>' +
+        '<div class="mini"><div style="width:' + pp + '%;background:' + barColor(pp) + '"></div></div></div>';
+
+    // Trend (area)
+    const series = [['Estone', 'fin', '#1e8bff'], ['Іспанська', 'es', '#ff9a1f'], ['Спорт', 'sport', '#10c6d4']];
+    drawChart('trend', {
+      type: 'line',
+      data: { labels: d.trend.map(t => dm(t.w)), datasets: series.map(s => ({
+        label: s[0], data: d.trend.map(t => t[s[1]]), borderColor: s[2], backgroundColor: areaFill(s[2]),
+        fill: true, tension: .4, borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: s[2] })) },
+      options: { maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { position: 'bottom', labels: { color: '#8391ad', boxWidth: 10, boxHeight: 10, usePointStyle: true, font: { weight: 700 } } },
+          tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + c.parsed.y + '%' } } },
+        scales: { x: { grid: { display: false }, ticks: { color: '#8391ad', maxRotation: 0, autoSkip: true, maxTicksLimit: 5 } },
+                  y: { min: 0, max: 100, grid: { color: '#243049' }, ticks: { color: '#8391ad', stepSize: 25, callback: v => v + '%' } } } },
+    });
+
+    // Visibility
+    const vis = (name, sn) => {
+      if (!sn) return '<div class="tile"><div class="l">' + name + '</div><div class="v">—</div><div class="s">ще немає даних</div></div>';
+      const dl = sn.delta === null ? '' : '<span class="' + (sn.delta >= 0 ? 'up' : 'down') + '">' + (sn.delta >= 0 ? '▲ +' : '▼ ') + sn.delta + '</span> · ';
+      return '<div class="tile"><div class="l">' + name + '</div><div class="v">' + sn.value.toLocaleString('uk-UA') +
+        '</div><div class="s">' + dl + dm(sn.day) + '</div></div>';
+    };
+    $('vis').innerHTML = vis('Instagram', d.insta) + vis('Сайт, візити', d.site);
+  }
+
+  function load(ws) {
+    if (loading) return;
+    loading = true;
+    $('refresh').classList.add('spin');
+    $('err').style.display = 'none';
+    google.script.run
+      .withSuccessHandler(d => { loading = false; $('refresh').classList.remove('spin'); render(d); })
+      .withFailureHandler(() => { loading = false; $('refresh').classList.remove('spin'); $('err').style.display = 'block'; })
+      .getDevData(KEY, ws);
+  }
+
+  $('refresh').onclick = () => load(state.ws);
+  $('prev').onclick = () => load(addDays(state.ws, -7));
+  $('next').onclick = () => { if (!state.isCurrent) load(addDays(state.ws, 7)); };
+  setInterval(() => load(state.ws), 60 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) load(state.ws); });
+
+  if (window.Chart) { Chart.defaults.font.family = "'Manrope', -apple-system, Roboto, sans-serif"; }
+  render(state);
+</script>
+</body>
+</html>
