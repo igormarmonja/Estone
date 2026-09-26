@@ -9,6 +9,8 @@ const WEBAPP_URL     = 'ВСТАВ_URL_ПІСЛЯ_РОЗГОРТАННЯ';   // 
 const OWNER_ID       = 0;                                // твій Telegram ID (бот підкаже на /start)
 const GEMINI_API_KEY = 'ВСТАВ_КЛЮЧ_GEMINI';
 const GEMINI_MODEL   = 'gemini-3.1-flash-lite';
+// Якщо основна модель недоступна — бот сам пробує ці (…-latest Google оновлює сам)
+const GEMINI_FALLBACKS = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash'];
 const DASH_KEY       = 'ВСТАВ_ПАРОЛЬ_ДАШБОРДА';          // будь-який набір літер і цифр
 const TZ             = 'Europe/Madrid';
 const CURRENCY       = '€';
@@ -199,6 +201,7 @@ function handleMessage_(msg) {
   if (msg.voice || msg.audio) { handleVoice_(chatId, msg.voice || msg.audio); return; }
   if (!msg.text) return;
   const text = msg.text.trim();
+  if (MENU[text]) { clearMode_(); MENU[text](chatId); return; }
   if (text.startsWith('/')) { command_(chatId, text); return; }
   if (text.startsWith('#')) { handleTag_(chatId, text); return; }
   process_(chatId, text, null);
@@ -210,12 +213,23 @@ function handleVoice_(chatId, v) {
   if (!f.ok) { send_(chatId, 'Не вдалося отримати голосове 😕'); return; }
   tg_('sendChatAction', { chat_id: chatId, action: 'typing' });
   const blob = UrlFetchApp.fetch('https://api.telegram.org/file/bot' + BOT_TOKEN + '/' + f.result.file_path).getBlob();
-  process_(chatId, null, { mime: v.mime_type || 'audio/ogg', data: Utilities.base64Encode(blob.getBytes()) });
+  process_(chatId, null, { mime: (v.mime_type || 'audio/ogg').split(';')[0], data: Utilities.base64Encode(blob.getBytes()) });
 }
 
 /** Вільний текст або голос: план, огляд або записи — залежно від режиму. */
 function process_(chatId, text, audio) {
   const mode = mode_();
+
+  if (mode === 'idea' || mode.indexOf('ask:') === 0 || mode.indexOf('lang:') === 0) {
+    let t = text;
+    if (audio) { const r = ai_(TRANSCRIBE_PROMPT, null, audio); t = r && r.transcript; }
+    if (!t) { send_(chatId, 'Не вдалося розібрати 😕 Спробуй ще раз текстом.\n' + geminiErr_()); return; }
+    clearMode_();
+    if (mode === 'idea') send_(chatId, saveIdea_(t));
+    else if (mode.indexOf('lang:') === 0) langHelp_(chatId, mode.slice(5), t);
+    else handleTag_(chatId, '#' + DEV_ALIASES[METRICS[Number(mode.slice(4))]][0] + ' ' + t);
+    return;
+  }
 
   if (mode === 'plan') {
     let items = [];
@@ -266,7 +280,7 @@ function process_(chatId, text, audio) {
   if (!geminiOn_()) { send_(chatId, 'Без Gemini я розумію тільки швидкі записи: #дотик 20. Довідка: /help'); return; }
   tg_('sendChatAction', { chat_id: chatId, action: 'typing' });
   const r = ai_(PARSE_PROMPT, text, audio);
-  if (!r) { send_(chatId, 'Не вдалося розібрати 😕 Спробуй ще раз або швидкий запис: #дотик 20'); return; }
+  if (!r) { send_(chatId, 'Не вдалося розібрати 😕 Спробуй ще раз або запиши через ➕ Записати.\n' + geminiErr_()); return; }
   const entries = (r.entries || []).map(cleanEntry_).filter(Boolean);
   const idea = r.idea ? String(r.idea).trim() : '';
   const heard = audio && r.transcript ? '🎙 «' + String(r.transcript).slice(0, 300) + '»\n\n' : '';
@@ -330,25 +344,25 @@ function handleTag_(chatId, text) {
 
 const HELP =
   '🎯 Челендж 90 днів\n\n' +
-  '🎙 Просто надиктуй голосом або напиши, що зробив:\n' +
+  '🎙 Найпростіше — надиктуй голосом або напиши, що зробив:\n' +
   '«написав 15 дизайнерам, двоє відповіли, 20 хвилин іспанської, 15 англійської, був у залі»\n' +
   'Можна і про вчора: «вчора зробив прорахунок на 2400»\n\n' +
-  '⚡ Швидко: #дотик 20 · #відповідь 2 · #дзвінок 3 · #розмова 1\n' +
-  '#прорахунок 2400 · #угода 3500 маржа 700\n' +
-  '#іспанська 20 · #слова 5 · #слово desagüe · #англ 15\n' +
-  '#спорт 45 · #вага 80.5 · #підтягування 4\n#інста 520 · #сайт 140\n' +
-  '#читання 20 · #музика 15 · #сон 7 · #сигарети 3 · #некурив\n' +
-  '#ідея … — записати ідею на потім · #підсумок … — підсумок дня\n\n' +
-  '🗣 Для клієнтів:\n/es текст — переклад для WhatsApp іспанською (або встав повідомлення клієнта — перекладу і дам відповідь)\n/en текст — те саме англійською\n\n' +
-  '/today — сьогодні\n/habits — звички дня\n/week — тиждень\n/plan — задати план дня\n/coach — порада коуча\n' +
-  '/words — слова на сьогодні\n/goals — цілі челенджу\n/dash — дашборд\n/undo — скасувати останній запис\n/skip — скасувати очікування плану чи огляду';
+  '⌨️ Або кнопки внизу:\n' +
+  '➕ Записати — вибрати, що зробив, і натиснути кількість\n' +
+  '✅ Звички — відмітити звички дня\n📝 План · 🌙 Підсумок — ранок і вечір\n' +
+  '🗣 Клієнту — переклад для WhatsApp іспанською чи англійською\n' +
+  '💡 Ідея — записати ідею на потім, щоб не відволікатися\n' +
+  '🔧 Перевірка — чи працює Gemini (коуч, слова, голосові)\n\n' +
+  '📊 Дашборд відкривається кнопкою 📱 Дашборд. Щось записав помилково — ➕ Записати → ↩️ Скасувати.\n' +
+  '(Старі швидкі записи через # теж працюють: #дотик 20, #сон 7 …)';
 
 function command_(chatId, text) {
   const cmd = text.split(/\s+/)[0].split('@')[0].toLowerCase();
   switch (cmd) {
     case '/start':
     case '/help':
-      send_(chatId, HELP); break;
+    case '/menu':
+      send_(chatId, HELP, { reply_markup: MAIN_KB }); break;
 
     case '/today':
       send_(chatId, todayText_()); break;
@@ -376,7 +390,7 @@ function command_(chatId, text) {
       if (!geminiOn_()) { send_(chatId, 'Потрібен ключ Gemini.'); return; }
       tg_('sendChatAction', { chat_id: chatId, action: 'typing' });
       const c = coach_();
-      send_(chatId, c ? '🧠 ' + c : 'Коуч зараз недоступний 😕 Спробуй пізніше.');
+      send_(chatId, c ? '🧠 ' + c : 'Коуч зараз недоступний 😕\n' + geminiErr_());
       break;
     }
 
@@ -401,7 +415,8 @@ function command_(chatId, text) {
     case '/words': {
       let w = botWordsToday_();
       if (!w.length) { tg_('sendChatAction', { chat_id: chatId, action: 'typing' }); w = newDailyWords_(); }
-      send_(chatId, w.length ? wordsText_(w) : 'Не вдалося підібрати слова 😕 Спробуй пізніше.', { parse_mode: 'HTML' });
+      if (w.length) send_(chatId, wordsText_(w), { parse_mode: 'HTML' });
+      else send_(chatId, 'Не вдалося підібрати слова 😕\n' + geminiErr_());
       break;
     }
 
@@ -429,6 +444,12 @@ function handleCallback_(cq) {
     return;
   }
   if (parts[0] === 'hb') { habitCallback_(cq, parts[1], Number(parts[2])); return; }
+  if (parts[0] === 'lg') { logCallback_(cq, parts); return; }
+  if (parts[0] === 'ln') {
+    setMode_('lang:' + parts[1], 1);
+    editMenu_(cq, (parts[1] === 'es' ? '🇪🇸' : '🇬🇧') + ' Напиши (або надиктуй) українською, що хочеш сказати клієнту — або встав його повідомлення.', []);
+    return;
+  }
   if (parts[0] !== 'pt') return;
   const date = parts[1], idx = Number(parts[2]);
   const plan = getPlan_(date);
@@ -552,23 +573,65 @@ const TRANSCRIBE_PROMPT =
 function geminiOn_() { return GEMINI_API_KEY && GEMINI_API_KEY.indexOf('ВСТАВ') !== 0; }
 
 function gemini_(parts, json, maxTokens) {
-  try {
-    const cfg = { temperature: json ? 0 : 0.6, maxOutputTokens: maxTokens || 1024 };
-    if (json) cfg.responseMimeType = 'application/json';
-    const res = UrlFetchApp.fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent', {
-        method: 'post', contentType: 'application/json', muteHttpExceptions: true,
-        headers: { 'x-goog-api-key': GEMINI_API_KEY },
-        payload: JSON.stringify({ contents: [{ parts: parts }], generationConfig: cfg }),
-      });
-    const d = JSON.parse(res.getContentText());
-    if (d.error) { console.error('Gemini: ' + d.error.message); return null; }
-    const c = (d.candidates || [])[0];
-    return c && c.content ? c.content.parts.map(p => p.text || '').join('') : null;
-  } catch (err) {
-    console.error(err);
-    return null;
+  const p = PropertiesService.getScriptProperties();
+  const good = p.getProperty('GEMINI_OK');
+  const models = [good, GEMINI_MODEL].concat(GEMINI_FALLBACKS).filter((m, i, a) => m && a.indexOf(m) === i);
+  let lastErr = '';
+  for (let i = 0; i < models.length; i++) {
+    const model = models[i];
+    try {
+      // Моделі Gemini 3 «думають» перед відповіддю, і думки з'їдають ліміт — тому ліміт великий
+      const cfg = { temperature: json ? 0 : 0.6, maxOutputTokens: Math.max(maxTokens || 0, 8192) };
+      if (json) cfg.responseMimeType = 'application/json';
+      const res = UrlFetchApp.fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent', {
+          method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+          headers: { 'x-goog-api-key': GEMINI_API_KEY },
+          payload: JSON.stringify({ contents: [{ parts: parts }], generationConfig: cfg }),
+        });
+      const d = JSON.parse(res.getContentText());
+      if (d.error) {
+        lastErr = model + ': ' + d.error.message;
+        if (/API key|API_KEY|PERMISSION_DENIED|location is not supported/i.test(d.error.message + ' ' + d.error.status)) break;  // інша модель не допоможе
+        continue;
+      }
+      const c = (d.candidates || [])[0];
+      const out = c && c.content && c.content.parts ? c.content.parts.filter(x => !x.thought).map(x => x.text || '').join('') : '';
+      if (!out) {
+        lastErr = model + ': порожня відповідь (' + ((c && c.finishReason) || (d.promptFeedback && d.promptFeedback.blockReason) || '?') + ')';
+        continue;
+      }
+      if (good !== model) p.setProperty('GEMINI_OK', model);
+      p.deleteProperty('GEMINI_ERR');
+      return out;
+    } catch (err) {
+      lastErr = model + ': ' + err.message;
+    }
   }
+  p.setProperty('GEMINI_ERR', String(lastErr).slice(0, 500));
+  console.error('Gemini: ' + lastErr);
+  return null;
+}
+
+/** Людський опис останньої помилки Gemini. */
+function geminiErr_() {
+  const e = PropertiesService.getScriptProperties().getProperty('GEMINI_ERR') || '';
+  if (!e) return '';
+  let hint = '';
+  if (/API key not valid|API_KEY_INVALID/i.test(e)) hint = 'Ключ неправильний. Створи новий на aistudio.google.com/apikey і встав у GEMINI_API_KEY.';
+  else if (/quota|RESOURCE_EXHAUSTED|rate/i.test(e)) hint = 'Вичерпано ліміт безкоштовних запитів. Зачекай або перевір ліміти в aistudio.google.com.';
+  else if (/location is not supported/i.test(e)) hint = 'Google не пускає з цього регіону.';
+  else if (/PERMISSION_DENIED|has not been used|disabled/i.test(e)) hint = 'Для ключа не ввімкнено Gemini API. Створи ключ саме в aistudio.google.com/apikey.';
+  else if (/not found|not supported/i.test(e)) hint = 'Модель недоступна для твого ключа.';
+  return '⚠️ Gemini: ' + e + (hint ? '\n💡 ' + hint : '');
+}
+
+/** Кнопка «🔧 Перевірка»: чи працює Gemini і який ключ/модель. */
+function diagText_() {
+  if (!geminiOn_()) return '❌ Ключ Gemini не вписано (GEMINI_API_KEY). Візьми його на aistudio.google.com/apikey.';
+  const out = gemini_([{ text: 'Відповідай одним словом: працює' }], false, 50);
+  const model = PropertiesService.getScriptProperties().getProperty('GEMINI_OK');
+  return out ? '✅ Gemini працює · модель ' + model + '\nКоуч, слова і голосові мають працювати.' : '❌ Gemini не відповідає.\n' + geminiErr_();
 }
 
 function ai_(instruction, text, audio) {
@@ -821,6 +884,110 @@ function wordsQuiz_() {
   const hasNew = quiz.some(w => w.added === today && w.source === 'бот');
   send_(OWNER_ID, text, Object.assign({ parse_mode: 'HTML' },
     hasNew ? { reply_markup: { inline_keyboard: [[{ text: '✅ Вивчив слова дня', callback_data: 'wl:' + today }]] } } : {}));
+}
+
+// ======================= МЕНЮ =======================
+
+const MAIN_KB = { is_persistent: true, resize_keyboard: true, keyboard: [
+  [{ text: '➕ Записати' }, { text: '✅ Звички' }],
+  [{ text: '📝 План' }, { text: '🌙 Підсумок' }],
+  [{ text: '📊 Сьогодні' }, { text: '📈 Тиждень' }],
+  [{ text: '🧠 Коуч' }, { text: '📚 Слова' }],
+  [{ text: '🗣 Клієнту' }, { text: '💡 Ідея' }],
+  [{ text: '📱 Дашборд' }, { text: '🔧 Перевірка' }],
+] };
+
+const MENU = {
+  '➕ Записати': c => send_(c, LOG_ROOT_TEXT, { reply_markup: { inline_keyboard: logRootKb_() } }),
+  '✅ Звички': c => command_(c, '/habits'),
+  '📝 План': c => command_(c, '/plan'),
+  '🌙 Підсумок': c => {
+    setMode_('evening', 6);
+    send_(c, '✍️ Підсумок дня — текстом або голосом 🎙\n1. Що зробив?\n2. Де злився і чому? Чесно.\n3. Що завтра робиш ПЕРШИМ?');
+  },
+  '📊 Сьогодні': c => command_(c, '/today'),
+  '📈 Тиждень': c => command_(c, '/week'),
+  '🧠 Коуч': c => command_(c, '/coach'),
+  '📚 Слова': c => command_(c, '/words'),
+  '🗣 Клієнту': c => send_(c, '🗣 Якою мовою клієнт?', { reply_markup: { inline_keyboard: [[
+    { text: '🇪🇸 Іспанською', callback_data: 'ln:es' }, { text: '🇬🇧 Англійською', callback_data: 'ln:en' }]] } }),
+  '💡 Ідея': c => { setMode_('idea', 1); send_(c, '💡 Напиши або надиктуй ідею — збережу до неділі, щоб вона не відволікала.'); },
+  '📱 Дашборд': c => command_(c, '/dash'),
+  '🔧 Перевірка': c => { tg_('sendChatAction', { chat_id: c, action: 'typing' }); send_(c, diagText_()); },
+};
+
+// Що можна записати через «➕ Записати»: категорія → показники
+const LOG_ROOT_TEXT = '➕ Що записати?';
+const LOG_CATS = {
+  sales: { name: '💼 Продажі', metrics: ['Дотик', 'Відповідь', 'Дзвінок', 'Розмова', 'Прорахунок', 'Угода', 'Instagram', 'Сайт'] },
+  lang:  { name: '🗣 Мови', metrics: ['Іспанська', 'Англійська', 'Слова'] },
+  body:  { name: '💪 Спорт і тіло', metrics: ['Спорт', 'Вага', 'Підтягування'] },
+  life:  { name: '🌱 Життя', metrics: ['Читання', 'Музика', 'Сон', 'Сигарети', 'Без сигарет'] },
+};
+// Кнопки з готовими числами; показники без них бот попросить ввести
+const QUICK_VALUES = {
+  'Дотик': [1, 5, 10, 20], 'Відповідь': [1, 2, 3, 5], 'Дзвінок': [1, 3, 5, 10], 'Розмова': [1, 2, 3],
+  'Іспанська': [15, 30, 45, 60], 'Англійська': [10, 15, 30], 'Слова': [5, 10],
+  'Спорт': [30, 45, 60, 90], 'Читання': [15, 30, 60], 'Музика': [15, 30, 60], 'Сон': [5, 6, 7, 8], 'Сигарети': [1, 3, 5, 10],
+};
+const ASK_TEXT = {
+  'Прорахунок': 'Напиши суму прорахунку в євро, наприклад: 2400', 'Угода': 'Напиши суму і маржу, наприклад: 3500 700',
+  'Вага': 'Напиши вагу, наприклад: 80.5', 'Підтягування': 'Скільки максимум підтягнувся за підхід?',
+  'Instagram': 'Скільки зараз підписників?', 'Сайт': 'Скільки візитів на сайт?',
+};
+const UNITS = { 'Іспанська': ' хв', 'Англійська': ' хв', 'Читання': ' хв', 'Музика': ' хв', 'Спорт': ' хв', 'Сон': ' год' };
+
+function logRootKb_() {
+  return Object.keys(LOG_CATS).map(k => [{ text: LOG_CATS[k].name, callback_data: 'lg:c:' + k }])
+    .concat([[{ text: '↩️ Скасувати останній запис', callback_data: 'lg:u' }]]);
+}
+
+function editMenu_(cq, text, kb) {
+  tg_('editMessageText', { chat_id: cq.message.chat.id, message_id: cq.message.message_id, text: text,
+    reply_markup: { inline_keyboard: kb } });
+}
+
+function logCallback_(cq, parts) {
+  const chatId = cq.message.chat.id;
+  const act = parts[1];
+  if (act === 'r') { editMenu_(cq, LOG_ROOT_TEXT, logRootKb_()); return; }
+  if (act === 'u') { editMenu_(cq, '↩️ Скасовую…', []); command_(chatId, '/undo'); return; }
+  if (act === 'c') {
+    const cat = LOG_CATS[parts[2]];
+    if (!cat) return;
+    const btns = cat.metrics.map(m => ({ text: (ICONS[m] || '') + ' ' + m, callback_data: 'lg:m:' + METRICS.indexOf(m) + ':' + parts[2] }));
+    const kb = [];
+    for (let i = 0; i < btns.length; i += 2) kb.push(btns.slice(i, i + 2));
+    kb.push([{ text: '⬅️ Назад', callback_data: 'lg:r' }]);
+    editMenu_(cq, cat.name + ' — що саме?', kb);
+    return;
+  }
+  const metric = METRICS[Number(parts[2])];
+  if (!metric) return;
+  const tag = '#' + DEV_ALIASES[metric][0];
+  if (act === 'm') {
+    if (metric === 'Без сигарет') { editMenu_(cq, '🚭 Записую…', []); handleTag_(chatId, tag); return; }
+    const vals = QUICK_VALUES[metric];
+    if (!vals) {
+      setMode_('ask:' + parts[2], 1);
+      editMenu_(cq, (ICONS[metric] || '') + ' ' + (ASK_TEXT[metric] || 'Напиши число'), []);
+      return;
+    }
+    editMenu_(cq, (ICONS[metric] || '') + ' ' + metric + (UNITS[metric] ? ' (' + UNITS[metric].trim() + ')' : '') + ' — скільки?', [
+      vals.map(v => ({ text: String(v), callback_data: 'lg:v:' + parts[2] + ':' + v })),
+      [{ text: '✍️ Інше число', callback_data: 'lg:a:' + parts[2] }, { text: '⬅️ Назад', callback_data: 'lg:c:' + (parts[3] || 'sales') }],
+    ]);
+    return;
+  }
+  if (act === 'a') {
+    setMode_('ask:' + parts[2], 1);
+    editMenu_(cq, (ICONS[metric] || '') + ' ' + metric + ': напиши число' + (UNITS[metric] ? ' (' + UNITS[metric].trim() + ')' : ''), []);
+    return;
+  }
+  if (act === 'v') {
+    editMenu_(cq, (ICONS[metric] || '') + ' ' + metric + ': ' + parts[3] + (UNITS[metric] || ''), []);
+    handleTag_(chatId, tag + ' ' + parts[3]);
+  }
 }
 
 // ======================= ЗВИЧКИ =======================
@@ -1282,6 +1449,7 @@ function setWebhook() {
   if (WEBAPP_URL.indexOf('https://') !== 0) throw new Error('Спочатку встав WEBAPP_URL');
   console.log(tg_('setWebhook', { url: WEBAPP_URL, drop_pending_updates: true, allowed_updates: ['message', 'callback_query'] }));
   console.log(tg_('setMyCommands', { commands: [
+    { command: 'menu', description: 'Показати меню' },
     { command: 'today', description: 'Сьогодні' },
     { command: 'habits', description: 'Звички дня' },
     { command: 'es', description: 'Переклад для клієнта іспанською' },
@@ -1295,6 +1463,7 @@ function setWebhook() {
     { command: 'undo', description: 'Скасувати останній запис' },
     { command: 'help', description: 'Довідка' },
   ] }));
+  if (OWNER_ID) send_(OWNER_ID, '⌨️ Меню оновлено — кнопки внизу.', { reply_markup: MAIN_KB });
 }
 
 /** 3. Вмикає ранкові, денні, вечірні та недільні повідомлення. */
