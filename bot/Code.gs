@@ -28,6 +28,8 @@ const GOALS_90 = `
 🇬🇧 Англійська: 15 хв щодня (105 хв на тиждень) — підтримувати й розвивати. Подкасти, серіали, розмова.
 💪 Спорт: 3 тренування на тиждень (36+ за челендж). Вага з ~80,5 до 77,5 кг.
    10 підтягувань за підхід. Видимий прес і сильна спина.
+📖 Читання українською та англійською, 🎹 музика (Suno) 15 хв щодня, 🚭 кинути курити, 😴 налагодити сон.
+📝 Щодня план зранку і підсумок увечері.
 🔥 Навіщо: впевненість у собі і доказ, що можна працювати віддалено на Україну та відкрити autónomo.
 `;
 
@@ -51,6 +53,7 @@ const MORNING_HOUR = 7;    // ранковий план
 const NUDGE_HOUR   = 15;   // нагадування, якщо за день нічого не записано
 const EVENING_HOUR = 21;   // вечірня перевірка
 const REVIEW_HOUR  = 19;   // недільний огляд
+const LATE_HOUR    = 23;   // пізнє нагадування, якщо немає підсумку дня
 
 // ----- Цілі на тиждень і місяць -----
 const DEV_TARGETS = {
@@ -59,6 +62,8 @@ const DEV_TARGETS = {
   'Англійська': 105,  // активних хвилин (15 на день)
   'Слова': 35,        // 5 на день
   'Спорт': 3,         // тренувань
+  'Читання': 105,     // хвилин (15 на день)
+  'Музика': 105,      // хвилин (15 на день)
 };
 
 // ----- Швидкий запис через # -----
@@ -75,10 +80,51 @@ const DEV_ALIASES = {
   'Слова':      ['слова', 'words'],
   'Вага':       ['вага', 'вес', 'weight'],
   'Підтягування': ['підтягування', 'підтяг', 'турнік', 'pullups'],
+  'Читання':    ['читання', 'читав', 'книга', 'reading'],
+  'Музика':     ['музика', 'suno', 'суно', 'music'],
+  'Сон':        ['сон', 'спав', 'sleep'],
+  'Сигарети':   ['сигарети', 'сигарета', 'цигарки', 'курив', 'smoke'],
+  'Без сигарет': ['некурив', 'безсигарет'],
+  'Підсумок':   ['підсумок'],
   'Instagram':  ['інста', 'інстаграм', 'insta', 'instagram'],
   'Сайт':       ['сайт', 'site', 'web'],
 };
 const SNAPSHOTS = ['Вага', 'Підтягування', 'Instagram', 'Сайт'];
+
+// ----- Звички (система «Атомних звичок») -----
+const HABITS_START = '2026-09-27';   // з цього дня бот рахує звички і пропуски
+const IDENTITY = 'Я людина, яка тримає слово, дане собі.';
+// mini — версія на 2 хвилини для поганого дня; hint — що робити, якщо звичку не відмітити кнопкою
+const HABITS = [
+  { k: 'План',        icon: '📝', mini: 'одна головна справа і час', hint: 'Задай план: /plan' },
+  { k: 'Продажі',     icon: '💼', mini: 'одне повідомлення клієнту', hint: 'Напиши або надиктуй, що зробив: «написав 5 дизайнерам»' },
+  { k: 'Іспанська',   icon: '🇪🇸', mini: '5 хвилин або слова дня' },
+  { k: 'Англійська',  icon: '🇬🇧', mini: '5 хвилин подкасту' },
+  { k: 'Читання',     icon: '📖', mini: 'одна сторінка' },
+  { k: 'Музика',      icon: '🎹', mini: '2 хвилини в Suno' },
+  { k: 'Без сигарет', icon: '🚭', mini: 'відкласти наступну сигарету на 30 хв' },
+  { k: 'Підсумок',    icon: '🌙', mini: 'три речення', hint: 'Напиши підсумок: #підсумок … або надиктуй після вечірньої перевірки' },
+];
+const QUICK_HABITS = { 'Іспанська': 15, 'Англійська': 15, 'Читання': 15, 'Музика': 15, 'Без сигарет': 1 };  // кнопка = запис
+const SALES_DAY_MIN = 10;    // мінімум продажних дій на день; поки менше — нові ідеї чекають
+const SLEEP_GOAL    = 7;     // годин
+const QUOTE_CONV    = 0.175; // конверсія прорахунків у продажі (15–20%)
+
+// ----- Тон: жорсткий, як просив Ігор -----
+const TAUNTS = [
+  'Ну добре, можеш цього не робити. Як хочеш. Це ж ти хотів росту і змін, а не я.',
+  'Ну добре, роби що хочеш. Ти ж краще знаєш 🙂',
+  'Ну да, да, ти ж сильний. Потім усе наздоженеш, як завжди)))) Ага, ага.',
+  'Знову «завтра»? Цих «завтра» вже набралося на 40 років.',
+  'Обіцянка собі — теж обіцянка. Чи тобі можна не тримати слово?',
+  'Нічого страшного. Просто ще один день, як усі попередні роки.',
+  'Цікаво, скільки ще разів ти пообіцяєш собі і не зробиш?',
+];
+const DOUBLE_MISS = [
+  'Два дні поспіль без: {h}. Саме так і минули роки до 40 — «потім», «з понеділка», «наздожену». І де результат?',
+  'Другий пропуск поспіль: {h}. Один пропуск — випадковість. Два — твоя стара звичка здаватися.',
+  'Знову нуль: {h}. Той Ігор, що все відкладав, радий — він знову виграє.',
+];
 // ========================================================
 
 const METRICS      = Object.keys(DEV_ALIASES);
@@ -88,6 +134,8 @@ const SHEET_LOG    = 'Записи';
 const SHEET_PLAN   = 'Плани';
 const SHEET_REVIEW = 'Огляди';
 const SHEET_WORDS  = 'Слова';
+const SHEET_JOURNAL = 'Щоденник';
+const SHEET_IDEAS  = 'Ідеї';
 const WORD_TOPICS = [
   'камінь, кухні й ванні кімнати (для продажів Estone): матеріали, вироби, монтаж',
   'розмова з клієнтом: ціна, терміни, замір, доставка, передоплата',
@@ -100,7 +148,8 @@ const WORD_TOPICS = [
 const WORD_INTERVALS = [1, 3, 7, 14];   // повторення через 1, 3, 7, 14 днів
 const ICONS = { 'Дотик': '📨', 'Відповідь': '💬', 'Дзвінок': '📞', 'Розмова': '🤝', 'Прорахунок': '📐',
   'Угода': '🎉', 'Іспанська': '🇪🇸', 'Англійська': '🇬🇧', 'Слова': '📚', 'Спорт': '💪', 'Вага': '⚖️', 'Підтягування': '🏋️',
-  'Instagram': '📸', 'Сайт': '🌐' };
+  'Instagram': '📸', 'Сайт': '🌐',
+  'Читання': '📖', 'Музика': '🎹', 'Сон': '😴', 'Сигарети': '🚬', 'Без сигарет': '🚭', 'Підсумок': '🌙' };
 
 // ======================= ВХІД ВІД TELEGRAM =======================
 
@@ -197,18 +246,36 @@ function process_(chatId, text, audio) {
     return;
   }
 
+  if (mode === 'evening') {
+    let answer = text, r = null;
+    if (geminiOn_()) {
+      tg_('sendChatAction', { chat_id: chatId, action: 'typing' });
+      r = ai_(PARSE_PROMPT, text, audio);
+      if (audio) answer = r && r.transcript;
+    }
+    if (!answer) { send_(chatId, 'Не вдалося розібрати 😕 Спробуй ще раз.'); return; }
+    const date = modeDate_() || today_();
+    clearMode_();
+    const entries = r ? (r.entries || []).map(cleanEntry_).filter(Boolean) : [];
+    entries.forEach(e => { if (!e.days_ago) e.days_ago = daysAgo_(date); saveEntry_(e, audio ? 'голос' : 'текст'); });
+    saveJournal_(answer, date);
+    send_(chatId, '🌙 Підсумок записано.' + (entries.length ? '\n\n' + confirm_(entries) : '') + '\n\n' + habitVerdict_(date));
+    return;
+  }
+
   if (!geminiOn_()) { send_(chatId, 'Без Gemini я розумію тільки швидкі записи: #дотик 20. Довідка: /help'); return; }
   tg_('sendChatAction', { chat_id: chatId, action: 'typing' });
   const r = ai_(PARSE_PROMPT, text, audio);
   if (!r) { send_(chatId, 'Не вдалося розібрати 😕 Спробуй ще раз або швидкий запис: #дотик 20'); return; }
   const entries = (r.entries || []).map(cleanEntry_).filter(Boolean);
+  const idea = r.idea ? String(r.idea).trim() : '';
   const heard = audio && r.transcript ? '🎙 «' + String(r.transcript).slice(0, 300) + '»\n\n' : '';
-  if (!entries.length) {
+  if (!entries.length && !idea) {
     send_(chatId, heard + 'Не знайшов, що записати 🤔\nПриклад: «написав 15 дизайнерам, 20 хвилин іспанської, був у залі»');
     return;
   }
   entries.forEach(e => saveEntry_(e, audio ? 'голос' : 'текст'));
-  send_(chatId, heard + confirm_(entries));
+  send_(chatId, heard + (entries.length ? confirm_(entries) : '') + (idea ? (entries.length ? '\n\n' : '') + saveIdea_(idea) : ''));
 }
 
 // ======================= ШВИДКИЙ ЗАПИС # =======================
@@ -219,6 +286,15 @@ function handleTag_(chatId, text) {
   if (!m) { send_(chatId, HELP); return; }
   const tag = m[1].toLowerCase();
   if (tag === 'слово' || tag === 'word') { addOwnWord_(chatId, m[2]); return; }
+  if (tag === 'ідея' || tag === 'idea') {
+    if (!m[2].trim()) { send_(chatId, 'Напиши ідею: #ідея відео з монтажу раковини'); return; }
+    send_(chatId, saveIdea_(m[2].trim())); return;
+  }
+  if (tag === 'підсумок') {
+    if (!m[2].trim()) { send_(chatId, 'Напиши підсумок: #підсумок зробив…, злився на…, завтра першим…'); return; }
+    saveJournal_(m[2].trim(), today_());
+    send_(chatId, '🌙 Підсумок записано.\n\n' + habitVerdict_(today_())); return;
+  }
   const metric = METRICS.find(k => DEV_ALIASES[k].some(a => tag === a || (a.length >= 4 && tag.indexOf(a) === 0)));
   if (!metric) { send_(chatId, 'Не знаю такого показника 🤔 Довідка: /help'); return; }
   const rest = m[2];
@@ -235,6 +311,10 @@ function handleTag_(chatId, text) {
     case 'Англійська':
       if (!nums.length) { send_(chatId, 'Напиши хвилини: #' + tag + ' 20'); return; }
       e.qty = nums[0]; break;
+    case 'Читання': case 'Музика': e.qty = nums[0] || 15; break;
+    case 'Сон':
+      if (!nums.length) { send_(chatId, 'Напиши години: #сон 7.5'); return; }
+      e.value = nums[0]; break;
     case 'Спорт': e.value = nums[0] || null; break;
     case 'Вага': case 'Підтягування': case 'Instagram': case 'Сайт':
       if (!nums.length) { send_(chatId, 'Напиши число: #' + tag + ' 80.5'); return; }
@@ -256,8 +336,11 @@ const HELP =
   '⚡ Швидко: #дотик 20 · #відповідь 2 · #дзвінок 3 · #розмова 1\n' +
   '#прорахунок 2400 · #угода 3500 маржа 700\n' +
   '#іспанська 20 · #слова 5 · #слово desagüe · #англ 15\n' +
-  '#спорт 45 · #вага 80.5 · #підтягування 4\n#інста 520 · #сайт 140\n\n' +
-  '/today — сьогодні\n/week — тиждень\n/plan — задати план дня\n/coach — порада коуча\n' +
+  '#спорт 45 · #вага 80.5 · #підтягування 4\n#інста 520 · #сайт 140\n' +
+  '#читання 20 · #музика 15 · #сон 7 · #сигарети 3 · #некурив\n' +
+  '#ідея … — записати ідею на потім · #підсумок … — підсумок дня\n\n' +
+  '🗣 Для клієнтів:\n/es текст — переклад для WhatsApp іспанською (або встав повідомлення клієнта — перекладу і дам відповідь)\n/en текст — те саме англійською\n\n' +
+  '/today — сьогодні\n/habits — звички дня\n/week — тиждень\n/plan — задати план дня\n/coach — порада коуча\n' +
   '/words — слова на сьогодні\n/goals — цілі челенджу\n/dash — дашборд\n/undo — скасувати останній запис\n/skip — скасувати очікування плану чи огляду';
 
 function command_(chatId, text) {
@@ -269,6 +352,17 @@ function command_(chatId, text) {
 
     case '/today':
       send_(chatId, todayText_()); break;
+
+    case '/habits': {
+      const t = today_(), done = habitDay_(daySums_(devRows_()), t, planDates_());
+      send_(chatId, '🧱 Звички · ' + done.filter(Boolean).length + '/' + HABITS.length + ' — натисни, що зроблено:',
+        { reply_markup: { inline_keyboard: habitsKeyboard_(t, done) } });
+      break;
+    }
+
+    case '/es':
+    case '/en':
+      langHelp_(chatId, cmd.slice(1), text.replace(/^\S+\s*/, '')); break;
 
     case '/week':
       send_(chatId, devReport_()); break;
@@ -334,6 +428,7 @@ function handleCallback_(cq) {
     send_(cq.message.chat.id, confirm_([e]));
     return;
   }
+  if (parts[0] === 'hb') { habitCallback_(cq, parts[1], Number(parts[2])); return; }
   if (parts[0] !== 'pt') return;
   const date = parts[1], idx = Number(parts[2]);
   const plan = getPlan_(date);
@@ -349,39 +444,69 @@ function handleCallback_(cq) {
 function morningPush() {
   const day = dayNum_();
   if (day > CHALLENGE_DAYS + 1) return;
-  const y = devSum_(devRows_(), addDays_(today_(), -1), addDays_(today_(), -1));
-  const yLine = sumLine_(y);
+  const rows = devRows_(), plans = planDates_(), m = daySums_(rows);
+  const yd = addDays_(today_(), -1);
+  const yLine = sumLine_(m[yd] || {});
+  const yDone = yd >= HABITS_START ? habitDay_(m, yd, plans).filter(Boolean).length : null;
+  const miss = missed_(m, plans);
+  let msg = '☀️ Доброго ранку! ' + dayLine_() + '\n🪪 ' + IDENTITY +
+    (yLine ? '\n\nВчора: ' + yLine : '') +
+    (yDone !== null ? '\n🧱 Звички вчора: ' + yDone + '/' + HABITS.length : '');
+  if (miss.twice.length) msg += '\n\n🚨 ' + pick_(DOUBLE_MISS).replace('{h}', miss.twice.map(h => h.icon + ' ' + h.k).join(', '));
+  if (miss.once.length) msg += '\n\n⚠️ Вчора пропустив: ' + miss.once.map(h => h.icon + ' ' + h.k).join(', ') +
+    '.\nПравило одне: ніколи не пропускай двічі. Сьогодні — хоча б мінімальна версія.';
   setMode_('plan', 8);
-  send_(OWNER_ID, '☀️ Доброго ранку! ' + dayLine_() +
-    (yLine ? '\nВчора: ' + yLine : '') +
-    '\n\nЯкі 3 головні справи на сьогодні? Напиши або надиктуй 🎙\n/skip — без плану');
+  send_(OWNER_ID, msg + '\n\n📝 Які 3 головні справи сьогодні і КОЛИ саме?\nНаприклад: «13:00 — написати 10 дизайнерам». Напиши або надиктуй 🎙\n/skip — без плану');
   const w = botWordsToday_().length ? botWordsToday_() : newDailyWords_();
   if (w.length) send_(OWNER_ID, wordsText_(w), { parse_mode: 'HTML' });
 }
 
 function middayNudge() {
   const today = today_();
-  if (devRows_().some(r => r.day === today)) return;
-  send_(OWNER_ID, '👀 Сьогодні ще жодного запису.\nОдин маленький крок прямо зараз: 5 повідомлень клієнтам, 10 хвилин іспанської або англійський подкаст. Що обираєш?');
+  const rows = devRows_(), plans = planDates_(), m = daySums_(rows);
+  const done = habitDay_(m, today, plans);
+  const todo = HABITS.filter((h, i) => !done[i] && h.k !== 'Підсумок');
+  const sales = salesCount_(m[today] || {});
+  if (!todo.length && sales >= SALES_DAY_MIN) return;
+  const nothing = !rows.some(r => r.day === today);
+  let msg = nothing ? '👀 Вже ' + NUDGE_HOUR + ':00, а в тебе сьогодні нуль записів.\n' + pick_(TAUNTS) : '⏰ Перевірка о ' + NUDGE_HOUR + ':00.';
+  if (sales < SALES_DAY_MIN) msg += '\n\n💼 Продажних дій сьогодні: ' + sales + '/' + SALES_DAY_MIN;
+  if (todo.length) msg += '\n\nЩе не зроблено. Мінімальна версія на 2 хвилини:\n' + todo.map(h => '⬜ ' + h.icon + ' ' + h.k + ' → ' + h.mini).join('\n');
+  msg += '\n\nПочни з найменшого. Прямо зараз, а не «після».';
+  send_(OWNER_ID, msg, { reply_markup: { inline_keyboard: habitsKeyboard_(today, done) } });
 }
 
 function eveningPush() {
   const today = today_();
-  const s = devSum_(devRows_(), today, today);
-  const line = sumLine_(s);
-  const plan = getPlan_(today);
-  let msg = '🌙 Вечірня перевірка · ' + dayLine_() + '\n\n' +
-    (line ? 'Сьогодні записано: ' + line : 'Сьогодні ще нічого не записано.');
-  if (plan.length) msg += '\n\n📝 План дня — натисни, що виконано:';
-  msg += '\n\nЩо ще зробив? Надиктуй одним голосовим 🎙';
-  send_(OWNER_ID, msg, plan.length ? { reply_markup: { inline_keyboard: planKeyboard_(today) } } : null);
+  const rows = devRows_(), plans = planDates_(), m = daySums_(rows);
+  const line = sumLine_(m[today] || {});
+  const done = habitDay_(m, today, plans);
+  const n = done.filter(Boolean).length;
+  send_(OWNER_ID, '🌙 Вечірня перевірка · ' + dayLine_() + '\n\n' +
+    (line ? 'Сьогодні записано: ' + line : 'Сьогодні нічого не записано.') +
+    '\n\n🧱 Звички: ' + n + '/' + HABITS.length + ' — натисни, що ще зробив:',
+    { reply_markup: { inline_keyboard: habitsKeyboard_(today, done) } });
+  if (getPlan_(today).length) send_(OWNER_ID, '📝 План дня — що виконано?', { reply_markup: { inline_keyboard: planKeyboard_(today) } });
+  setMode_('evening', 6);
+  send_(OWNER_ID, '✍️ Підсумок дня — текстом або голосом 🎙\n1. Що зробив?\n2. Де злився і чому? Чесно.\n3. Що завтра робиш ПЕРШИМ?' +
+    (n < HABITS.length / 2 ? '\n\n' + pick_(TAUNTS) : ''));
   wordsQuiz_();
+}
+
+function lateNudge() {
+  const today = today_();
+  if (q_(daySums_(devRows_())[today] || {}, 'Підсумок')) return;
+  setMode_('evening', 4);
+  send_(OWNER_ID, '🕚 Підсумку дня досі немає.\n' + pick_(TAUNTS) + '\n\nТри речення, дві хвилини. Надиктуй 🎙');
 }
 
 function weeklyReview() {
   send_(OWNER_ID, devReport_());
   const coach = coach_();
   if (coach) send_(OWNER_ID, '🧠 Коуч:\n' + coach);
+  const ideas = ideasSince_(addDays_(today_(), -6));
+  if (ideas.length) send_(OWNER_ID, '💡 Ідеї тижня (' + ideas.length + '):\n' + ideas.map(x => '• ' + x).join('\n') +
+    '\n\nЖодну не беремо в роботу, поки план продажів не виконано. Обери максимум одну на наступний тиждень — або жодної.');
   setMode_('review', 20);
   send_(OWNER_ID, '📋 Недільний огляд. Відповідай одним повідомленням або голосом:\n' +
     '1. Що цього тижня спрацювало?\n2. Що не вийшло і чому?\n3. Головний фокус на наступний тиждень?\n\n' +
@@ -406,9 +531,16 @@ const PARSE_PROMPT =
   '- Вага: зважування. value = кг (наприклад 80.5).\n' +
   '- Підтягування: максимум підтягувань за один підхід. value = кількість повторень.\n' +
   '- Instagram: value = кількість підписників. Сайт: value = кількість візитів.\n' +
+  '- Читання: читав книгу (українською чи англійською). qty = хвилини (якщо не названо — 15), note = мова і назва книги.\n' +
+  '- Музика: писав музику, Suno, грав на інструменті. qty = хвилини (якщо не названо — 15).\n' +
+  '- Сон: скільки спав. value = години (наприклад 6.5).\n' +
+  '- Сигарети: викурені сигарети. qty = кількість.\n' +
+  '- Без сигарет: цілий день не курив. qty = 1.\n' +
   'days_ago: 0 якщо сьогодні, 1 якщо «вчора», 2 якщо «позавчора».\n' +
+  'Записуй тільки те, що вже зроблено. Плани на майбутнє («завтра напишу…») — не записуй.\n' +
+  'idea: якщо Ігор описує нову ідею, проєкт чи інструмент, який хоче зробити (сайт, дизайн, бот, рекламу, новий напрям) — коротко перекажи її (до 12 слів), інакше null.\n' +
   'Якщо в повідомленні немає нічого з цього, entries = [].\n' +
-  'Відповідай ТІЛЬКИ JSON: {"transcript": "дослівний текст повідомлення", "entries": [{"metric": "Дотик", "qty": 1, "value": null, "margin": null, "note": "до 6 слів", "days_ago": 0}]}';
+  'Відповідай ТІЛЬКИ JSON: {"transcript": "дослівний текст повідомлення", "entries": [{"metric": "Дотик", "qty": 1, "value": null, "margin": null, "note": "до 6 слів", "days_ago": 0}], "idea": null}';
 
 const PLAN_PROMPT =
   'Ігор диктує план на день. Виділи до 3 головних справ, кожну коротко (до 8 слів), українською.\n' +
@@ -456,17 +588,28 @@ function coach_(reviewAnswer) {
   const ctx = {
     день_челенджу: dayNum_(), всього_днів: CHALLENGE_DAYS, цілі_на_90_днів: GOALS_90.trim(),
     тиждень: { з: d.ws, по: d.we, бал: d.score, відсотки_цілей: d.goals, дії_факт_ціль: d.actions,
-      іспанська_хв: d.spanish, англійська_хв: d.english, спорт: d.sport },
+      іспанська_хв: d.spanish, англійська_хв: d.english, спорт: d.sport,
+      звички: d.habits.list.map((h, i) => h.k + ': ' + d.habits.grid[i].filter(x => x === true).length + ' днів, серія ' + d.habits.streaks[i]),
+      життя: d.life },
+    прогноз_з_прорахунків: d.challenge.forecast, ідеї_тижня: ideasSince_(d.ws),
     місяць: d.month, воронка_4_тижні: d.funnel, тренд_8_тижнів: d.trend,
     план_дня_виконано: planStats_(d.ws, d.we), попередній_огляд: lastReview_(),
   };
   const prompt =
-    'Ти — чесний і доброзичливий коуч Ігоря в 90-денному челенджі. Ігор працює оператором ЧПУ в Іспанії, ' +
+    'Ти — чесний і жорсткий коуч Ігоря в 90-денному челенджі. Ігорю 40. Він працює оператором ЧПУ в Іспанії (часто вночі), ' +
     'паралельно розвиває Estone (декоративний камінь і кераміка для дизайнерів та архітекторів в Україні й Іспанії), ' +
-    'вчить іспанську (рівень A2), підтримує англійську і займається спортом. Його відома пастка: будувати інструменти й «упаковку» замість продажів.\n' +
-    'Дай відповідь українською, до 150 слів, простим текстом без markdown: ' +
+    'вчить іспанську (A2) та англійську, тренується, читає, пише музику в Suno, кидає курити. Живе за системою «Атомних звичок».\n' +
+    'Його відомі пастки: слабка дисципліна; будувати інструменти й «упаковку» замість продажів; розпорошуватися на нові ідеї. ' +
+    'В Іспанії замовлень майже немає, бо він нікому про себе не розказує; гальмує через страх спілкування з клієнтами іспанською — ' +
+    'нагадуй, що команди /es і /en перекладають повідомлення для клієнтів. В Україні головний показник B2B — кількість прорахунків ' +
+    '(15–20% з них стають продажами); якщо клієнт порахувався кілька разів і зник — ціна неконкурентна.\n' +
+    'Тон: Ігор сам попросив жорсткий стиль. Коли він не робить обіцяне — говори прямо, з сарказмом і підколками на кшталт ' +
+    '«ну добре, роби що хочеш, ти ж краще знаєш» або «ну да, ти ж потім усе наздоженеш, як завжди». Нагадуй, що саме такі «потім» ' +
+    'привели його до 40 без результату. Підколюй за дії, а не принижуй як людину, і завжди давай конкретний вихід. ' +
+    'Реальний прогрес визнавай коротко, без лестощів. Якщо Ігор пише про хворобу, горе чи сильне виснаження — без підколок: коротко підтримай і зменш план до мінімальних версій звичок.\n' +
+    'Дай відповідь українською, до 170 слів, простим текстом без markdown: ' +
     '1) що добре (одне речення з цифрою); 2) головне вузьке місце (з цифрою); 3) три конкретні дії на наступні 7 днів. ' +
-    'Не хвали без причини. Якщо даних мало, так і скажи і порадь почати записувати.\n\nДані: ' + JSON.stringify(ctx) +
+    'Якщо даних мало, так і скажи — це теж про дисципліну.\n\nДані: ' + JSON.stringify(ctx) +
     (reviewAnswer ? '\n\nВідповідь Ігоря на недільний огляд: ' + reviewAnswer +
       '\nВрахуй її: допоможи зробити фокус на наступний тиждень конкретним і вимірюваним.' : '');
   const out = gemini_([{ text: prompt }], false, 1500);
@@ -480,7 +623,8 @@ function cleanEntry_(e) {
   const n = x => (x === null || x === undefined || x === '' || isNaN(Number(x))) ? null : Number(x);
   const out = { metric: e.metric, qty: n(e.qty), value: n(e.value), margin: n(e.margin),
     note: String(e.note || '').slice(0, 80), days_ago: Math.max(0, Math.min(6, n(e.days_ago) || 0)) };
-  if ((out.metric === 'Іспанська' || out.metric === 'Англійська') && !(out.qty > 0)) out.qty = 15;
+  if (['Іспанська', 'Англійська', 'Читання', 'Музика'].indexOf(out.metric) !== -1 && !(out.qty > 0)) out.qty = 15;
+  if (out.metric === 'Сон') { out.qty = 1; if (!(out.value > 0)) return null; }
   if (['Спорт', 'Прорахунок', 'Угода'].concat(SNAPSHOTS).indexOf(out.metric) !== -1 && !(out.qty > 0)) out.qty = 1;
   if (out.metric === 'Спорт') out.qty = Math.max(1, Math.round(out.qty));
   if (SNAPSHOTS.indexOf(out.metric) !== -1) { out.qty = 1; if (out.value === null) return null; }
@@ -503,12 +647,17 @@ function confirm_(entries) {
     const when = e.days_ago === 1 ? ' (вчора)' : e.days_ago > 1 ? ' (' + e.days_ago + ' дн. тому)' : '';
     const ic = ICONS[e.metric] || '✅';
     switch (e.metric) {
-      case 'Іспанська':
-        return ic + ' +' + e.qty + ' хв' + when + ' · тиждень ' + q_(s, 'Іспанська') + '/' + DEV_TARGETS['Іспанська'] +
-          ' · серія ' + streak_(rows, 'Іспанська') + ' дн. 🔥';
-      case 'Англійська':
-        return ic + ' +' + e.qty + ' хв' + when + ' · тиждень ' + q_(s, 'Англійська') + '/' + DEV_TARGETS['Англійська'] +
-          ' · серія ' + streak_(rows, 'Англійська') + ' дн.';
+      case 'Іспанська': case 'Англійська': case 'Читання': case 'Музика':
+        return ic + ' ' + e.metric + ' +' + e.qty + ' хв' + when + ' · тиждень ' + q_(s, e.metric) + '/' + DEV_TARGETS[e.metric] +
+          ' · серія ' + streak_(rows, e.metric) + ' дн. 🔥';
+      case 'Сон':
+        return ic + ' Сон ' + e.value + ' год' + when + (e.value < SLEEP_GOAL ? ' · менше ' + SLEEP_GOAL + ' год — завтра голова буде ватна' : ' 👍');
+      case 'Сигарети':
+        return ic + ' Сигарет +' + e.qty + when + ' · за тиждень ' + q_(s, 'Сигарети') + '. Чесно записав — вже добре. Наступну відклади на 30 хв.';
+      case 'Без сигарет':
+        return ic + ' День без сигарет' + when + ' · серія ' + streak_(rows, 'Без сигарет') + ' дн. 💪';
+      case 'Підсумок':
+        return ic + ' Підсумок дня' + when;
       case 'Спорт':
         return ic + ' Тренування' + (e.value ? ' ' + e.value + ' хв' : '') + when + ' · тиждень ' + q_(s, 'Спорт') + '/' + DEV_TARGETS['Спорт'];
       case 'Угода':
@@ -674,6 +823,171 @@ function wordsQuiz_() {
     hasNew ? { reply_markup: { inline_keyboard: [[{ text: '✅ Вивчив слова дня', callback_data: 'wl:' + today }]] } } : {}));
 }
 
+// ======================= ЗВИЧКИ =======================
+
+function planDates_() {
+  const sh = sheet_(SHEET_PLAN);
+  const n = sh.getLastRow();
+  const set = {};
+  if (n >= 2) sh.getRange(2, 1, n - 1, 1).getDisplayValues().forEach(r => { set[r[0]] = 1; });
+  return set;
+}
+
+/** Суми по днях: { '2026-09-27': { 'Дотик': {qty, value, margin}, … } } */
+function daySums_(rows) {
+  const m = {};
+  rows.forEach(r => {
+    const s = m[r.day] || (m[r.day] = {});
+    const x = s[r.metric] || (s[r.metric] = { qty: 0, value: 0, margin: 0 });
+    x.qty += r.qty; x.value += r.value; x.margin += r.margin;
+  });
+  return m;
+}
+
+function salesCount_(s) { return FIN_KEYS.reduce((a, k) => a + q_(s, k), 0); }
+
+function habitDone_(k, s, date, plans) {
+  switch (k) {
+    case 'План': return !!plans[date];
+    case 'Продажі': return salesCount_(s) > 0 || q_(s, 'Угода') > 0;
+    case 'Іспанська': return q_(s, 'Іспанська') > 0 || q_(s, 'Слова') > 0;
+    case 'Без сигарет': return q_(s, 'Без сигарет') > 0 && !q_(s, 'Сигарети');
+    default: return q_(s, k) > 0;
+  }
+}
+
+function habitDay_(m, date, plans) { return HABITS.map(h => habitDone_(h.k, m[date] || {}, date, plans)); }
+
+function habitStreak_(m, plans, k) {
+  let d = today_(), n = 0;
+  if (!habitDone_(k, m[d] || {}, d, plans)) d = addDays_(d, -1);
+  while (d >= HABITS_START && habitDone_(k, m[d] || {}, d, plans)) { n++; d = addDays_(d, -1); }
+  return n;
+}
+
+/** % виконаних звичок за період (до сьогодні включно); null, якщо звички ще не рахувались. */
+function habitPct_(m, plans, from, to) {
+  const today = today_();
+  let d = from < HABITS_START ? HABITS_START : from, total = 0, done = 0;
+  const end = to > today ? today : to;
+  for (; d <= end; d = addDays_(d, 1)) {
+    habitDay_(m, d, plans).forEach(x => { total++; if (x) done++; });
+  }
+  return total ? Math.round(done / total * 100) : null;
+}
+
+/** Пропуски: once — пропущено вчора, twice — вчора і позавчора. */
+function missed_(m, plans) {
+  const y = addDays_(today_(), -1), y2 = addDays_(today_(), -2);
+  const out = { once: [], twice: [] };
+  if (y < HABITS_START) return out;
+  HABITS.forEach(h => {
+    if (habitDone_(h.k, m[y] || {}, y, plans)) return;
+    if (y2 >= HABITS_START && !habitDone_(h.k, m[y2] || {}, y2, plans)) out.twice.push(h);
+    else out.once.push(h);
+  });
+  return out;
+}
+
+function habitsKeyboard_(date, done) {
+  const btns = HABITS.map((h, i) => ({ text: (done[i] ? '✅ ' : '⬜ ') + h.icon + ' ' + h.k, callback_data: 'hb:' + date + ':' + i }));
+  const kb = [];
+  for (let i = 0; i < btns.length; i += 2) kb.push(btns.slice(i, i + 2));
+  return kb;
+}
+
+function habitCallback_(cq, date, idx) {
+  const h = HABITS[idx];
+  const chatId = cq.message.chat.id;
+  if (!h) return;
+  const plans = planDates_();
+  let m = daySums_(devRows_());
+  if (habitDone_(h.k, m[date] || {}, date, plans)) return;
+  if (!QUICK_HABITS[h.k]) { send_(chatId, h.icon + ' ' + (h.hint || 'Запиши це повідомленням.')); return; }
+  if (h.k === 'Без сигарет' && q_(m[date] || {}, 'Сигарети')) {
+    send_(chatId, '🚬 За цей день записано сигарет: ' + q_(m[date], 'Сигарети') + '. День без сигарет не зараховується. Завтра — з нуля.');
+    return;
+  }
+  const e = { metric: h.k, qty: QUICK_HABITS[h.k], value: null, margin: null, note: 'кнопка', days_ago: daysAgo_(date) };
+  saveEntry_(e, 'кнопка');
+  m = daySums_(devRows_());
+  tg_('editMessageReplyMarkup', { chat_id: chatId, message_id: cq.message.message_id,
+    reply_markup: { inline_keyboard: habitsKeyboard_(date, habitDay_(m, date, plans)) } });
+}
+
+/** Підсумок звичок за день + реакція в тоні коуча. */
+function habitVerdict_(date) {
+  const done = habitDay_(daySums_(devRows_()), date, planDates_());
+  const miss = HABITS.filter((h, i) => !done[i]);
+  const head = '🧱 Звички: ' + (HABITS.length - miss.length) + '/' + HABITS.length;
+  if (!miss.length) return head + '\n🔥 Все закрито. Отак і виглядає людина, яка тримає слово.';
+  return head + '\nНе зроблено: ' + miss.map(h => h.icon + ' ' + h.k).join(', ') +
+    (miss.length > 2 ? '\n\n' + pick_(TAUNTS) : '\n\nЗавтра — не пропускати вдруге.');
+}
+
+function saveJournal_(text, date) {
+  sheet_(SHEET_JOURNAL).appendRow([date, text]);
+  if (!q_(daySums_(devRows_())[date] || {}, 'Підсумок')) {
+    saveEntry_({ metric: 'Підсумок', qty: 1, value: null, margin: null, note: '', days_ago: daysAgo_(date) }, 'щоденник');
+  }
+}
+
+function daysAgo_(date) {
+  const t = today_();
+  const a = Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10));
+  const b = Date.UTC(+t.slice(0, 4), +t.slice(5, 7) - 1, +t.slice(8, 10));
+  return Math.max(0, Math.min(6, Math.round((b - a) / 864e5)));
+}
+
+function pick_(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// ======================= ІДЕЇ (щоб не розпорошуватись) =======================
+
+/** Записує ідею в «Ідеї» і повертає текст відповіді. */
+function saveIdea_(idea) {
+  sheet_(SHEET_IDEAS).appendRow([new Date(), idea, 'нова']);
+  const sales = salesCount_(devSum_(devRows_(), today_(), today_()));
+  return '💡 Ідею записав: «' + idea + '». Розберемо в неділю, не зараз.' +
+    (sales < SALES_DAY_MIN ? '\n\nА тепер чесно: продажних дій сьогодні ' + sales + '/' + SALES_DAY_MIN +
+      '. Нова ідея — найзручніший спосіб не писати клієнтам. Спочатку клієнти, потім фантазії.' : '');
+}
+
+function ideasSince_(from) {
+  const sh = sheet_(SHEET_IDEAS);
+  const n = sh.getLastRow();
+  if (n < 2) return [];
+  return sh.getRange(2, 1, n - 1, 2).getValues()
+    .filter(r => r[0] instanceof Date && Utilities.formatDate(r[0], TZ, 'yyyy-MM-dd') >= from)
+    .map(r => String(r[1]));
+}
+
+// ======================= МОВА ДЛЯ КЛІЄНТІВ =======================
+
+const LANG_IN = { es: 'іспанською', en: 'англійською' };
+
+function langHelp_(chatId, lang, body) {
+  if (!geminiOn_()) { send_(chatId, 'Потрібен ключ Gemini.'); return; }
+  if (!body) {
+    send_(chatId, 'Напиши після команди текст українською — перепишу для клієнта ' + LANG_IN[lang] + '.\n' +
+      'Або встав повідомлення клієнта — перекладу і запропоную відповідь.\n\nПриклад: /' + lang + ' добрий день, можу приїхати на замір у четвер');
+    return;
+  }
+  tg_('sendChatAction', { chat_id: chatId, action: 'typing' });
+  const L = LANG_IN[lang];
+  const r = ai_('Ти — асистент Ігоря, власника Estone: вироби з натурального каменю, кварцу й кераміки ' +
+    '(кухонні стільниці, раковини, підвіконня, сходи; замір, виготовлення, монтаж) в Іспанії. Клієнт спілкується ' + L + '.\n' +
+    'Якщо текст написаний українською або російською — це повідомлення Ігоря клієнту: перепиши його ' + L + ' для WhatsApp — ' +
+    'природно, ввічливо і коротко, як пише місцевий майстер' + (lang === 'es' ? ' (звертайся на «usted», якщо з тексту не видно, що на «tú»)' : '') + '. kind = "out".\n' +
+    'Якщо текст написаний ' + L + ' — це повідомлення клієнта: переклади українською і запропонуй коротку відповідь ' + L +
+    ', яка веде до наступного кроку (фото, розміри, замір, прорахунок). kind = "in".\n' +
+    'Відповідай ТІЛЬКИ JSON: {"kind": "out", "text": "повідомлення мовою клієнта", "uk": "переклад українською", "reply": "", "reply_uk": ""}', body, null);
+  if (!r || (!r.text && !r.reply)) { send_(chatId, 'Не вдалося перекласти 😕 Спробуй ще раз.'); return; }
+  const msg = r.kind === 'in'
+    ? '📥 Клієнт пише:\n🇺🇦 ' + esc_(r.uk || r.text || '') + '\n\n💬 Варіант відповіді (натисни, щоб скопіювати):\n<code>' + esc_(r.reply || '') + '</code>\n🇺🇦 ' + esc_(r.reply_uk || '')
+    : '📤 Для клієнта (натисни, щоб скопіювати):\n<code>' + esc_(r.text || '') + '</code>\n\n🇺🇦 ' + esc_(r.uk || '');
+  send_(chatId, msg, { parse_mode: 'HTML' });
+}
+
 // ======================= РЕЖИМИ =======================
 
 function mode_() {
@@ -682,8 +996,9 @@ function mode_() {
   return m && Date.now() < Number(p.getProperty('MODE_UNTIL') || 0) ? m : '';
 }
 function setMode_(m, hours) {
-  PropertiesService.getScriptProperties().setProperties({ MODE: m, MODE_UNTIL: String(Date.now() + hours * 36e5) });
+  PropertiesService.getScriptProperties().setProperties({ MODE: m, MODE_UNTIL: String(Date.now() + hours * 36e5), MODE_DATE: today_() });
 }
+function modeDate_() { return PropertiesService.getScriptProperties().getProperty('MODE_DATE'); }
 function clearMode_() { PropertiesService.getScriptProperties().deleteProperty('MODE'); }
 
 // ======================= ЗВІТИ =======================
@@ -707,7 +1022,10 @@ function sumLine_(s) {
   const out = [];
   METRICS.forEach(k => {
     if (!s[k]) return;
-    if (k === 'Іспанська' || k === 'Англійська') out.push(k.toLowerCase() + ' ' + q_(s, k) + ' хв');
+    if (['Іспанська', 'Англійська', 'Читання', 'Музика'].indexOf(k) !== -1) out.push(k.toLowerCase() + ' ' + q_(s, k) + ' хв');
+    else if (k === 'Сон') out.push('сон ' + q_(s, k, 'value') + ' год');
+    else if (k === 'Без сигарет') out.push('без сигарет ✓');
+    else if (k === 'Підсумок') return;
     else if (k === 'Спорт') out.push('спорт ' + q_(s, k));
     else if (k === 'Слова') out.push('слова ' + q_(s, k));
     else if (SNAPSHOTS.indexOf(k) !== -1) return;
@@ -720,7 +1038,10 @@ function todayText_() {
   const today = today_();
   const s = devSum_(devRows_(), today, today);
   const plan = getPlan_(today);
+  const done = habitDay_(daySums_(devRows_()), today, planDates_());
   return dayLine_() + '\n\n' + (sumLine_(s) ? 'Записано: ' + sumLine_(s) : 'Сьогодні ще нічого не записано.') +
+    '\n\n🧱 Звички ' + done.filter(Boolean).length + '/' + HABITS.length + ': ' +
+    HABITS.map((h, i) => (done[i] ? '✅' : '⬜') + h.icon).join(' ') +
     (plan.length ? '\n\n📝 План:\n' + plan.map(p => (p.done ? '✅ ' : '⬜ ') + p.text).join('\n') : '');
 }
 
@@ -731,6 +1052,7 @@ function devReport_() {
   d.actions.forEach(a => lines.push(a.k + ': ' + a.v + '/' + a.t + '  ' + bar_(a.v, a.t)));
   if (d.month.turnoverT) lines.push('Місяць: оборот ' + fmt_(d.month.turnover) + ' з ' + fmt_(d.month.turnoverT) + ' (мін. ' + fmt_(d.month.turnoverMin) + '), угод ' + d.month.deals);
   lines.push('Челендж: ' + fmt_(d.challenge.turnover) + ' з ' + fmt_(d.challenge.goal) + '  ' + bar_(d.challenge.turnover, d.challenge.goal));
+  if (d.challenge.quotesSum) lines.push('Прорахунків на ' + fmt_(d.challenge.quotesSum) + ' → прогноз продажів ≈ ' + fmt_(d.challenge.forecast));
   lines.push('', '🗣 Мови · ' + d.goals.es + '%',
     '🇪🇸 ' + d.spanish.min + '/' + d.spanish.t + ' хв  ' + bar_(d.spanish.min, d.spanish.t) + ' · серія ' + d.spanish.streak + ' дн.',
     'Слова: ' + d.words.week + '/' + d.words.t + ' · всього ' + d.words.total + '/' + d.words.goal,
@@ -738,6 +1060,17 @@ function devReport_() {
   lines.push('', '💪 Спорт · ' + d.goals.sport + '%', d.sport.n + '/' + d.sport.t + ' тренувань  ' + bar_(d.sport.n, d.sport.t));
   if (d.body.weight) lines.push('Вага: ' + d.body.weight.value + ' кг (ціль ' + WEIGHT_GOAL + ')');
   if (d.body.pullups) lines.push('Підтягування: ' + d.body.pullups.value + '/' + PULLUP_GOAL);
+  if (d.goals.habits !== null) {
+    lines.push('', '🧱 Звички · ' + d.goals.habits + '%');
+    d.habits.list.forEach((h, i) => {
+      const g = d.habits.grid[i].filter(x => x !== null);
+      lines.push(h.icon + ' ' + h.k + ': ' + g.filter(Boolean).length + '/' + g.length + (d.habits.streaks[i] ? ' · серія ' + d.habits.streaks[i] : ''));
+    });
+  }
+  const L = d.life;
+  lines.push('', '🌱 Сон: ' + (L.sleepAvg ? L.sleepAvg + ' год у середньому' : 'немає даних (#сон 7)') +
+    ' · 🚬 сигарет ' + L.cigs + ' · 🚭 днів без ' + L.smokeFree +
+    '\n📖 читання ' + L.reading + '/' + L.readingT + ' хв · 🎹 музика ' + L.music + '/' + L.musicT + ' хв');
   lines.push('', '📝 План дня виконано: ' + planStats_(d.ws, d.we));
   if (dashOn_()) lines.push('', '📊 ' + dashUrl_());
   return lines.join('\n');
@@ -752,6 +1085,8 @@ function devData_(ws) {
   const isCurrent = ws === curWs;
   const s = devSum_(rows, ws, we);
   const g = goalPct_(s);
+  const plans = planDates_(), m = daySums_(rows);
+  g.habits = habitPct_(m, plans, ws, we);
   const month = (isCurrent ? today : we).slice(0, 7);
   const ms = devSum_(rows, month + '-01', month + '-31');
   const f4 = devSum_(rows, addDays_(ws, -21), we);
@@ -764,13 +1099,16 @@ function devData_(ws) {
   for (let i = 7; i >= 0; i--) {
     const w = addDays_(ws, -7 * i);
     const gp = goalPct_(devSum_(rows, w, addDays_(w, 6)));
-    trend.push({ w: w, fin: gp.fin, es: gp.es, sport: gp.sport });
+    gp.habits = habitPct_(m, plans, w, addDays_(w, 6));
+    trend.push({ w: w, fin: gp.fin, es: gp.es, sport: gp.sport, habits: gp.habits, score: score_(gp) });
   }
   const day = dayNum_();
+  const chal = devSum_(rows, CHALLENGE_START, addDays_(CHALLENGE_START, CHALLENGE_DAYS - 1));
+  const sleepDays = days.filter(x => m[x.d] && m[x.d]['Сон']);
   return {
     ws: ws, we: we, isCurrent: isCurrent, today: today,
     day: day >= 1 && day <= CHALLENGE_DAYS ? day : 0, days_total: CHALLENGE_DAYS,
-    score: Math.round((g.fin + g.es + g.sport) / 3), goals: g,
+    score: score_(g), goals: g,
     actions: FIN_KEYS.map(k => ({ k: k, v: q_(s, k), t: DEV_TARGETS[k] })),
     spanish: { min: q_(s, 'Іспанська'), t: DEV_TARGETS['Іспанська'], streak: streak_(rows, 'Іспанська') },
     english: { min: q_(s, 'Англійська'), t: DEV_TARGETS['Англійська'], streak: streak_(rows, 'Англійська') },
@@ -784,9 +1122,21 @@ function devData_(ws) {
       quotes: q_(ms, 'Прорахунок'), quotesSum: q_(ms, 'Прорахунок', 'value'),
     },
     challenge: {
-      turnover: q_(devSum_(rows, CHALLENGE_START, addDays_(CHALLENGE_START, CHALLENGE_DAYS - 1)), 'Угода', 'value'),
-      deals: q_(devSum_(rows, CHALLENGE_START, addDays_(CHALLENGE_START, CHALLENGE_DAYS - 1)), 'Угода'),
+      turnover: q_(chal, 'Угода', 'value'), deals: q_(chal, 'Угода'),
       goal: TURNOVER_GOAL, min: TURNOVER_MIN,
+      quotes: q_(chal, 'Прорахунок'), quotesSum: q_(chal, 'Прорахунок', 'value'),
+      forecast: Math.round(q_(chal, 'Прорахунок', 'value') * QUOTE_CONV), conv: QUOTE_CONV,
+    },
+    habits: {
+      list: HABITS.map(h => ({ k: h.k, icon: h.icon })),
+      grid: HABITS.map(h => days.map(x => x.d > today || x.d < HABITS_START ? null : habitDone_(h.k, m[x.d] || {}, x.d, plans))),
+      streaks: HABITS.map(h => habitStreak_(m, plans, h.k)),
+    },
+    life: {
+      sleepAvg: sleepDays.length ? Math.round(sleepDays.reduce((a, x) => a + m[x.d]['Сон'].value, 0) / sleepDays.length * 10) / 10 : 0,
+      sleepGoal: SLEEP_GOAL, cigs: q_(s, 'Сигарети'),
+      smokeFree: days.filter(x => habitDone_('Без сигарет', m[x.d] || {}, x.d, plans)).length,
+      reading: q_(s, 'Читання'), readingT: DEV_TARGETS['Читання'], music: q_(s, 'Музика'), musicT: DEV_TARGETS['Музика'],
     },
     words: { week: q_(s, 'Слова'), t: DEV_TARGETS['Слова'], total: wordsTotal_(rows), goal: WORDS_GOAL },
     body: {
@@ -825,6 +1175,10 @@ function goalPct_(s) {
   const es = Math.round((pct_(q_(s, 'Іспанська'), DEV_TARGETS['Іспанська']) + pct_(q_(s, 'Слова'), DEV_TARGETS['Слова']) +
     pct_(q_(s, 'Англійська'), DEV_TARGETS['Англійська'])) / 3);
   return { fin: fin, es: es, sport: pct_(q_(s, 'Спорт'), DEV_TARGETS['Спорт']) };
+}
+function score_(g) {
+  const p = [g.fin, g.es, g.sport].concat(g.habits === null || g.habits === undefined ? [] : [g.habits]);
+  return Math.round(p.reduce((a, x) => a + x, 0) / p.length);
 }
 function firstSnap_(rows, metric) {
   const r = rows.find(x => x.metric === metric);
@@ -877,6 +1231,8 @@ const HEADERS = {
   'Плани':  ['Дата', 'Справа', 'Статус'],
   'Огляди': ['Дата', 'Відповідь', 'Коуч'],
   'Слова':  ['Слово', 'Переклад', 'Приклад', 'Тема', 'Додано', 'Джерело', 'Етап', 'Наступне'],
+  'Щоденник': ['Дата', 'Підсумок'],
+  'Ідеї':   ['Дата', 'Ідея', 'Статус'],
 };
 
 function sheet_(name) {
@@ -887,7 +1243,7 @@ function sheet_(name) {
     sh.appendRow(HEADERS[name]);
     sh.setFrozenRows(1);
     sh.getRange('1:1').setFontWeight('bold');
-    if (name === SHEET_PLAN) sh.getRange('A:A').setNumberFormat('@');
+    if (name === SHEET_PLAN || name === SHEET_JOURNAL) sh.getRange('A:A').setNumberFormat('@');
     else if (name === SHEET_WORDS) sh.getRange('E:H').setNumberFormat('@');
     else sh.getRange('A:A').setNumberFormat('dd.MM.yyyy HH:mm');
   }
@@ -913,9 +1269,10 @@ function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   PropertiesService.getScriptProperties().setProperty('SS_ID', ss.getId());
   ss.setSpreadsheetTimeZone(TZ);
-  [SHEET_LOG, SHEET_PLAN, SHEET_REVIEW, SHEET_WORDS].forEach(sheet_);
+  const names = [SHEET_LOG, SHEET_PLAN, SHEET_REVIEW, SHEET_WORDS, SHEET_JOURNAL, SHEET_IDEAS];
+  names.forEach(sheet_);
   ss.getSheets().forEach(s => {
-    if ([SHEET_LOG, SHEET_PLAN, SHEET_REVIEW, SHEET_WORDS].indexOf(s.getName()) === -1 && s.getLastRow() === 0) ss.deleteSheet(s);
+    if (names.indexOf(s.getName()) === -1 && s.getLastRow() === 0) ss.deleteSheet(s);
   });
   console.log('Готово: вкладки створено.');
 }
@@ -926,6 +1283,9 @@ function setWebhook() {
   console.log(tg_('setWebhook', { url: WEBAPP_URL, drop_pending_updates: true, allowed_updates: ['message', 'callback_query'] }));
   console.log(tg_('setMyCommands', { commands: [
     { command: 'today', description: 'Сьогодні' },
+    { command: 'habits', description: 'Звички дня' },
+    { command: 'es', description: 'Переклад для клієнта іспанською' },
+    { command: 'en', description: 'Переклад для клієнта англійською' },
     { command: 'week', description: 'Тиждень' },
     { command: 'plan', description: 'План дня' },
     { command: 'coach', description: 'Порада коуча' },
@@ -943,6 +1303,7 @@ function installTriggers() {
   ScriptApp.newTrigger('morningPush').timeBased().atHour(MORNING_HOUR).nearMinute(30).everyDays(1).inTimezone(TZ).create();
   ScriptApp.newTrigger('middayNudge').timeBased().atHour(NUDGE_HOUR).everyDays(1).inTimezone(TZ).create();
   ScriptApp.newTrigger('eveningPush').timeBased().atHour(EVENING_HOUR).everyDays(1).inTimezone(TZ).create();
+  ScriptApp.newTrigger('lateNudge').timeBased().atHour(LATE_HOUR).nearMinute(30).everyDays(1).inTimezone(TZ).create();
   ScriptApp.newTrigger('weeklyReview').timeBased().onWeekDay(ScriptApp.WeekDay.SUNDAY).atHour(REVIEW_HOUR).inTimezone(TZ).create();
   console.log('Розклад увімкнено: ' + ScriptApp.getProjectTriggers().length + ' тригери.');
 }
