@@ -233,6 +233,8 @@ function process_(chatId, text, audio) {
   }
 
   if (mode === 'plan') {
+    // «давай ти напиши план», «запропонуй» — бот складає план сам
+    if (text && /запропону|склади|придумай|ти (сам|напиши|дай)|напиши мені|дай план|сам(ий)? план/i.test(text)) { proposePlan_(chatId); return; }
     let items = [];
     if (audio) {
       const r = ai_(PLAN_PROMPT, null, audio);
@@ -383,9 +385,7 @@ function command_(chatId, text) {
       send_(chatId, devReport_()); break;
 
     case '/plan':
-      setMode_('plan', 8);
-      send_(chatId, '📝 Які 3 головні справи на сьогодні? Напиши (кожну з нового рядка) або надиктуй 🎙');
-      break;
+      proposePlan_(chatId); break;
 
     case '/coach': {
       if (!geminiOn_()) { send_(chatId, 'Потрібен ключ Gemini.'); return; }
@@ -446,6 +446,7 @@ function handleCallback_(cq) {
   }
   if (parts[0] === 'hb') { habitCallback_(cq, parts[1], Number(parts[2])); return; }
   if (parts[0] === 'lg') { logCallback_(cq, parts); return; }
+  if (parts[0] === 'pp') { planCallback_(cq, parts[1]); return; }
   if (parts[0] === 'mn') {
     const item = MORE_ITEMS[Number(parts[1])];
     if (!item) return;
@@ -484,8 +485,8 @@ function morningPush() {
   if (miss.twice.length) msg += '\n\n🚨 ' + pick_(DOUBLE_MISS).replace('{h}', miss.twice.map(h => h.icon + ' ' + h.k).join(', '));
   if (miss.once.length) msg += '\n\n⚠️ Вчора пропустив: ' + miss.once.map(h => h.icon + ' ' + h.k).join(', ') +
     '.\nПравило одне: ніколи не пропускай двічі. Сьогодні — хоча б мінімальна версія.';
-  setMode_('plan', 8);
-  send_(OWNER_ID, msg + '\n\n📝 Які 3 головні справи сьогодні і КОЛИ саме?\nНаприклад: «13:00 — написати 10 дизайнерам». Напиши або надиктуй 🎙\n/skip — без плану');
+  send_(OWNER_ID, msg);
+  proposePlan_(OWNER_ID);
   const w = botWordsToday_().length ? botWordsToday_() : newDailyWords_();
   if (w.length) send_(OWNER_ID, wordsText_(w), { parse_mode: 'HTML' });
 }
@@ -1013,6 +1014,87 @@ function logCallback_(cq, parts) {
     editMenu_(cq, (ICONS[metric] || '') + ' ' + metric + ': ' + parts[3] + (UNITS[metric] || ''), []);
     handleTag_(chatId, tag + ' ' + parts[3]);
   }
+}
+
+// ======================= ПЛАН ДНЯ ВІД КОУЧА =======================
+
+const PROPOSE_PROMPT =
+  'Ти — жорсткий коуч Ігоря в 90-денному челенджі. Склади план на сьогодні: рівно 3 головні справи, які найбільше наближають його до цілей.\n' +
+  'Правила:\n' +
+  '1) Перша справа — завжди продажі Estone з конкретною кількістю (дотики дизайнерам/архітекторам, дзвінки, прорахунки). ' +
+  'Бери числа з «потрібно_сьогодні» — це скільки треба щодня, щоб виконати тижневу ціль.\n' +
+  '2) Якщо у вчорашньому підсумку Ігор написав, що робить першим завтра, — це має бути в плані.\n' +
+  '3) Друга і третя — де найбільше відставання (іспанська, спорт) або важлива віха з цілей (наприклад, консультація з гестором щодо autónomo). ' +
+  'Не став щоденні звички (читання, музика, англійська, без сигарет) — вони відстежуються окремо.\n' +
+  '4) Кожна справа — до 12 слів, з числом і часом доби («Ранок:», «Обід:», «Вечір:»), бо Ігор працює змінами, часто вночі.\n' +
+  '5) Якщо вчорашній план не виконано — не збільшуй навантаження, а зроби план реальним.\n' +
+  'why — одне коротке жорстке речення, чому саме це сьогодні.\n' +
+  'Відповідай ТІЛЬКИ JSON: {"plan": ["Ранок: …", "Обід: …", "Вечір: …"], "why": "…"}';
+
+/** Скільки треба зробити сьогодні, щоб наздогнати тижневі цілі. */
+function dailyNeeds_(rows) {
+  const today = today_(), ws = weekStart_(today);
+  const s = devSum_(rows, ws, addDays_(ws, 6));
+  const daysLeft = 7 - Math.round((Date.parse(today) - Date.parse(ws)) / 864e5);
+  const out = {};
+  // Тільки те, що залежить від Ігоря; не більше ніж 1,5 звичайної денної норми — щоб план був реальним
+  const unit = { 'Іспанська': ' хв', 'Спорт': ' тренування' };
+  ['Дотик', 'Дзвінок', 'Прорахунок', 'Іспанська', 'Слова', 'Спорт'].forEach(k => {
+    const left = DEV_TARGETS[k] - q_(s, k);
+    if (left <= 0) return;
+    const n = Math.min(Math.ceil(left / daysLeft), Math.ceil(DEV_TARGETS[k] / 7 * 1.5));
+    out[k] = n + (unit[k] || '') + ' (тиждень ' + q_(s, k) + '/' + DEV_TARGETS[k] + ')';
+  });
+  return out;
+}
+
+function lastJournal_() {
+  const sh = sheet_(SHEET_JOURNAL);
+  const n = sh.getLastRow();
+  if (n < 2) return '';
+  const r = sh.getRange(n, 1, 1, 2).getDisplayValues()[0];
+  return r[0] >= addDays_(today_(), -1) ? String(r[1]).slice(0, 600) : '';
+}
+
+function proposePlan_(chatId) {
+  setMode_('plan', 8);
+  if (!geminiOn_()) { send_(chatId, '📝 Які 3 головні справи на сьогодні? Напиши (кожну з нового рядка) або надиктуй 🎙'); return; }
+  tg_('sendChatAction', { chat_id: chatId, action: 'typing' });
+  const rows = devRows_(), plans = planDates_(), m = daySums_(rows);
+  const yd = addDays_(today_(), -1);
+  const yPlan = getPlan_(yd);
+  const ctx = {
+    сьогодні: today_(), день_тижня: ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'пʼятниця', 'субота'][new Date(Date.parse(today_())).getUTCDay()],
+    день_челенджу: dayNum_(), цілі: GOALS_90.trim(), потрібно_сьогодні: dailyNeeds_(rows),
+    вже_зроблено_сьогодні: sumLine_(m[today_()] || {}) || 'нічого',
+    вчорашній_план: yPlan.length ? yPlan.map(p => (p.done ? '✅ ' : '❌ ') + p.text) : 'не було',
+    вчорашній_підсумок: lastJournal_() || 'не було',
+    пропущені_вчора_звички: missed_(m, plans).once.concat(missed_(m, plans).twice).map(h => h.k),
+  };
+  const r = ai_(PROPOSE_PROMPT, JSON.stringify(ctx), null);
+  const items = r && r.plan ? r.plan.map(x => String(x).trim()).filter(Boolean).slice(0, 3) : [];
+  if (!items.length) {
+    send_(chatId, '📝 Не вдалося скласти план 😕 Напиши свої 3 справи (кожну з нового рядка) або надиктуй 🎙\n' + geminiErr_());
+    return;
+  }
+  PropertiesService.getScriptProperties().setProperty('PROPOSAL', JSON.stringify({ date: today_(), items: items }));
+  send_(chatId, '📝 План на сьогодні від коуча:\n' + items.map((x, i) => (i + 1) + '. ' + x).join('\n') +
+    (r.why ? '\n\n💬 ' + r.why : '') + '\n\nБереш? Або напиши/надиктуй свій.', { reply_markup: { inline_keyboard: [
+      [{ text: '✅ Беру', callback_data: 'pp:ok' }],
+      [{ text: '🔄 Інший варіант', callback_data: 'pp:new' }, { text: '✏️ Напишу свій', callback_data: 'pp:own' }],
+    ] } });
+}
+
+function planCallback_(cq, act) {
+  const chatId = cq.message.chat.id;
+  if (act === 'new') { editMenu_(cq, '🔄 Складаю інший варіант…', []); proposePlan_(chatId); return; }
+  if (act === 'own') { setMode_('plan', 8); editMenu_(cq, '✏️ Напиши свої 3 справи (кожну з нового рядка) або надиктуй 🎙', []); return; }
+  const p = JSON.parse(PropertiesService.getScriptProperties().getProperty('PROPOSAL') || '{}');
+  if (!p.items || p.date !== today_()) { editMenu_(cq, 'Цей план уже застарів. Натисни 📝 План ще раз.', []); return; }
+  savePlan_(p.date, p.items);
+  clearMode_();
+  editMenu_(cq, '📝 План на сьогодні:\n' + p.items.map((x, i) => (i + 1) + '. ' + x).join('\n') +
+    '\n\nПрийнято. Ввечері перевіримо, чи ти людина слова 😉', []);
 }
 
 // ======================= ЗВИЧКИ =======================
