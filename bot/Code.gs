@@ -82,6 +82,7 @@ const DEV_ALIASES = {
   'Слова':      ['слова', 'words'],
   'Вага':       ['вага', 'вес', 'weight'],
   'Підтягування': ['підтягування', 'підтяг', 'турнік', 'pullups'],
+  'Віджимання': ['віджимання', 'віджим', 'pushups'],
   'Читання':    ['читання', 'читав', 'книга', 'reading'],
   'Музика':     ['музика', 'suno', 'суно', 'music'],
   'Сон':        ['сон', 'спав', 'sleep'],
@@ -149,7 +150,7 @@ const WORD_TOPICS = [
 ];
 const WORD_INTERVALS = [1, 3, 7, 14];   // повторення через 1, 3, 7, 14 днів
 const ICONS = { 'Дотик': '📨', 'Відповідь': '💬', 'Дзвінок': '📞', 'Розмова': '🤝', 'Прорахунок': '📐',
-  'Угода': '🎉', 'Іспанська': '🇪🇸', 'Англійська': '🇬🇧', 'Слова': '📚', 'Спорт': '💪', 'Вага': '⚖️', 'Підтягування': '🏋️',
+  'Угода': '🎉', 'Іспанська': '🇪🇸', 'Англійська': '🇬🇧', 'Слова': '📚', 'Спорт': '💪', 'Вага': '⚖️', 'Підтягування': '🏋️', 'Віджимання': '🤸',
   'Instagram': '📸', 'Сайт': '🌐',
   'Читання': '📖', 'Музика': '🎹', 'Сон': '😴', 'Сигарети': '🚬', 'Без сигарет': '🚭', 'Підсумок': '🌙' };
 
@@ -158,15 +159,15 @@ const ICONS = { 'Дотик': '📨', 'Відповідь': '💬', 'Дзвін�
 function doPost(e) {
   const lock = LockService.getScriptLock();
   try {
-    lock.waitLock(25000);
     const update = JSON.parse(e.postData.contents);
     const cache = CacheService.getScriptCache();
     const key = 'u_' + update.update_id;
-    if (!cache.get(key)) {
-      cache.put(key, '1', 21600);
-      if (update.callback_query) handleCallback_(update.callback_query);
-      else if (update.message) handleMessage_(update.message);
-    }
+    if (cache.get(key)) return HtmlService.createHtmlOutput('ok');   // Telegram повторив той самий запит
+    cache.put(key, '1', 21600);
+    // Чекаємо довго: поки Gemini думає над попереднім повідомленням, нове не губиться, а стає в чергу
+    lock.waitLock(120000);
+    if (update.callback_query) handleCallback_(update.callback_query);
+    else if (update.message) handleMessage_(update.message);
   } catch (err) {
     console.error(err);
   } finally {
@@ -347,7 +348,7 @@ const HELP =
   '🎙 Найпростіше — надиктуй голосом або напиши, що зробив:\n' +
   '«написав 15 дизайнерам, двоє відповіли, 20 хвилин іспанської, 15 англійської, був у залі»\n' +
   'Можна і про вчора: «вчора зробив прорахунок на 2400»\n\n' +
-  '⌨️ Або кнопки внизу:\n' +
+  '⌨️ Або кнопки внизу (сховати/показати — значок ⌨️ у полі вводу; решта — у «☰ Ще»):\n' +
   '➕ Записати — вибрати, що зробив, і натиснути кількість\n' +
   '✅ Звички — відмітити звички дня\n📝 План · 🌙 Підсумок — ранок і вечір\n' +
   '🗣 Клієнту — переклад для WhatsApp іспанською чи англійською\n' +
@@ -445,6 +446,13 @@ function handleCallback_(cq) {
   }
   if (parts[0] === 'hb') { habitCallback_(cq, parts[1], Number(parts[2])); return; }
   if (parts[0] === 'lg') { logCallback_(cq, parts); return; }
+  if (parts[0] === 'mn') {
+    const item = MORE_ITEMS[Number(parts[1])];
+    if (!item) return;
+    tg_('deleteMessage', { chat_id: cq.message.chat.id, message_id: cq.message.message_id });
+    MENU[item](cq.message.chat.id);
+    return;
+  }
   if (parts[0] === 'ln') {
     setMode_('lang:' + parts[1], 1);
     editMenu_(cq, (parts[1] === 'es' ? '🇪🇸' : '🇬🇧') + ' Напиши (або надиктуй) українською, що хочеш сказати клієнту — або встав його повідомлення.', []);
@@ -538,8 +546,12 @@ function weeklyReview() {
 
 const PARSE_PROMPT =
   'Ти — парсер щоденника 90-денного челенджу. Ігор пише або диктує українською (іноді з російськими чи іспанськими словами), що зробив. Витягни ВСІ записи.\n' +
+  'Голос може бути нечітким. Часті слова Ігоря: підтягуюсь, підтягнувся, віджимаюсь, віджався, турнік, зал, дизайнерам, архітекторам, ' +
+  'прорахунок, замір, стільниця, раковина, іспанська, англійська. Якщо чуєш схоже слово — обирай найімовірніше з цього списку ' +
+  '(наприклад «пітчаюсь» у контексті «три рази» = «підтягуюсь»).\n' +
+  'Не вигадуй: якщо не впевнений, до якого показника належить дія, — не записуй її.\n' +
   'Показники (metric):\n' +
-  '- Дотик: повідомлення, листи, контакти з клієнтами. qty = кількість.\n' +
+  '- Дотик: ТІЛЬКИ повідомлення, листи, контакти з клієнтами Estone (дизайнери, архітектори, замовники). qty = кількість. Спорт і все інше — НЕ дотик.\n' +
   '- Відповідь: клієнти відповіли. qty = кількість.\n' +
   '- Дзвінок: дзвінки клієнтам (спроби). qty.\n' +
   '- Розмова: розмова чи зустріч з клієнтом, що відбулася. qty.\n' +
@@ -550,7 +562,8 @@ const PARSE_PROMPT =
   '- Спорт: тренування, зал, біг. qty = 1 за кожне, value = хвилини, якщо названі.\n' +
   '- Слова: вивчені іспанські слова. qty = кількість.\n' +
   '- Вага: зважування. value = кг (наприклад 80.5).\n' +
-  '- Підтягування: максимум підтягувань за один підхід. value = кількість повторень.\n' +
+  '- Підтягування: ТІЛЬКИ підтягування на турніку. value = кількість повторень за один підхід.\n' +
+  '- Віджимання: віджимання від підлоги. qty = кількість повторень (всього). Віджимання — це НЕ підтягування.\n' +
   '- Instagram: value = кількість підписників. Сайт: value = кількість візитів.\n' +
   '- Читання: читав книгу (українською чи англійською). qty = хвилини (якщо не названо — 15), note = мова і назва книги.\n' +
   '- Музика: писав музику, Suno, грав на інструменті. qty = хвилини (якщо не названо — 15).\n' +
@@ -576,6 +589,7 @@ function gemini_(parts, json, maxTokens) {
   const p = PropertiesService.getScriptProperties();
   const good = p.getProperty('GEMINI_OK');
   const models = [good, GEMINI_MODEL].concat(GEMINI_FALLBACKS).filter((m, i, a) => m && a.indexOf(m) === i);
+  const noThink = {};
   let lastErr = '';
   for (let i = 0; i < models.length; i++) {
     const model = models[i];
@@ -583,6 +597,9 @@ function gemini_(parts, json, maxTokens) {
       // Моделі Gemini 3 «думають» перед відповіддю, і думки з'їдають ліміт — тому ліміт великий
       const cfg = { temperature: json ? 0 : 0.6, maxOutputTokens: Math.max(maxTokens || 0, 8192) };
       if (json) cfg.responseMimeType = 'application/json';
+      // Менше «роздумів» = швидша відповідь: розбір фраз — мінімум, коуч — трохи
+      if (/^gemini-3/.test(model) && !noThink[model]) cfg.thinkingConfig = { thinkingLevel: json ? 'minimal' : 'low' };
+      else if (/^gemini-2\.5/.test(model)) cfg.thinkingConfig = { thinkingBudget: json ? 0 : 512 };
       const res = UrlFetchApp.fetch(
         'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent', {
           method: 'post', contentType: 'application/json', muteHttpExceptions: true,
@@ -592,6 +609,7 @@ function gemini_(parts, json, maxTokens) {
       const d = JSON.parse(res.getContentText());
       if (d.error) {
         lastErr = model + ': ' + d.error.message;
+        if (/thinking/i.test(d.error.message) && !noThink[model]) { noThink[model] = 1; i--; continue; }  // модель не знає цього налаштування — ще раз без нього
         if (/API key|API_KEY|PERMISSION_DENIED|location is not supported/i.test(d.error.message + ' ' + d.error.status)) break;  // інша модель не допоможе
         continue;
       }
@@ -713,6 +731,8 @@ function confirm_(entries) {
       case 'Іспанська': case 'Англійська': case 'Читання': case 'Музика':
         return ic + ' ' + e.metric + ' +' + e.qty + ' хв' + when + ' · тиждень ' + q_(s, e.metric) + '/' + DEV_TARGETS[e.metric] +
           ' · серія ' + streak_(rows, e.metric) + ' дн. 🔥';
+      case 'Віджимання':
+        return ic + ' Віджимання +' + e.qty + when + ' · сьогодні ' + q_(devSum_(rows, today_(), today_()), 'Віджимання') + ' 💪';
       case 'Сон':
         return ic + ' Сон ' + e.value + ' год' + when + (e.value < SLEEP_GOAL ? ' · менше ' + SLEEP_GOAL + ' год — завтра голова буде ватна' : ' 👍');
       case 'Сигарети':
@@ -888,14 +908,12 @@ function wordsQuiz_() {
 
 // ======================= МЕНЮ =======================
 
-const MAIN_KB = { is_persistent: true, resize_keyboard: true, keyboard: [
-  [{ text: '➕ Записати' }, { text: '✅ Звички' }],
-  [{ text: '📝 План' }, { text: '🌙 Підсумок' }],
-  [{ text: '📊 Сьогодні' }, { text: '📈 Тиждень' }],
-  [{ text: '🧠 Коуч' }, { text: '📚 Слова' }],
-  [{ text: '🗣 Клієнту' }, { text: '💡 Ідея' }],
-  [{ text: '📱 Дашборд' }, { text: '🔧 Перевірка' }],
+// Компактне меню: 2 ряди, ховається кнопкою ⌨️ у полі вводу
+const MAIN_KB = { is_persistent: false, resize_keyboard: true, keyboard: [
+  [{ text: '➕ Записати' }, { text: '✅ Звички' }, { text: '📊 Сьогодні' }],
+  [{ text: '📝 План' }, { text: '🌙 Підсумок' }, { text: '☰ Ще' }],
 ] };
+const MORE_ITEMS = ['📈 Тиждень', '🧠 Коуч', '📚 Слова', '🗣 Клієнту', '💡 Ідея', '📱 Дашборд', '🔧 Перевірка', '❓ Довідка'];
 
 const MENU = {
   '➕ Записати': c => send_(c, LOG_ROOT_TEXT, { reply_markup: { inline_keyboard: logRootKb_() } }),
@@ -914,6 +932,13 @@ const MENU = {
   '💡 Ідея': c => { setMode_('idea', 1); send_(c, '💡 Напиши або надиктуй ідею — збережу до неділі, щоб вона не відволікала.'); },
   '📱 Дашборд': c => command_(c, '/dash'),
   '🔧 Перевірка': c => { tg_('sendChatAction', { chat_id: c, action: 'typing' }); send_(c, diagText_()); },
+  '❓ Довідка': c => send_(c, HELP, { reply_markup: MAIN_KB }),
+  '☰ Ще': c => {
+    const b = MORE_ITEMS.map((t, i) => ({ text: t, callback_data: 'mn:' + i }));
+    const kb = [];
+    for (let i = 0; i < b.length; i += 2) kb.push(b.slice(i, i + 2));
+    send_(c, '☰ Що відкрити?', { reply_markup: { inline_keyboard: kb } });
+  },
 };
 
 // Що можна записати через «➕ Записати»: категорія → показники
@@ -921,14 +946,14 @@ const LOG_ROOT_TEXT = '➕ Що записати?';
 const LOG_CATS = {
   sales: { name: '💼 Продажі', metrics: ['Дотик', 'Відповідь', 'Дзвінок', 'Розмова', 'Прорахунок', 'Угода', 'Instagram', 'Сайт'] },
   lang:  { name: '🗣 Мови', metrics: ['Іспанська', 'Англійська', 'Слова'] },
-  body:  { name: '💪 Спорт і тіло', metrics: ['Спорт', 'Вага', 'Підтягування'] },
+  body:  { name: '💪 Спорт і тіло', metrics: ['Спорт', 'Віджимання', 'Підтягування', 'Вага'] },
   life:  { name: '🌱 Життя', metrics: ['Читання', 'Музика', 'Сон', 'Сигарети', 'Без сигарет'] },
 };
 // Кнопки з готовими числами; показники без них бот попросить ввести
 const QUICK_VALUES = {
   'Дотик': [1, 5, 10, 20], 'Відповідь': [1, 2, 3, 5], 'Дзвінок': [1, 3, 5, 10], 'Розмова': [1, 2, 3],
   'Іспанська': [15, 30, 45, 60], 'Англійська': [10, 15, 30], 'Слова': [5, 10],
-  'Спорт': [30, 45, 60, 90], 'Читання': [15, 30, 60], 'Музика': [15, 30, 60], 'Сон': [5, 6, 7, 8], 'Сигарети': [1, 3, 5, 10],
+  'Спорт': [30, 45, 60, 90], 'Віджимання': [10, 20, 30, 50], 'Читання': [15, 30, 60], 'Музика': [15, 30, 60], 'Сон': [5, 6, 7, 8], 'Сигарети': [1, 3, 5, 10],
 };
 const ASK_TEXT = {
   'Прорахунок': 'Напиши суму прорахунку в євро, наприклад: 2400', 'Угода': 'Напиши суму і маржу, наприклад: 3500 700',
