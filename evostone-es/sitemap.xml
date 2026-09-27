@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://evostone.es/</loc>
+    <lastmod>2026-09-27</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://evostone.es/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://evostone.es/en/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://evostone.es/ru/"/>
+  </url>
+  <url>
+    <loc>https://evostone.es/en/</loc>
+    <lastmod>2026-09-27</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://evostone.es/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://evostone.es/en/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://evostone.es/ru/"/>
+  </url>
+  <url>
+    <loc>https://evostone.es/ru/</loc>
+    <lastmod>2026-09-27</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://evostone.es/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://evostone.es/en/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://evostone.es/ru/"/>
+  </url>
+</urlset>
