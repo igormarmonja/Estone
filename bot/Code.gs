@@ -264,19 +264,33 @@ function process_(chatId, text, audio) {
   }
 
   if (mode === 'evening') {
+    const date = modeDate_() || today_();
+    const daySum = daySums_(devRows_())[date] || {};
     let answer = text, r = null;
     if (geminiOn_()) {
       tg_('sendChatAction', { chat_id: chatId, action: 'typing' });
-      r = ai_(PARSE_PROMPT, text, audio);
+      // Підсумок описує весь день — Gemini має бачити, що вже записано, і додати тільки нове
+      r = ai_(PARSE_PROMPT + '\n\nЦЕ ПІДСУМОК ДНЯ. За цей день УЖЕ записано: ' + (sumLine_(daySum) || 'нічого') + '.\n' +
+        'Не записуй повторно те, що вже є. Якщо в підсумку названо більше, ніж записано (наприклад, записано 40 хв іспанської, ' +
+        'а в підсумку «70 хв»), запиши тільки різницю (30). Якщо стільки ж або менше — не записуй.', text, audio);
       if (audio) answer = r && r.transcript;
     }
-    if (!answer) { send_(chatId, 'Не вдалося розібрати 😕 Спробуй ще раз.'); return; }
-    const date = modeDate_() || today_();
+    if (!answer) { send_(chatId, 'Не вдалося розібрати 😕 Спробуй ще раз.\n' + geminiErr_()); return; }
     clearMode_();
-    const entries = r ? (r.entries || []).map(cleanEntry_).filter(Boolean) : [];
+    const skipped = [];
+    const entries = (r ? (r.entries || []).map(cleanEntry_).filter(Boolean) : []).filter(e => {
+      // Страховка: точно такий самий запис за цей день уже є — це дубль
+      const x = daySum[e.metric];
+      const dup = x && (e.days_ago || daysAgo_(date)) === daysAgo_(date) && (SNAPSHOTS.concat('Сон').indexOf(e.metric) !== -1
+        ? x.value === e.value : x.qty === e.qty);
+      if (dup) skipped.push(e.metric.toLowerCase());
+      return !dup;
+    });
     entries.forEach(e => { if (!e.days_ago) e.days_ago = daysAgo_(date); saveEntry_(e, audio ? 'голос' : 'текст'); });
     saveJournal_(answer, date);
-    send_(chatId, '🌙 Підсумок записано.' + (entries.length ? '\n\n' + confirm_(entries) : '') + '\n\n' + habitVerdict_(date));
+    send_(chatId, '🌙 Підсумок записано.' + (entries.length ? '\n\n' + confirm_(entries) : '') +
+      (skipped.length ? '\n\n♻️ Вже було записано раніше, не дублюю: ' + skipped.join(', ') : '') +
+      '\n\n' + habitVerdict_(date));
     return;
   }
 
