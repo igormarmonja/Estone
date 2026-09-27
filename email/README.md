@@ -1,4 +1,32 @@
-# Лист-розсилка ESTONE (стиль scroll-landing)
+# Листи-розсилки ESTONE (стиль scroll-landing)
+
+У папці два листи на спільних блоках `src/parts.mjs`:
+
+| Лист | Готовий файл | Де тексти |
+|---|---|---|
+| **Для дизайнерів та архітекторів, UA, під eSputnik** | `dist/esputnik-dyzainery-uk.html` | `src/esputnik-partners.mjs` → об'єкти `T` (тексти, ціни) і `LINK` (посилання) |
+| Розсилка evostone.es, ES/EN/RU | `dist/es.html`, `en.html`, `ru.html` | `src/content/<мова>.mjs` |
+
+## Лист для eSputnik
+1. `node email/build.mjs`
+2. eSputnik → Повідомлення → Email → новий → **Імпорт HTML** (або «Код»), вставити вміст `dist/esputnik-dyzainery-uk.html`.
+3. Тема листа: рядок `subject` у `T`; прехедер уже зашитий у HTML.
+4. Посилання `https://esputnik.com/unsubscribe` і `https://esputnik.com/viewInBrowser` eSputnik сам підміняє
+   на персональні. Не міняйте їх.
+5. Картинки беруться з `https://estone.com.ua/email/img/` (з'являться після деплою сайту з цією папкою).
+   Інший варіант: завантажити `img/p-*`, `logo-light.png` у бібліотеку зображень eSputnik і вказати їхню адресу в `IMG_BASE`.
+
+Розділи: шапка → hero (dark) → ціна UA vs ES (sand) → лист (paper) → фото колекції + кнопка каталогу (dark) →
+щілинні раковини, 2 товари (paper) → вироби з блоку мармуру (sand) → Super Sale (dark) → портфоліо, 3 фото (paper) →
+новинки (brand) → подарунок-каталог (sand) → підпис Ігоря (paper) → футер (dark).
+Жодного `position:absolute`: фото стоять звичайними `<img>`, текст іде під ними.
+
+Фото тимчасово взяті з сайту (раковини). Для «Стільниць» і «Меблів» варто поставити справжні фото робіт:
+покласти їх у `assets/img/`, у `make-images.mjs` замінити джерело для `p-tops.jpg` / `p-furniture.jpg` і запустити `node email/make-images.mjs`.
+
+---
+
+## Розсилка evostone.es (ES/EN/RU)
 
 HTML-шаблон email-розсилки в стилі лендингу evostone.es (шаблон `scroll-landing`, гілка з `evostone-es/`):
 ті самі шрифти (Jost / Manrope / IBM Plex Mono), палітра, мітки `01 —— РОЗДІЛ`, двоколірні заголовки

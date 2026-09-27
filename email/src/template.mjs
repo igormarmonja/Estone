@@ -3,24 +3,9 @@
    ширина 600px, на телефоні колонки стають в стовпчик (<style> у <head>).
    Послідовність фону розділів повторює лендинг: dark → paper → sand → paper → dark → sand → brand → paper → dark. */
 import { SITE, LANGS, CAMPAIGN, IMG_BASE, MERGE, C, SERIES, PRICES } from './data.mjs';
+import { F, THEME, esc, pad2, spacer, label, h, makeBtn, section, grid, doc, more, logo, giant } from './parts.mjs';
 
-const F = {
-  display: "'Jost','Futura','Century Gothic','Trebuchet MS',Arial,sans-serif",
-  text: "'Manrope','Helvetica Neue',Helvetica,Arial,sans-serif",
-  mono: "'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace",
-};
-
-/* Кольори розділу за значенням data-bg з лендингу */
-const THEME = {
-  paper: { bg: C.paper, fg: C.fg, mute: C.mute, line: C.line, accent: C.brand },
-  sand:  { bg: C.sand, fg: C.fg, mute: C.mute, line: C.lineSand, accent: C.brand },
-  dark:  { bg: C.dark, fg: C.fgD, mute: C.muteD, line: C.lineD, accent: C.sand2 },
-  brand: { bg: C.brand, fg: C.fgD, mute: C.muteB, line: C.lineB, accent: C.sand2 },
-};
-
-const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const img = (f) => IMG_BASE + f;
-const pad2 = (n) => String(n).padStart(2, '0');
 
 export function render(t, lang) {
   const L = LANGS.find((l) => l.code === lang);
@@ -28,45 +13,7 @@ export function render(t, lang) {
   const page = (hash = '', content = 'link', path = L.path) => `${SITE.domain}${path}?${utm(content)}${hash}`;
   const wa = SITE.whatsapp;
 
-  /* ── Дрібні блоки ─────────────────────────────── */
-  const label = (num, text, th) => `
-    <p style="margin:0 0 24px;font-family:${F.mono};font-size:12px;line-height:16px;letter-spacing:.12em;text-transform:uppercase;color:${th.mute};">
-      ${num ? `<span style="color:${th.accent};">${num}</span>&nbsp;&nbsp;<span style="color:${th.accent};opacity:.6;letter-spacing:-1px;">&#8212;&#8212;</span>&nbsp;&nbsp;` : ''}${esc(text)}
-    </p>`;
-
-  /* Рядок 2 заголовка — акцентний колір і тонке накреслення, як .ln:nth-child(2) на лендингу */
-  const h = (lines, th, { size = 48, cls = 'h2', tag = 'h2' } = {}) => `
-    <${tag} class="${cls}" style="margin:0;font-family:${F.display};font-size:${size}px;line-height:.95;letter-spacing:-.02em;text-transform:uppercase;font-weight:400;color:${th.fg};">
-      ${lines.map((l, i) => `<span style="display:block;${i ? `color:${th.accent};font-weight:300;` : ''}">${esc(l)}</span>`).join('')}
-    </${tag}>`;
-
-  /* Кнопка-пігулка. variant: light | dark | brand | outline-light | outline-dark */
-  const btn = (text, href, variant, { icon = 'arrow', content = 'button' } = {}) => {
-    const v = {
-      light: { bg: C.paper, fg: C.dark, bd: C.paper },
-      dark: { bg: C.dark, fg: C.paper, bd: C.dark },
-      brand: { bg: C.brand, fg: C.paper, bd: C.brand },
-      'outline-light': { bg: 'transparent', fg: C.paper, bd: '#BFAE9F' },
-      'outline-dark': { bg: 'transparent', fg: C.dark, bd: C.dark },
-    }[variant];
-    const tail = icon === 'arrow' ? '&nbsp;&nbsp;&#8594;' : '';
-    const head = icon === 'wa' ? `<img src="${img(variant.includes('dark') ? 'wa-dark.png' : 'wa-light.png')}" width="16" height="16" alt="" style="display:inline-block;vertical-align:-3px;border:0;margin-right:10px;">` : '';
-    const href2 = href.startsWith(SITE.domain) ? href.replace(/utm_content=[^&#]*/, `utm_content=${content}`) : href;
-    return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="display:inline-table;border-collapse:separate;"><tr>
-      <td align="center" bgcolor="${v.bg === 'transparent' ? '' : v.bg}" style="border-radius:999px;background:${v.bg};border:1px solid ${v.bd};mso-padding-alt:16px 26px;">
-        <a class="btn-a" href="${esc(href2)}" target="_blank" style="display:inline-block;padding:16px 26px;border-radius:999px;font-family:${F.display};font-size:13px;line-height:14px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:${v.fg};text-decoration:none;white-space:nowrap;">${head}${esc(text)}${tail}</a>
-      </td></tr></table>`;
-  };
-
-  const section = (bgName, inner, { pt = 72, pb = 72, extra = '' } = {}) => {
-    const th = THEME[bgName];
-    return `
-  <tr><td class="px" bgcolor="${th.bg}" style="background:${th.bg};padding:${pt}px 40px ${pb}px;${extra}">
-${inner}
-  </td></tr>`;
-  };
-
-  const spacer = (h) => `<div style="height:${h}px;line-height:${h}px;font-size:1px;">&nbsp;</div>`;
+  const btn = makeBtn(IMG_BASE);
 
   /* ── 01 Hero ───────────────────────────────────── */
   const TD = THEME.dark;
@@ -94,7 +41,7 @@ ${inner}
         <p style="margin:18px 0 0;font-family:${F.mono};font-size:13px;line-height:20px;letter-spacing:.04em;color:${C.sand2};">— ${esc(t.hero.tail)}</p>
         <p style="margin:22px 0 32px;max-width:440px;font-family:${F.text};font-size:16px;line-height:25px;color:${C.muteD};">${esc(t.hero.sub)}</p>
         <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-          <td class="col stack-gap" style="padding:0 10px 0 0;">${btn(t.hero.cta, page('#contacto', 'hero'), 'light', { content: 'hero_cta' })}</td>
+          <td class="col stack-gap" style="padding:0 10px 0 0;">${btn(t.hero.cta, page('#contacto', 'hero_cta'), 'light')}</td>
           <td class="col" style="padding:0;">${btn(t.hero.whatsapp, wa, 'outline-light', { icon: 'wa' })}</td>
         </tr></table>
       </td></tr>
@@ -132,22 +79,12 @@ ${inner}
         <p style="margin:16px 0 6px;font-family:${F.mono};font-size:11px;line-height:16px;letter-spacing:.12em;text-transform:uppercase;color:${C.brand};">${s.code} &nbsp;·&nbsp; ${s.models} ${esc(t.collection.models)}</p>
         <p style="margin:0 0 8px;font-family:${F.display};font-size:26px;line-height:28px;text-transform:uppercase;letter-spacing:-.01em;color:${TS.fg};">${esc(s.id[0].toUpperCase() + s.id.slice(1))}</p>
         <p style="margin:0 0 14px;font-family:${F.text};font-size:14px;line-height:21px;color:${TS.mute};">${esc(t.collection.series[s.id])}</p>
-        <a href="${esc(page('#coleccion', `series_${s.id}`))}" target="_blank" style="font-family:${F.display};font-size:12px;line-height:14px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:${TS.fg};text-decoration:none;border-bottom:1px solid ${TS.fg};padding-bottom:3px;">${esc(t.collection.view)} &#8594;</a>`;
-  const rows2 = (arr, fn, gap = 16) => {
-    let out = '';
-    for (let i = 0; i < arr.length; i += 2) {
-      out += `<tr>
-        <td class="col" width="50%" valign="top" style="padding:0 ${gap / 2}px ${i + 2 < arr.length ? 40 : 0}px 0;">${fn(arr[i], i)}</td>
-        <td class="col" width="50%" valign="top" style="padding:0 0 ${i + 2 < arr.length ? 40 : 0}px ${gap / 2}px;">${arr[i + 1] ? fn(arr[i + 1], i + 1) : ''}</td>
-      </tr>`;
-    }
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${out}</table>`;
-  };
+        ${more(t.collection.view, page('#coleccion', `series_${s.id}`), TS.fg)}`;
   const collection = section('sand', `
     ${label('02', t.collection.label, TS)}
     ${h(t.collection.h2, TS)}
     <p style="margin:24px 0 40px;max-width:440px;font-family:${F.text};font-size:16px;line-height:25px;color:${TS.mute};">${esc(t.collection.intro)}</p>
-    ${rows2(SERIES, card)}`);
+    ${grid(SERIES, card)}`);
 
   /* ── 04 Продукти: рядки з ціною «від» ──────────── */
   const productRows = Object.entries(t.products.items).map(([id, title], i) => `
@@ -171,12 +108,12 @@ ${inner}
       <tr><td style="border-top:1px solid ${TP.line};font-size:1px;line-height:1px;">&nbsp;</td></tr>
     </table>
     <p style="margin:14px 0 32px;font-family:${F.mono};font-size:11px;line-height:17px;letter-spacing:.04em;color:${TP.mute};">${esc(t.products.note)}</p>
-    ${btn(t.products.all, page('#productos', 'products'), 'dark', { content: 'products_all' })}`);
+    ${btn(t.products.all, page('#productos', 'products_all'), 'dark')}`);
 
   /* ── 05 Матеріали (темний блок + «marquee» контурним шрифтом) ── */
   const TDk = THEME.dark;
   const matCard = (m, i) => `
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;"><tr>
           <td style="border:1px solid ${TDk.line};border-radius:16px;padding:22px 20px 24px;">
             <p style="margin:0 0 28px;font-family:${F.mono};font-size:11px;line-height:16px;letter-spacing:.12em;color:${TDk.accent};">${pad2(i + 1)}</p>
             <p style="margin:0 0 8px;font-family:${F.display};font-size:22px;line-height:24px;text-transform:uppercase;color:${TDk.fg};">${esc(m.t)}</p>
@@ -190,7 +127,7 @@ ${inner}
     </p>
     ${h(t.materials.h2, TDk)}
     ${spacer(40)}
-    ${rows2(t.materials.items, matCard, 16).replace(/40px 0;/g, '16px 0;').replace(/0 0 40px/g, '0 0 16px')}
+    ${grid(t.materials.items, matCard, { rowGap: 16 })}
     ${spacer(36)}
     ${btn(t.materials.cta, wa, 'outline-light', { icon: 'wa' })}`, { pt: 64 });
 
@@ -242,7 +179,7 @@ ${inner}
     </table>
     ${spacer(36)}
     <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-      <td class="col stack-gap" style="padding:0 10px 0 0;">${btn(t.contact.cta, page('#contacto', 'contact'), 'brand', { content: 'contact_cta' })}</td>
+      <td class="col stack-gap" style="padding:0 10px 0 0;">${btn(t.contact.cta, page('#contacto', 'contact_cta'), 'brand')}</td>
       <td class="col" style="padding:0;">${btn('WhatsApp', wa, 'outline-dark', { icon: 'wa' })}</td>
     </tr></table>`, { pb: 80 });
 
@@ -264,7 +201,7 @@ ${inner}
         ${langLinks}
       </td>
     </tr></table>
-    <p class="giant" aria-hidden="true" style="margin:28px 0 28px;font-family:${F.display};font-size:132px;line-height:100px;font-weight:500;letter-spacing:-.02em;color:#6A5040;white-space:nowrap;">${SITE.brand}</p>
+    ${giant(SITE.brand)}
     <p style="margin:0;padding-top:20px;border-top:1px solid ${C.lineD};font-family:${F.text};font-size:12px;line-height:19px;color:${C.muteD};">
       ${esc(t.footer.why)}<br>
       <a href="${MERGE.unsubscribe}" target="_blank" style="color:${C.paper};text-decoration:underline;">${esc(t.footer.unsubscribe)}</a>
@@ -272,70 +209,13 @@ ${inner}
     </p>
   </td></tr>`;
 
-  return `<!DOCTYPE html>
-<html lang="${t.htmlLang}" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="x-apple-disable-message-reformatting">
-<meta name="format-detection" content="telephone=no,address=no,email=no,date=no">
-<meta name="color-scheme" content="light only">
-<meta name="supported-color-schemes" content="light only">
-<title>${esc(t.subject)}</title>
-<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
-<style>h1,h2,p,td,a,span{font-family:Arial,sans-serif !important;}</style><![endif]-->
-<!--[if !mso]><!-->
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Jost:wght@300;400;500&family=Manrope:wght@400;500&display=swap" rel="stylesheet">
-<!--<![endif]-->
-<style>
-  body{margin:0;padding:0;width:100%!important;background:${C.dark};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
-  table{border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0;}
-  img{-ms-interpolation-mode:bicubic;}
-  a[x-apple-data-detectors]{color:inherit!important;text-decoration:none!important;}
-  u + #body a{color:inherit;text-decoration:none;}
-  @media (max-width:620px){
-    .wrap{width:100%!important;}
-    .px{padding-left:24px!important;padding-right:24px!important;}
-    .col{display:block!important;width:100%!important;padding-left:0!important;padding-right:0!important;}
-    .stack-gap{padding-bottom:12px!important;}
-    .stat{padding-bottom:20px!important;}
-    .fluid{max-width:100%!important;}
-    .h1{font-size:44px!important;}
-    .h2{font-size:36px!important;}
-    .lead-xl{font-size:22px!important;line-height:30px!important;}
-    .marquee{font-size:32px!important;line-height:38px!important;}
-    .giant{font-size:76px!important;line-height:64px!important;}
-    .hero-body{padding-top:170px!important;}
-    .hide-m{display:none!important;}
-    .btn-a{white-space:normal!important;}
-  }
-</style>
-</head>
-<body id="body" style="margin:0;padding:0;background:${C.dark};">
-  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:${C.dark};opacity:0;">${esc(t.preheader)}${'&#847;&zwnj;&nbsp;'.repeat(60)}</div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.dark}" style="background:${C.dark};">
-    <tr><td align="center" style="padding:0;">
-      <p style="margin:0;padding:14px 16px;font-family:${F.mono};font-size:11px;line-height:16px;letter-spacing:.08em;color:${C.muteD};">
+  return doc({
+    lang: t.htmlLang,
+    title: t.subject,
+    preheader: t.preheader,
+    top: `<p style="margin:0;padding:14px 16px;font-family:${F.mono};font-size:11px;line-height:16px;letter-spacing:.08em;color:${C.muteD};">
         <a href="${MERGE.webview}" target="_blank" style="color:${C.muteD};text-decoration:underline;">${esc(t.top.webview)}</a>
-      </p>
-      <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
-      <table role="presentation" class="wrap" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">
-${hero}
-${manifesto}
-${collection}
-${products}
-${materials}
-${process}
-${visit}
-${contact}
-${footer}
-      </table>
-      <!--[if mso]></td></tr></table><![endif]-->
-      ${spacer(24)}
-    </td></tr>
-  </table>
-</body>
-</html>
-`;
+      </p>`,
+    body: [hero, manifesto, collection, products, materials, process, visit, contact, footer].join('\n'),
+  });
 }

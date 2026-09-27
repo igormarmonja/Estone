@@ -23,6 +23,20 @@ const JOBS = [
     <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(40,28,21,.55) 0%,rgba(40,28,21,.15) 22%,rgba(40,28,21,.35) 45%,rgba(56,40,31,.92) 72%,#594133 100%)"></div>` },
   ...[['s-leonardo.jpg', 'le-02.jpg'], ['s-monet.jpg', 'mo-01.jpg'], ['s-kazimir.jpg', 'ka-06.jpg'], ['s-salvador.jpg', 'sa-04.jpg']]
     .map(([file, src]) => ({ file, w: 252, h: 315, html: `<div style="position:absolute;inset:0;background:url(${dataUrl(src)}) center/cover"></div>` })),
+  // Лист для дизайнерів (eSputnik): esputnik-partners.mjs
+  ...[
+    ['p-hero.jpg', 'cover.jpg', 600, 420, 'center 55%'],
+    ['p-alaior-white.jpg', 'ka-03.jpg', 252, 290, 'center'],
+    ['p-alaior-beige.jpg', 'ka-01.jpg', 252, 290, 'center 70%'],
+    ['p-marble.jpg', 'le-06.jpg', 520, 360, 'center 65%'],
+    ['p-viola.jpg', 'le-02.jpg', 600, 340, 'center 72%'],
+    ['p-tops.jpg', 'sa-03.jpg', 163, 210, 'center'],
+    ['p-sinks.jpg', 'ka-05.jpg', 163, 210, 'center'],
+    ['p-furniture.jpg', 'ka-08.jpg', 163, 210, 'center'],
+    ['p-cat-1.jpg', 'sa-01.jpg', 163, 163, 'center 60%'],
+    ['p-cat-2.jpg', 'mo-02.jpg', 163, 163, 'center 60%'],
+    ['p-cat-3.jpg', 'le-04.jpg', 163, 163, 'center 70%'],
+  ].map(([file, src, w, h, pos]) => ({ file, w, h, html: `<div style="position:absolute;inset:0;background:url(${dataUrl(src)}) ${pos}/cover"></div>` })),
   { file: 'logo-light.png', w: 22, h: 22, png: true, html: `<svg viewBox="0 0 295 300" width="22" height="22" fill="#F5EDE3">${LOGO}</svg>` },
   { file: 'wa-light.png', w: 16, h: 16, png: true, html: `<svg viewBox="0 0 24 24" width="16" height="16" fill="#F5EDE3"><path d="${WA}"/></svg>` },
   { file: 'wa-dark.png', w: 16, h: 16, png: true, html: `<svg viewBox="0 0 24 24" width="16" height="16" fill="#594133"><path d="${WA}"/></svg>` },
