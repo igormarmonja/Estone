@@ -139,6 +139,7 @@ const SHEET_REVIEW = 'Огляди';
 const SHEET_WORDS  = 'Слова';
 const SHEET_JOURNAL = 'Щоденник';
 const SHEET_IDEAS  = 'Ідеї';
+const SHEET_OTHER  = 'Інші справи';   // корисні справи поза показниками — тільки в таблиці, не в графіках
 const WORD_TOPICS = [
   'камінь, кухні й ванні кімнати (для продажів Estone): матеріали, вироби, монтаж',
   'розмова з клієнтом: ціна, терміни, замір, доставка, передоплата',
@@ -221,12 +222,17 @@ function handleVoice_(chatId, v) {
 function process_(chatId, text, audio) {
   const mode = mode_();
 
-  if (mode === 'idea' || mode.indexOf('ask:') === 0 || mode.indexOf('lang:') === 0) {
+  if (mode === 'idea' || mode === 'other' || mode.indexOf('ask:') === 0 || mode.indexOf('lang:') === 0) {
     let t = text;
     if (audio) { const r = ai_(TRANSCRIBE_PROMPT, null, audio); t = r && r.transcript; }
     if (!t) { send_(chatId, 'Не вдалося розібрати 😕 Спробуй ще раз текстом.\n' + geminiErr_()); return; }
     clearMode_();
     if (mode === 'idea') send_(chatId, saveIdea_(t));
+    else if (mode === 'other') {
+      const mm = t.match(/(\d+(?:[.,]\d+)?)\s*(год|хв)/i);
+      const minutes = mm ? Math.round(Number(mm[1].replace(',', '.')) * (/год/i.test(mm[2]) ? 60 : 1)) : null;
+      send_(chatId, saveOthers_([{ what: t.slice(0, 200), minutes: minutes, area: '' }], 0));
+    }
     else if (mode.indexOf('lang:') === 0) langHelp_(chatId, mode.slice(5), t);
     else handleTag_(chatId, '#' + DEV_ALIASES[METRICS[Number(mode.slice(4))]][0] + ' ' + t);
     return;
@@ -287,8 +293,10 @@ function process_(chatId, text, audio) {
       return !dup;
     });
     entries.forEach(e => { if (!e.days_ago) e.days_ago = daysAgo_(date); saveEntry_(e, audio ? 'голос' : 'текст'); });
+    const others = cleanOthers_(r && r.other);
     saveJournal_(answer, date);
     send_(chatId, '🌙 Підсумок записано.' + (entries.length ? '\n\n' + confirm_(entries) : '') +
+      (others.length ? '\n\n' + saveOthers_(others, daysAgo_(date)) : '') +
       (skipped.length ? '\n\n♻️ Вже було записано раніше, не дублюю: ' + skipped.join(', ') : '') +
       '\n\n' + habitVerdict_(date));
     return;
@@ -300,13 +308,18 @@ function process_(chatId, text, audio) {
   if (!r) { send_(chatId, 'Не вдалося розібрати 😕 Спробуй ще раз або запиши через ➕ Записати.\n' + geminiErr_()); return; }
   const entries = (r.entries || []).map(cleanEntry_).filter(Boolean);
   const idea = r.idea ? String(r.idea).trim() : '';
+  const others = cleanOthers_(r.other);
   const heard = audio && r.transcript ? '🎙 «' + String(r.transcript).slice(0, 300) + '»\n\n' : '';
-  if (!entries.length && !idea) {
+  if (!entries.length && !idea && !others.length) {
     send_(chatId, heard + 'Не знайшов, що записати 🤔\nПриклад: «написав 15 дизайнерам, 20 хвилин іспанської, був у залі»');
     return;
   }
   entries.forEach(e => saveEntry_(e, audio ? 'голос' : 'текст'));
-  send_(chatId, heard + (entries.length ? confirm_(entries) : '') + (idea ? (entries.length ? '\n\n' : '') + saveIdea_(idea) : ''));
+  const parts = [];
+  if (entries.length) parts.push(confirm_(entries));
+  if (others.length) parts.push(saveOthers_(others, 0));
+  if (idea) parts.push(saveIdea_(idea));
+  send_(chatId, heard + parts.join('\n\n'));
 }
 
 // ======================= ШВИДКИЙ ЗАПИС # =======================
@@ -564,7 +577,8 @@ const PARSE_PROMPT =
   'Голос може бути нечітким. Часті слова Ігоря: підтягуюсь, підтягнувся, віджимаюсь, віджався, турнік, зал, дизайнерам, архітекторам, ' +
   'прорахунок, замір, стільниця, раковина, іспанська, англійська. Якщо чуєш схоже слово — обирай найімовірніше з цього списку ' +
   '(наприклад «пітчаюсь» у контексті «три рази» = «підтягуюсь»).\n' +
-  'Не вигадуй: якщо не впевнений, до якого показника належить дія, — не записуй її.\n' +
+  'Не вигадуй показники: якщо дія не підходить до жодного показника, але це вже ЗРОБЛЕНА корисна справа ' +
+  '(робота над сайтом, бухгалтер/гестор, документи, фото робіт, закупівля, навчання, ремонт інструменту тощо) — поклади її в other.\n' +
   'Показники (metric):\n' +
   '- Дотик: ТІЛЬКИ повідомлення, листи, контакти з клієнтами Estone (дизайнери, архітектори, замовники). qty = кількість. Спорт і все інше — НЕ дотик.\n' +
   '- Відповідь: клієнти відповіли. qty = кількість.\n' +
@@ -587,9 +601,10 @@ const PARSE_PROMPT =
   '- Без сигарет: цілий день не курив. qty = 1.\n' +
   'days_ago: 0 якщо сьогодні, 1 якщо «вчора», 2 якщо «позавчора».\n' +
   'Записуй тільки те, що вже зроблено. Плани на майбутнє («завтра напишу…») — не записуй.\n' +
+  'other: зроблені справи поза показниками — [{"what": "що зробив, до 10 слів", "minutes": хвилини або null, "area": "сайт|бізнес|документи|навчання|особисте|інше", "days_ago": 0}].\n' +
   'idea: якщо Ігор описує нову ідею, проєкт чи інструмент, який хоче зробити (сайт, дизайн, бот, рекламу, новий напрям) — коротко перекажи її (до 12 слів), інакше null.\n' +
   'Якщо в повідомленні немає нічого з цього, entries = [].\n' +
-  'Відповідай ТІЛЬКИ JSON: {"transcript": "дослівний текст повідомлення", "entries": [{"metric": "Дотик", "qty": 1, "value": null, "margin": null, "note": "до 6 слів", "days_ago": 0}], "idea": null}';
+  'Відповідай ТІЛЬКИ JSON: {"transcript": "дослівний текст повідомлення", "entries": [{"metric": "Дотик", "qty": 1, "value": null, "margin": null, "note": "до 6 слів", "days_ago": 0}], "other": [], "idea": null}';
 
 const PLAN_PROMPT =
   'Ігор диктує план на день. Виділи до 3 головних справ, кожну коротко (до 8 слів), українською.\n' +
@@ -688,6 +703,7 @@ function coach_(reviewAnswer) {
       звички: d.habits.list.map((h, i) => h.k + ': ' + d.habits.grid[i].filter(x => x === true).length + ' днів, серія ' + d.habits.streaks[i]),
       життя: d.life },
     прогноз_з_прорахунків: d.challenge.forecast, ідеї_тижня: ideasSince_(d.ws),
+    інші_справи_тижня: othersBetween_(d.ws, d.we).map(o => o.what + (o.minutes ? ' (' + o.minutes + ' хв)' : '')),
     місяць: d.month, воронка_4_тижні: d.funnel, тренд_8_тижнів: d.trend,
     план_дня_виконано: planStats_(d.ws, d.we), попередній_огляд: lastReview_(),
   };
@@ -979,7 +995,8 @@ const UNITS = { 'Іспанська': ' хв', 'Англійська': ' хв', 
 
 function logRootKb_() {
   return Object.keys(LOG_CATS).map(k => [{ text: LOG_CATS[k].name, callback_data: 'lg:c:' + k }])
-    .concat([[{ text: '↩️ Скасувати останній запис', callback_data: 'lg:u' }]]);
+    .concat([[{ text: '📌 Інша справа (поза показниками)', callback_data: 'lg:o' }],
+      [{ text: '↩️ Скасувати останній запис', callback_data: 'lg:u' }]]);
 }
 
 function editMenu_(cq, text, kb) {
@@ -992,6 +1009,11 @@ function logCallback_(cq, parts) {
   const act = parts[1];
   if (act === 'r') { editMenu_(cq, LOG_ROOT_TEXT, logRootKb_()); return; }
   if (act === 'u') { editMenu_(cq, '↩️ Скасовую…', []); command_(chatId, '/undo'); return; }
+  if (act === 'o') {
+    setMode_('other', 1);
+    editMenu_(cq, '📌 Що зробив? Напиши або надиктуй, можна з часом: «2 год правив сайт», «зустріч з гестором»', []);
+    return;
+  }
   if (act === 'c') {
     const cat = LOG_CATS[parts[2]];
     if (!cat) return;
@@ -1240,6 +1262,36 @@ function saveIdea_(idea) {
       '. Нова ідея — найзручніший спосіб не писати клієнтам. Спочатку клієнти, потім фантазії.' : '');
 }
 
+// ======================= ІНШІ СПРАВИ (поза показниками) =======================
+
+function cleanOthers_(list) {
+  return (Array.isArray(list) ? list : []).filter(o => o && o.what).map(o => ({
+    what: String(o.what).slice(0, 200),
+    minutes: Number(o.minutes) > 0 ? Math.round(Number(o.minutes)) : null,
+    area: String(o.area || ''),
+    days_ago: Math.max(0, Math.min(6, Number(o.days_ago) || 0)),
+  }));
+}
+
+/** Записує у вкладку «Інші справи» і повертає текст відповіді. */
+function saveOthers_(list, baseDaysAgo) {
+  const sh = sheet_(SHEET_OTHER);
+  list.forEach(o => {
+    const ago = o.days_ago || baseDaysAgo || 0;
+    sh.appendRow([addDays_(today_(), -ago), o.what, o.minutes || '', o.area || '']);
+  });
+  return '📌 Записав в «Інші справи»:\n' + list.map(o => '• ' + o.what + (o.minutes ? ' — ' + o.minutes + ' хв' : '')).join('\n');
+}
+
+function othersBetween_(from, to) {
+  const sh = sheet_(SHEET_OTHER);
+  const n = sh.getLastRow();
+  if (n < 2) return [];
+  return sh.getRange(2, 1, n - 1, 4).getDisplayValues()
+    .filter(r => r[0] >= from && r[0] <= to)
+    .map(r => ({ what: r[1], minutes: Number(r[2]) || 0 }));
+}
+
 function ideasSince_(from) {
   const sh = sheet_(SHEET_IDEAS);
   const n = sh.getLastRow();
@@ -1359,6 +1411,11 @@ function devReport_() {
   lines.push('', '🌱 Сон: ' + (L.sleepAvg ? L.sleepAvg + ' год у середньому' : 'немає даних (#сон 7)') +
     ' · 🚬 сигарет ' + L.cigs + ' · 🚭 днів без ' + L.smokeFree +
     '\n📖 читання ' + L.reading + '/' + L.readingT + ' хв · 🎹 музика ' + L.music + '/' + L.musicT + ' хв');
+  const oth = othersBetween_(d.ws, d.we);
+  if (oth.length) {
+    const mins = oth.reduce((a, o) => a + (o.minutes || 0), 0);
+    lines.push('', '📌 Інші справи: ' + oth.length + (mins ? ' · ~' + Math.round(mins / 6) / 10 + ' год' : ''));
+  }
   lines.push('', '📝 План дня виконано: ' + planStats_(d.ws, d.we));
   if (dashOn_()) lines.push('', '📊 ' + dashUrl_());
   return lines.join('\n');
@@ -1521,6 +1578,7 @@ const HEADERS = {
   'Слова':  ['Слово', 'Переклад', 'Приклад', 'Тема', 'Додано', 'Джерело', 'Етап', 'Наступне'],
   'Щоденник': ['Дата', 'Підсумок'],
   'Ідеї':   ['Дата', 'Ідея', 'Статус'],
+  'Інші справи': ['Дата', 'Справа', 'Хвилини', 'Напрям'],
 };
 
 function sheet_(name) {
@@ -1531,7 +1589,7 @@ function sheet_(name) {
     sh.appendRow(HEADERS[name]);
     sh.setFrozenRows(1);
     sh.getRange('1:1').setFontWeight('bold');
-    if (name === SHEET_PLAN || name === SHEET_JOURNAL) sh.getRange('A:A').setNumberFormat('@');
+    if (name === SHEET_PLAN || name === SHEET_JOURNAL || name === SHEET_OTHER) sh.getRange('A:A').setNumberFormat('@');
     else if (name === SHEET_WORDS) sh.getRange('E:H').setNumberFormat('@');
     else sh.getRange('A:A').setNumberFormat('dd.MM.yyyy HH:mm');
   }
@@ -1557,7 +1615,7 @@ function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   PropertiesService.getScriptProperties().setProperty('SS_ID', ss.getId());
   ss.setSpreadsheetTimeZone(TZ);
-  const names = [SHEET_LOG, SHEET_PLAN, SHEET_REVIEW, SHEET_WORDS, SHEET_JOURNAL, SHEET_IDEAS];
+  const names = [SHEET_LOG, SHEET_PLAN, SHEET_REVIEW, SHEET_WORDS, SHEET_JOURNAL, SHEET_IDEAS, SHEET_OTHER];
   names.forEach(sheet_);
   ss.getSheets().forEach(s => {
     if (names.indexOf(s.getName()) === -1 && s.getLastRow() === 0) ss.deleteSheet(s);
