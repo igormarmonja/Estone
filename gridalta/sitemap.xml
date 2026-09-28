@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://gridalta.es/</loc>
+    <lastmod>2026-09-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://gridalta.es/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gridalta.es/en/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://gridalta.es/ua/"/>
+  </url>
+  <url>
+    <loc>https://gridalta.es/en/</loc>
+    <lastmod>2026-09-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://gridalta.es/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gridalta.es/en/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://gridalta.es/ua/"/>
+  </url>
+  <url>
+    <loc>https://gridalta.es/ua/</loc>
+    <lastmod>2026-09-28</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://gridalta.es/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gridalta.es/en/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://gridalta.es/ua/"/>
+  </url>
+</urlset>
