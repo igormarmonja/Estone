@@ -146,11 +146,9 @@ export const doc = ({ lang, title, preheader, top = '', body }) => `<!DOCTYPE ht
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.dark}" style="background:${C.dark};">
     <tr><td align="center" style="padding:0;">
       ${top}
-      <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
       <table role="presentation" class="wrap" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">
 ${body}
       </table>
-      <!--[if mso]></td></tr></table><![endif]-->
       ${spacer(24)}
     </td></tr>
   </table>
