@@ -13,8 +13,10 @@
 3. Тема листа: рядок `subject` у `T`; прехедер уже зашитий у HTML.
 4. Посилання `https://esputnik.com/unsubscribe` і `https://esputnik.com/viewInBrowser` eSputnik сам підміняє
    на персональні. Не міняйте їх.
-5. Картинки беруться з `https://estone.com.ua/email/img/` (з'являться після деплою сайту з цією папкою).
-   Інший варіант: завантажити `img/p-*`, `logo-light.png` у бібліотеку зображень eSputnik і вказати їхню адресу в `IMG_BASE`.
+5. Картинки беруться прямо з публічного репозиторію GitHub (`raw.githubusercontent.com/igormarmonja/Estone/<коміт>/email/img/`),
+   адреса прив'язана до коміту й не зміниться. Нові фото: закомітити в `email/img/`, запушити,
+   підставити новий хеш коміту в `IMG_BASE` у `src/esputnik-partners.mjs` і перезібрати.
+   Якщо репозиторій стане приватним, картинки зникнуть: тоді треба перенести їх у бібліотеку зображень eSputnik або на estone.com.ua.
 
 Розділи: шапка → hero (dark) → ціна UA vs ES (sand) → лист (paper) → фото колекції + кнопка каталогу (dark) →
 щілинні раковини, 2 товари (paper) → вироби з блоку мармуру (sand) → Super Sale (dark) → портфоліо, 3 фото (paper) →

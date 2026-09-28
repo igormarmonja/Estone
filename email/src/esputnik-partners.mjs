@@ -6,9 +6,11 @@
 import { C } from './data.mjs';
 import { F, THEME, esc, pad2, spacer, label, h, lead, makeBtn, more, section, grid, logo, giant, doc } from './parts.mjs';
 
-/* Картинки: папка email/img/ після деплою сайту estone.com.ua.
-   Можна також завантажити їх у бібліотеку зображень eSputnik і вказати її адресу тут. */
-const IMG_BASE = process.env.IMG_BASE || 'https://estone.com.ua/email/img/';
+/* Картинки беремо прямо з публічного репозиторію GitHub, прив'язані до коміту 03c2c64fd47235676576a588475506912dfa42d3[:7]:
+   адреса не зміниться, навіть якщо файли в гілці перепишуть.
+   Нові фото: закомітити в email/img/, запушити й підставити сюди новий хеш коміту.
+   Інший варіант — бібліотека зображень eSputnik або https://estone.com.ua/email/img/ після деплою сайту. */
+const IMG_BASE = process.env.IMG_BASE || 'https://raw.githubusercontent.com/igormarmonja/Estone/03c2c64fd47235676576a588475506912dfa42d3/email/img/';
 
 /* Службові посилання eSputnik: сервіс сам підставляє в них персональні адреси */
 const ESPUTNIK = {
