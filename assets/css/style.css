@@ -606,3 +606,41 @@ section h2{
   .offer-ribbon{font-size:13.5px;padding:10px 15px;align-items:flex-start;}
   .offer-ribbon .dot{margin-top:5px;}
 }
+
+/* Стаття бази знань */
+.post-meta{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:18px;font-family:var(--font-mono);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
+.post-body{max-width:760px;}
+.post-body h2{font-size:clamp(22px,2.6vw,30px);margin:40px 0 14px;}
+.post-body h3{font-size:19px;margin:28px 0 10px;}
+.post-body p{margin-bottom:16px;font-size:16.5px;line-height:1.72;}
+.post-body ul,.post-body ol{margin:0 0 18px 20px;}
+.post-body li{margin-bottom:9px;font-size:16.5px;line-height:1.66;color:var(--muted);}
+.post-body li strong{color:var(--text);font-weight:600;}
+.post-body a{color:var(--brand);text-decoration:underline;text-underline-offset:3px;}
+.post-note{
+  margin:26px 0;padding:22px 24px;border-radius:var(--r);
+  background:var(--card);border:1px solid var(--line);border-left:3px solid var(--brand);
+}
+.post-note p{margin:0;font-size:15.5px;}
+.post-note strong{display:block;margin-bottom:6px;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);}
+.post-cta{
+  margin:34px 0;padding:28px;border-radius:var(--r-lg);background:var(--dark);
+}
+.post-cta h3{color:var(--paper);font-size:22px;margin-bottom:8px;}
+.post-cta p{color:rgba(245,237,227,.68);font-size:15px;margin-bottom:18px;}
+
+/* Список статей */
+.posts{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.post-card{
+  display:flex;flex-direction:column;padding:26px 24px;border-radius:var(--r);
+  background:var(--card);border:1px solid var(--line);
+  transition:transform .4s var(--ease),box-shadow .4s var(--ease),border-color .4s var(--ease);
+}
+.post-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(138,79,42,.4);}
+.post-card .label{margin-bottom:12px;}
+.post-card h3{font-size:20px;line-height:1.24;margin-bottom:10px;}
+.post-card p{font-size:14.5px;color:var(--muted);margin-bottom:16px;}
+.post-card .post-more{margin-top:auto;font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--brand);}
+.post-soon{opacity:.55;}
+.post-soon:hover{transform:none;box-shadow:none;border-color:var(--line);}
+@media (max-width:900px){.posts{grid-template-columns:1fr;}}
