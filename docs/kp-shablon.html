@@ -285,7 +285,13 @@ function calc(){
   $('tPrep').textContent=fmt(g*Math.min(100,Math.max(0,num($('prepPct').value)))/100);
 }
 document.addEventListener('input',calc);
-document.addEventListener('change',calc);
+document.addEventListener('change',function(e){
+  if(e.target.classList.contains('ck')){
+    var q=e.target.closest('tr').querySelector('.qt');
+    if(e.target.checked&&!q.value)q.value=1;
+  }
+  calc();
+});
 
 /* креслення */
 function addFile(f){
