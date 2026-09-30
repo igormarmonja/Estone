@@ -70,6 +70,11 @@ button.ghost{background:transparent;color:inherit;border:1px solid currentColor}
 .price .r li{padding-left:16px;position:relative}
 .price .r li:before{content:"";position:absolute;left:0;top:.55em;width:8px;height:1px;background:var(--sand)}
 
+.pp{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin:9px 0 8px}
+.pp .pl{font-size:11.5px;color:var(--sand);margin-bottom:2px}
+.pp .pv{font:400 34px/1.1 var(--display);white-space:nowrap}
+.pp .pv small{font-size:16px;opacity:.8}
+.pp .pv em{font-style:normal;font-size:20px;opacity:.85}
 .note{font-size:11.5px;color:var(--muted);border-left:2px solid var(--brand);padding:1px 0 1px 10px}
 
 .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding:6mm 14mm 9mm;font-size:11px;color:var(--muted);border-top:1px solid var(--line);margin-left:14mm;margin-right:14mm;padding-left:0;padding-right:0}
@@ -103,8 +108,8 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
 .decor .dp b{font-weight:700}
 .decor .dp2,.decor .dt{font-size:11.5px;display:flex;justify-content:space-between;gap:6px;padding-top:2px}
 .decor .dp2 b{font-weight:700}
-.decor .dt{margin-top:4px;padding-top:4px;border-top:1px solid var(--brand);font-weight:700;color:var(--brand)}
-.decor .dt b{font-size:14px;font-family:var(--display)}
+.decor .dt{margin-top:3px;padding-top:3px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}
+.decor .dt b{font-weight:600}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .chip{border:1px solid var(--line);border-radius:99px;padding:3px 11px;font-size:11px;background:var(--card);cursor:pointer;user-select:none}
 .chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
@@ -196,15 +201,18 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
 
     <div class="price on-dark">
       <div class="l">
-        <div class="eyebrow">Орієнтовна вартість</div>
-        <div class="big">
-          <span><span contenteditable="true" data-ph="від">від</span></span>
-          <span contenteditable="true">4 060</span>
-          <span class="cur">—</span>
-          <span contenteditable="true">4 830</span>
-          <span class="cur">$</span>
+        <div class="eyebrow">Орієнтовна вартість · за одну стільницю</div>
+        <div class="pp">
+          <div>
+            <div class="pl" contenteditable="true">Стільниця 1 · 1490×400 мм</div>
+            <div class="pv"><small contenteditable="true">від</small> <span contenteditable="true">1 900</span> <em>$</em></div>
+          </div>
+          <div>
+            <div class="pl" contenteditable="true">Стільниця 2 · 2090×310 мм</div>
+            <div class="pv"><small contenteditable="true">від</small> <span contenteditable="true">2 160</span> <em>$</em></div>
+          </div>
         </div>
-        <div class="sub" contenteditable="true">за обидві стільниці, залежно від декору · з доставкою і монтажем · деталі на стор. 2</div>
+        <div class="sub" contenteditable="true">остаточна ціна залежить від обраного декору · з доставкою і монтажем</div>
       </div>
       <div class="r">
         <div>
@@ -317,7 +325,7 @@ function decor(n){
     '<div class="dm" contenteditable="true" data-ph="виробник · код"></div>'+
     '<div class="dp"><span>Стільниця 1</span><b class="p1" contenteditable="true" data-ph="0 000 $"></b></div>'+
     '<div class="dp2"><span>Стільниця 2</span><b class="p2" contenteditable="true" data-ph="0 000 $"></b></div>'+
-    '<div class="dt"><span>Разом орієнтовно</span><b class="pt" contenteditable="true" data-ph="0 000 $"></b></div></div>';
+    '<div class="dt"><span>Обидві стільниці</span><b class="pt" contenteditable="true" data-ph="0 000 $"></b></div></div>';
   var sw=el.querySelector('.swatch');
   sw.querySelector('input[type=file]').addEventListener('change',function(){
     var f=this.files[0]; if(!f)return;
