@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Шаблон комерційної пропозиції — ESTONE</title>
+<style>
+@font-face{font-family:'Manrope';src:url('../assets/fonts/manrope-cyrillic.woff2') format('woff2');font-weight:200 800;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Manrope';src:url('../assets/fonts/manrope-latin.woff2') format('woff2');font-weight:200 800;unicode-range:U+0000-00FF,U+2000-206F,U+20AC}
+@font-face{font-family:'Jost';src:url('../assets/fonts/jost-cyrillic.woff2') format('woff2');font-weight:100 900;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Jost';src:url('../assets/fonts/jost-latin.woff2') format('woff2');font-weight:100 900;unicode-range:U+0000-00FF,U+2000-206F,U+20AC}
+
+:root{
+  --brand:#8A4F2A; --sand:#E3D5C5; --dark:#594133; --paper:#F5EDE3; --card:#FFFBF5;
+  --muted:rgba(89,65,51,.62); --line:rgba(89,65,51,.18); --field:rgba(138,79,42,.07);
+  --font:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:'Jost',var(--font);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--dark);font:14px/1.5 var(--font)}
+.toolbar{position:sticky;top:0;z-index:5;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:10px 16px;background:var(--dark);color:#fff}
+.toolbar span{align-self:center;font-size:13px;opacity:.85}
+button,.btn{font:600 13px var(--font);border:0;border-radius:999px;padding:9px 18px;cursor:pointer;background:var(--brand);color:#fff}
+button.ghost{background:transparent;color:inherit;border:1px solid currentColor}
+
+.sheet{max-width:820px;margin:20px auto 40px;background:var(--card);padding:36px 40px;border-radius:14px;box-shadow:0 18px 40px -28px rgba(89,65,51,.45)}
+
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;border-bottom:2px solid var(--brand);padding-bottom:16px}
+.logo{display:flex;align-items:center;gap:10px;font:600 26px var(--display);letter-spacing:.08em;color:var(--dark)}
+.logo svg{width:26px;height:26px;fill:var(--brand)}
+.tagline{font-size:12px;color:var(--muted);margin-top:4px}
+.meta{display:grid;grid-template-columns:auto 130px;gap:6px 10px;align-items:center;font-size:13px}
+.meta label{color:var(--muted);text-align:right}
+
+h1{font:500 28px/1.15 var(--display);margin:22px 0 4px}
+h2{font:600 12px var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin:26px 0 10px}
+.lead{color:var(--muted);margin:0 0 4px}
+
+input,select,textarea{font:inherit;color:inherit;background:var(--field);border:1px solid transparent;border-radius:8px;padding:7px 10px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);background:#fff}
+textarea{resize:vertical;min-height:64px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.grid .full{grid-column:1/-1}
+.f>span{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+
+/* креслення */
+.drop{border:2px dashed var(--stone,#BCAB99);border-radius:12px;padding:22px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s}
+.drop.over{border-color:var(--brand);background:var(--field)}
+.drop b{color:var(--brand)}
+.drop input{display:none}
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:12px}
+.file{position:relative;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.file img{display:block;width:100%;max-height:340px;object-fit:contain;background:#fff}
+.file .pdf{padding:26px 10px;text-align:center;font:600 22px var(--display);color:var(--brand)}
+.file .cap{display:flex;gap:6px;align-items:center;padding:6px 8px;border-top:1px solid var(--line)}
+.file .cap input{padding:3px 6px;font-size:12px}
+.file .x{position:absolute;top:6px;right:6px;width:24px;height:24px;padding:0;border-radius:50%;background:var(--dark);line-height:24px}
+
+/* таблиці */
+table{width:100%;border-collapse:collapse}
+th{font:600 11px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 6px;border-bottom:1px solid var(--line)}
+td{padding:4px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
+td input,td select{padding:5px 7px}
+.n{text-align:right}
+td.sum{text-align:right;font-weight:600;white-space:nowrap;padding-right:6px}
+td.chk{width:26px}
+td.chk input{width:auto}
+.w-q{width:76px}.w-u{width:70px}.w-p{width:104px}.w-s{width:110px}.w-x{width:30px}
+td .rm{background:transparent;color:var(--muted);padding:2px 8px;font-size:16px}
+.addrow{margin-top:8px}
+
+.totals{margin:14px 0 0 auto;max-width:340px;display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:center}
+.totals .inl{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.totals .inl input{width:70px;text-align:right}
+.totals .grand{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--brand);padding-top:8px;margin-top:4px;font:600 20px var(--display)}
+.totals .val{text-align:right;font-weight:600}
+
+.incl{columns:2;gap:24px;padding-left:18px;margin:0}
+.incl li{break-inside:avoid;margin-bottom:3px}
+.terms{font-size:13px;color:var(--muted);margin:0;padding-left:18px}
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:34px;font-size:12px;color:var(--muted)}
+.sign div{border-top:1px solid var(--dark);padding-top:4px}
+.foot{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+
+@media (max-width:640px){
+  .sheet{padding:20px 16px;margin:0;border-radius:0}
+  .top{flex-direction:column}.grid{grid-template-columns:1fr}.incl{columns:1}
+  .meta{grid-template-columns:auto 1fr;width:100%}
+  table{font-size:12px}.w-p{width:84px}.w-s{width:90px}
+}
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff}
+  .toolbar,.noprint,.drop,.file .x,.rm,.addrow{display:none!important}
+  .sheet{box-shadow:none;margin:0;padding:0;max-width:none;border-radius:0;background:#fff}
+  input,select,textarea{background:transparent!important;border:0!important;padding:0!important;appearance:none;-webkit-appearance:none}
+  textarea{resize:none}
+  .file .cap input{font-size:11px}
+  tr.off{display:none}
+  h2,.file,tr{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span>Шаблон КП · заповніть поля, додайте креслення, потім «Друк / PDF»</span>
+  <button onclick="window.print()">Друк / PDF</button>
+  <button class="ghost" onclick="resetAll()">Очистити</button>
+</div>
+
+<div class="sheet" id="sheet">
+
+  <div class="top">
+    <div>
+      <div class="logo">
+        <svg viewBox="0 0 295 300" aria-hidden="true"><path d="M0 0h295v45H120v45H0z"/><path d="M0 135h295v45H120v45H0z"/><path d="M0 255h295v45H0z"/></svg>
+        ESTONE
+      </div>
+      <div class="tagline">Stone. Designed for living.<br>Київ, вул. Волинська, 65 · +380 68 864 71 07 · info@estone.com.ua</div>
+    </div>
+    <div class="meta">
+      <label for="kpNo">КП №</label><input id="kpNo" placeholder="2026-001">
+      <label for="kpDate">Дата</label><input id="kpDate" type="date">
+      <label for="kpValid">Дійсне до</label><input id="kpValid" type="date">
+    </div>
+  </div>
+
+  <h1>Комерційна пропозиція</h1>
+  <p class="lead">Прорахунок виробу з каменю з доставкою і монтажем</p>
+
+  <h2>1. Клієнт і об'єкт</h2>
+  <div class="grid">
+    <label class="f"><span>Клієнт / компанія</span><input id="cName"></label>
+    <label class="f"><span>Телефон</span><input id="cPhone" type="tel"></label>
+    <label class="f full"><span>Адреса об'єкта (місто, вулиця, поверх, ліфт)</span><input id="cAddr"></label>
+    <label class="f"><span>Виріб</span>
+      <select id="cProduct">
+        <option value="">— оберіть —</option>
+        <option>Кухонна стільниця</option><option>Стільниця + фартух</option><option>Підвіконня</option>
+        <option>Ванна кімната / умивальник</option><option>Сходи</option><option>Барна стійка / ресепшн</option>
+        <option>Інше</option>
+      </select>
+    </label>
+    <label class="f"><span>Менеджер</span><input id="cManager"></label>
+  </div>
+
+  <h2>2. Креслення клієнта</h2>
+  <label class="drop noprint" id="drop">
+    <input type="file" id="fileIn" accept="image/*,.pdf" multiple>
+    <b>Натисніть</b> або перетягніть сюди креслення, ескіз чи фото (JPG, PNG, PDF)
+  </label>
+  <div class="files" id="files"></div>
+  <p class="lead" style="margin-top:8px;font-size:12px">Розміри на кресленні орієнтовні; остаточні — за результатами заміру на об'єкті.</p>
+
+  <h2>3. Матеріал</h2>
+  <div class="grid">
+    <label class="f"><span>Тип матеріалу</span>
+      <select id="mType">
+        <option value="">— оберіть —</option>
+        <option>Кварцовий камінь</option><option>Акриловий камінь</option>
+        <option>Керамограніт</option><option>Натуральний камінь</option>
+      </select>
+    </label>
+    <label class="f"><span>Назва матеріалу / декор / колір</span><input id="mName" placeholder="напр. Silestone Calacatta Gold"></label>
+    <label class="f"><span>Товщина, мм</span><input id="mThick" placeholder="12 / 20 / 30"></label>
+    <label class="f"><span>Профіль кромки / торця</span><input id="mEdge" placeholder="прямий, підклеєний 40 мм, фаска…"></label>
+    <label class="f"><span>Поверхня</span><input id="mFinish" placeholder="полірована, матова, suede"></label>
+    <label class="f"><span>Загальний метраж (пог. м / м²)</span><input id="mArea"></label>
+  </div>
+
+  <h2>4. Основні позиції</h2>
+  <table id="mainTbl">
+    <thead><tr><th>Позиція</th><th class="w-u">Од.</th><th class="w-q">К-сть</th><th class="w-p n">Ціна, грн</th><th class="w-s n">Сума</th><th class="w-x"></th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button class="ghost addrow noprint" style="color:var(--brand)" onclick="addMain()">+ Додати позицію</button>
+
+  <h2>5. Додаткові роботи та функції</h2>
+  <p class="lead noprint" style="font-size:12px">Позначте потрібне, вкажіть кількість і ціну. Непозначені рядки в друк не потраплять.</p>
+  <table id="extraTbl">
+    <thead><tr><th class="w-x"></th><th>Робота</th><th class="w-u">Од.</th><th class="w-q">К-сть</th><th class="w-p n">Ціна, грн</th><th class="w-s n">Сума</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <button class="ghost addrow noprint" style="color:var(--brand)" onclick="addExtra('',  'шт', true)">+ Додати свою роботу</button>
+
+  <div class="totals">
+    <span>Основні позиції</span><span class="val" id="tMain">0</span>
+    <span>Додаткові роботи</span><span class="val" id="tExtra">0</span>
+    <span>Знижка</span><span class="inl"><input id="disc" type="number" min="0" max="100" step="1" value="0"> %</span>
+    <div class="grand"><span>Разом, грн</span><span id="tGrand">0</span></div>
+    <span>Аванс</span><span class="inl"><input id="prepPct" type="number" min="0" max="100" step="5" value="50"> % = <b id="tPrep">0</b></span>
+  </div>
+
+  <h2>6. Що входить у вартість</h2>
+  <ul class="incl">
+    <li>Замір на об'єкті</li><li>Креслення на погодження</li>
+    <li>Виготовлення</li><li>Обробка торця</li>
+    <li>Вирізи й отвори (за списком вище)</li><li>Доставка</li>
+    <li>Монтаж</li><li>Гарантія 5 років</li>
+  </ul>
+
+  <h2>7. Умови</h2>
+  <div class="grid">
+    <label class="f"><span>Термін виготовлення</span><input id="tTerm" placeholder="напр. 10–14 робочих днів після заміру"></label>
+    <label class="f"><span>Оплата</span><input id="tPay" placeholder="аванс на матеріал, решта — перед монтажем"></label>
+    <label class="f full"><span>Примітки та особливості (що не входить, підготовка основи, підключення сантехніки тощо)</span>
+      <textarea id="tNotes"></textarea></label>
+  </div>
+  <ul class="terms" style="margin-top:10px">
+    <li>Ціна фіксується після узгодження креслення і не змінюється.</li>
+    <li>Кольори й зображення в каталозі приблизні; рекомендуємо затвердити зразок.</li>
+    <li>Підключення техніки та сантехніки, демонтаж старих виробів — окремо, якщо не вказано в позиціях.</li>
+  </ul>
+
+  <div class="sign"><div>Від ESTONE</div><div>Від замовника</div></div>
+  <div class="foot"><span>ESTONE · estone.com.ua</span><span>Виробництво: Київ · Alicante</span></div>
+</div>
+
+<script>
+var EXTRAS = [
+  ['Виріз під варильну поверхню','шт'],
+  ['Виріз під мийку (врізна / підстільна)','шт'],
+  ['Отвір під змішувач','шт'],
+  ['Фартух / бортик','пог. м'],
+  ['Підклейка торця (потовщення)','пог. м'],
+  ['Фігурний профіль кромки','пог. м'],
+  ['Радіусні / гнуті елементи','шт'],
+  ['Підсилення під звис / острів','шт'],
+  ['Інтегрована мийка (з каменю)','шт'],
+  ['Жолобки для стоку води','шт'],
+  ['Підвіконня','пог. м'],
+  ['Демонтаж старої стільниці','шт'],
+  ['Занос без ліфта (за поверх)','пов.'],
+  ['Виїзд за межі Києва','км']
+];
+var MAIN_DEFAULT = ['Стільниця','Фартух','Підвіконня'];
+
+function $(id){return document.getElementById(id)}
+function num(v){v=parseFloat(String(v).replace(',','.'));return isNaN(v)?0:v}
+function fmt(n){return Math.round(n).toLocaleString('uk-UA').replace(/ /g,' ')}
+function esc(s){return String(s).replace(/"/g,'&quot;')}
+
+function rowMain(name){
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td><input class="nm" value="'+esc(name||'')+'" placeholder="Назва позиції"></td>'+
+    '<td><input class="un" value="пог. м"></td>'+
+    '<td><input class="qt n" type="number" min="0" step="any"></td>'+
+    '<td><input class="pr n" type="number" min="0" step="any"></td>'+
+    '<td class="sum">0</td>'+
+    '<td><button class="rm" title="Видалити" onclick="this.closest(\'tr\').remove();calc()">×</button></td>';
+  return tr;
+}
+function addMain(name){ $('mainTbl').tBodies[0].appendChild(rowMain(name)); }
+
+function addExtra(name, unit, on){
+  var tr=document.createElement('tr');
+  if(!on) tr.className='off';
+  tr.innerHTML='<td class="chk"><input type="checkbox" class="ck"'+(on?' checked':'')+'></td>'+
+    '<td><input class="nm" value="'+esc(name)+'" placeholder="Назва роботи"></td>'+
+    '<td><input class="un" value="'+esc(unit)+'"></td>'+
+    '<td><input class="qt n" type="number" min="0" step="any" value="'+(on?1:'')+'"></td>'+
+    '<td><input class="pr n" type="number" min="0" step="any"></td>'+
+    '<td class="sum">0</td>';
+  $('extraTbl').tBodies[0].appendChild(tr);
+}
+
+function sumTable(id){
+  var total=0;
+  Array.prototype.forEach.call($(id).tBodies[0].rows,function(tr){
+    var ck=tr.querySelector('.ck'), on=!ck||ck.checked;
+    tr.classList.toggle('off',!on);
+    var s=on?num(tr.querySelector('.qt').value)*num(tr.querySelector('.pr').value):0;
+    tr.querySelector('.sum').textContent=on&&s?fmt(s):'';
+    total+=s;
+  });
+  return total;
+}
+function calc(){
+  var m=sumTable('mainTbl'), e=sumTable('extraTbl');
+  var d=Math.min(100,Math.max(0,num($('disc').value)));
+  var g=(m+e)*(1-d/100);
+  $('tMain').textContent=fmt(m); $('tExtra').textContent=fmt(e); $('tGrand').textContent=fmt(g);
+  $('tPrep').textContent=fmt(g*Math.min(100,Math.max(0,num($('prepPct').value)))/100);
+}
+document.addEventListener('input',calc);
+document.addEventListener('change',calc);
+
+/* креслення */
+function addFile(f){
+  var box=document.createElement('div'); box.className='file';
+  var cap='<div class="cap"><input placeholder="Підпис (напр. Кухня, вид зверху)" value="'+esc(f.name.replace(/\.[^.]+$/,''))+'"></div>';
+  var x='<button class="x" title="Прибрати" onclick="this.closest(\'.file\').remove()">×</button>';
+  if(f.type.indexOf('image/')===0){
+    var r=new FileReader();
+    r.onload=function(){box.innerHTML='<img src="'+r.result+'" alt="">'+cap+x};
+    r.readAsDataURL(f);
+  } else {
+    box.innerHTML='<div class="pdf">PDF<div style="font:500 12px var(--font);color:var(--muted);margin-top:4px">'+esc(f.name)+'</div></div>'+cap+x;
+  }
+  $('files').appendChild(box);
+}
+function addFiles(list){Array.prototype.forEach.call(list,addFile)}
+$('fileIn').addEventListener('change',function(){addFiles(this.files);this.value=''});
+var drop=$('drop');
+['dragenter','dragover'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add('over')})});
+['dragleave','drop'].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove('over')})});
+drop.addEventListener('drop',function(e){addFiles(e.dataTransfer.files)});
+
+function init(){
+  var t=new Date(), v=new Date(t.getTime()+14*864e5);
+  $('kpDate').value=t.toISOString().slice(0,10);
+  $('kpValid').value=v.toISOString().slice(0,10);
+  MAIN_DEFAULT.forEach(addMain);
+  EXTRAS.forEach(function(x){addExtra(x[0],x[1],false)});
+  calc();
+}
+function resetAll(){
+  if(!confirm('Очистити всі поля і креслення?'))return;
+  location.reload();
+}
+init();
+</script>
+</body>
+</html>
