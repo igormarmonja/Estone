@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Попередній прорахунок — ESTONE</title>
+<style>
+@font-face{font-family:'Manrope';src:url('../assets/fonts/manrope-cyrillic.woff2') format('woff2');font-weight:200 800;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Manrope';src:url('../assets/fonts/manrope-latin.woff2') format('woff2');font-weight:200 800;unicode-range:U+0000-00FF,U+2000-206F,U+20AC}
+@font-face{font-family:'Jost';src:url('../assets/fonts/jost-cyrillic.woff2') format('woff2');font-weight:100 900;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Jost';src:url('../assets/fonts/jost-latin.woff2') format('woff2');font-weight:100 900;unicode-range:U+0000-00FF,U+2000-206F,U+20AC}
+
+:root{
+  --brand:#8A4F2A; --sand:#E3D5C5; --stone:#BCAB99; --dark:#594133; --paper:#F5EDE3; --card:#FFFBF5;
+  --muted:rgba(89,65,51,.62); --line:rgba(89,65,51,.18);
+  --font:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:'Jost',var(--font);
+}
+*{box-sizing:border-box}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:#d9cbbb;color:var(--dark);font:12.5px/1.5 var(--font)}
+
+.toolbar{position:sticky;top:0;z-index:9;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:10px 16px;background:var(--dark);color:#fff;align-items:center}
+.toolbar span{font-size:13px;opacity:.85}
+button{font:600 13px var(--font);border:0;border-radius:999px;padding:9px 18px;cursor:pointer;background:var(--brand);color:#fff}
+button.ghost{background:transparent;color:inherit;border:1px solid currentColor}
+
+/* сторінка A4 */
+.page{position:relative;width:210mm;height:297mm;margin:18px auto;background:var(--paper);overflow:hidden;box-shadow:0 18px 40px -20px rgba(0,0,0,.4);display:flex;flex-direction:column}
+
+/* редаговані поля */
+[contenteditable]{outline:none;border-radius:4px;transition:background .15s}
+[contenteditable]:hover{background:rgba(138,79,42,.09)}
+[contenteditable]:focus{background:rgba(138,79,42,.14)}
+[contenteditable]:empty:before{content:attr(data-ph);opacity:.45}
+.on-dark [contenteditable]:hover,.on-dark [contenteditable]:focus{background:rgba(255,255,255,.16)}
+
+.logo{display:inline-flex;align-items:center;gap:10px;font:600 24px var(--display);letter-spacing:.1em}
+.logo svg{width:24px;height:24px;fill:currentColor}
+
+/* СТОРІНКА 1 */
+.hero{position:relative;height:126mm;flex:none;color:#fff;background:#3b2c22 url('../assets/img/cover.jpg') center 62%/cover;cursor:pointer}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(35,24,17,.55) 0%,rgba(35,24,17,0) 38%,rgba(35,24,17,.78) 100%)}
+.hero>*{position:relative;z-index:1}
+.hero-top{position:absolute;left:14mm;right:14mm;top:11mm;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.hero-top small{font-size:11px;letter-spacing:.06em;opacity:.85;text-align:right;line-height:1.5}
+.hero-title{position:absolute;left:14mm;right:14mm;bottom:11mm;z-index:2}
+.eyebrow{font:600 10.5px var(--font);letter-spacing:.2em;text-transform:uppercase;color:var(--sand)}
+.hero h1{margin:6px 0 0;font:400 40px/1.05 var(--display);letter-spacing:.005em}
+.hero-hint{position:absolute;right:14mm;bottom:11mm;z-index:2;font-size:10px;opacity:.6}
+
+.body1{flex:1;padding:12mm 14mm 0;display:flex;flex-direction:column;gap:9mm}
+.label{font:600 10px var(--font);letter-spacing:.18em;text-transform:uppercase;color:var(--brand);margin-bottom:5px}
+.client{display:grid;grid-template-columns:1.25fr 1fr;gap:10mm;align-items:start}
+.client .name{font:500 27px/1.15 var(--display);min-height:31px}
+.client dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:12.5px}
+.client dt{color:var(--muted)}
+.client dd{margin:0;font-weight:600;min-height:18px}
+
+.price{display:grid;grid-template-columns:1.45fr 1fr;background:var(--dark);color:#fff;border-radius:6mm;overflow:hidden}
+.price .l{padding:8mm 8mm 8mm 9mm}
+.price .r{padding:8mm 9mm;background:var(--brand);display:flex;flex-direction:column;justify-content:center;gap:6px;font-size:12px;line-height:1.5}
+.price .big{font:400 36px/1.1 var(--display);white-space:nowrap;margin:8px 0 4px;display:flex;align-items:baseline;flex-wrap:nowrap;gap:0 9px}
+.price .big [contenteditable]{min-width:60px;display:inline-block}
+.price .cur{font:400 20px var(--display);opacity:.8}
+.price .sub{font-size:12px;color:var(--sand)}
+.price .r b{display:block;font:600 10px var(--font);letter-spacing:.16em;text-transform:uppercase;color:var(--sand);margin-bottom:2px}
+.price .r ul{margin:0;padding:0;list-style:none}
+.price .r li{padding-left:16px;position:relative}
+.price .r li:before{content:"";position:absolute;left:0;top:.55em;width:8px;height:1px;background:var(--sand)}
+
+.note{font-size:11.5px;color:var(--muted);border-left:2px solid var(--brand);padding:1px 0 1px 10px}
+
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding:6mm 14mm 9mm;font-size:11px;color:var(--muted);border-top:1px solid var(--line);margin-left:14mm;margin-right:14mm;padding-left:0;padding-right:0}
+.foot b{color:var(--dark)}
+
+/* СТОРІНКА 2 */
+.p2head{display:flex;justify-content:space-between;align-items:center;padding:11mm 14mm 6mm;border-bottom:1px solid var(--line);margin:0 14mm;padding-left:0;padding-right:0}
+.p2head .logo{font-size:20px;color:var(--dark)}.p2head .logo svg{fill:var(--brand);width:20px;height:20px}
+.p2head span{font-size:11px;color:var(--muted)}
+.body2{flex:1;padding:8mm 14mm 0;display:flex;flex-direction:column;gap:7mm}
+h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
+.spec{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:4mm;overflow:hidden;background:var(--card)}
+.spec div{padding:8px 11px;border-right:1px solid var(--line)}
+.spec div:last-child{border-right:0}
+.spec small{display:block;font:600 9px var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.spec [contenteditable]{display:block;font-weight:600;font-size:13px;min-height:19px}
+
+.decors{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+.decor{background:var(--card);border:1px solid var(--line);border-radius:4mm;overflow:hidden}
+.swatch{position:relative;height:36mm;background:var(--sand);cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;font-size:10.5px;color:var(--muted);background-size:cover;background-position:center}
+.swatch.has{color:transparent}
+.swatch input{display:none}
+.swatch .clr{position:absolute;right:6px;bottom:6px;width:22px;height:22px;border-radius:50%;border:2px solid #fff;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.swatch .clr input{display:block;width:44px;height:44px;margin:-10px;border:0;padding:0;cursor:pointer;opacity:0}
+.swatch .clr{background:conic-gradient(#e6d3bd,#bfa78b,#8a4f2a,#594133,#e6d3bd)}
+.decor .in{padding:7px 10px 9px}
+.decor .tag{font:600 9px var(--font);letter-spacing:.16em;text-transform:uppercase;color:var(--brand)}
+.decor .dn{font:500 15px/1.2 var(--display);min-height:18px;margin:2px 0}
+.decor .dm{font-size:11px;color:var(--muted);min-height:15px}
+.decor .dp{margin-top:5px;padding-top:5px;border-top:1px solid var(--line);font-size:11.5px;display:flex;justify-content:space-between;gap:6px}
+.decor .dp b{font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{border:1px solid var(--line);border-radius:99px;padding:3px 11px;font-size:11px;background:var(--card);cursor:pointer;user-select:none}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+
+.two{display:grid;grid-template-columns:1.2fr 1fr;gap:7mm}
+.sketch{border:1.5px dashed var(--stone);border-radius:4mm;min-height:52mm;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:11px;cursor:pointer;overflow:hidden;background:var(--card)}
+.sketch img{width:100%;height:100%;max-height:60mm;object-fit:contain}
+.sketch input{display:none}
+.incl{margin:0;padding:0;list-style:none;columns:1;font-size:12px}
+.incl li{padding:3px 0 3px 20px;position:relative;border-bottom:1px solid var(--line)}
+.incl li:after{content:"";position:absolute;left:2px;top:9px;width:9px;height:5px;border-left:2px solid var(--brand);border-bottom:2px solid var(--brand);transform:rotate(-45deg)}
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.step{background:var(--dark);color:#fff;border-radius:4mm;padding:9px 11px 10px}
+.step:nth-child(1){background:var(--card);color:var(--dark);border:1px solid var(--line)}
+.step i{font:400 22px var(--display);font-style:normal;color:var(--sand)}
+.step:nth-child(1) i{color:var(--brand)}
+.step b{display:block;font-size:12px;margin:1px 0 2px}
+.step p{margin:0;font-size:10.5px;line-height:1.4;opacity:.8}
+
+.contact{background:var(--brand);color:#fff;margin:0;padding:7mm 14mm;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto}
+.contact .q{font:400 19px/1.2 var(--display)}
+.contact .c{font-size:12px;text-align:right;line-height:1.55}
+.contact .c b{font-size:15px}
+
+@media (max-width:820px){
+  body{background:var(--paper)}
+  .page{transform-origin:top left;box-shadow:none}
+}
+@media print{
+  @page{size:A4;margin:0}
+  body{background:none}
+  .toolbar,.hero-hint,.noprint{display:none!important}
+  .page{margin:0;box-shadow:none;break-after:page;page-break-after:always}
+  .page:last-child{break-after:auto;page-break-after:auto}
+  [contenteditable]:hover,[contenteditable]:focus{background:none}
+  [contenteditable]:empty:before{content:""}
+  .swatch:not(.has) span{display:none}
+  .sketch:not(.has){border:0;background:none}.sketch:not(.has) span{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span>Клікайте по тексту, щоб редагувати · по фото — щоб замінити · потім «Друк / PDF» (без полів, фон увімкнено)</span>
+  <button onclick="window.print()">Друк / PDF</button>
+  <button class="ghost" onclick="location.reload()">Очистити</button>
+</div>
+
+<!-- ═════════ СТОРІНКА 1 ═════════ -->
+<section class="page">
+  <div class="hero on-dark" id="hero" title="Клік — замінити фото">
+    <input type="file" id="heroIn" accept="image/*" hidden>
+    <div class="hero-top">
+      <div class="logo">
+        <svg viewBox="0 0 295 300" aria-hidden="true"><path d="M0 0h295v45H120v45H0z"/><path d="M0 135h295v45H120v45H0z"/><path d="M0 255h295v45H0z"/></svg>
+        ESTONE
+      </div>
+      <small>Stone. Designed for living.<br>estone.com.ua</small>
+    </div>
+    <div class="hero-title">
+      <div class="eyebrow">Попередній прорахунок</div>
+      <h1>Вироби з каменю<br>для вашого простору</h1>
+    </div>
+    <div class="hero-hint">клік — замінити фото</div>
+  </div>
+
+  <div class="body1">
+    <div class="client">
+      <div>
+        <div class="label">Підготовлено для</div>
+        <div class="name" contenteditable="true" data-ph="Ім'я клієнта"></div>
+      </div>
+      <dl>
+        <dt>Об'єкт</dt><dd contenteditable="true" data-ph="місто, адреса"></dd>
+        <dt>Виріб</dt><dd contenteditable="true" data-ph="напр. кухонна стільниця"></dd>
+        <dt>Дата</dt><dd contenteditable="true" id="dateF"></dd>
+        <dt>№</dt><dd contenteditable="true" data-ph="2026-001"></dd>
+      </dl>
+    </div>
+
+    <div class="price on-dark">
+      <div class="l">
+        <div class="eyebrow">Орієнтовна вартість</div>
+        <div class="big">
+          <span><span contenteditable="true" data-ph="від">від</span></span>
+          <span contenteditable="true" data-ph="0 000"></span>
+          <span class="cur">—</span>
+          <span contenteditable="true" data-ph="0 000"></span>
+          <span class="cur">грн</span>
+        </div>
+        <div class="sub" contenteditable="true">з доставкою і монтажем</div>
+      </div>
+      <div class="r">
+        <div>
+          <b>У вартість входить</b>
+          <ul>
+            <li>Замір і креслення на погодження</li>
+            <li>Виготовлення та обробка торця</li>
+            <li>Доставка і монтаж</li>
+            <li>Гарантія 5 років</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="note" contenteditable="true">
+      Це орієнтовна оцінка за наданими розмірами та фото. Остаточну вартість фіксуємо після заміру на об'єкті та
+      затвердження креслення й декору — далі ціна не змінюється.
+    </div>
+  </div>
+
+  <div class="foot">
+    <span><b>+380 68 864 71 07</b> · info@estone.com.ua</span>
+    <span>Київ · Alicante</span>
+  </div>
+</section>
+
+<!-- ═════════ СТОРІНКА 2 ═════════ -->
+<section class="page">
+  <div class="p2head">
+    <div class="logo">
+      <svg viewBox="0 0 295 300" aria-hidden="true"><path d="M0 0h295v45H120v45H0z"/><path d="M0 135h295v45H120v45H0z"/><path d="M0 255h295v45H0z"/></svg>
+      ESTONE
+    </div>
+    <span>Попередній прорахунок · <span id="dateF2"></span></span>
+  </div>
+
+  <div class="body2">
+    <div>
+      <div class="label">Матеріал і декор</div>
+      <h2>Варіанти для вибору</h2>
+      <div class="chips noprint" id="chips">
+        <span class="chip">Кварцовий камінь</span><span class="chip">Акриловий камінь</span>
+        <span class="chip">Керамограніт</span><span class="chip">Натуральний камінь</span>
+      </div>
+    </div>
+
+    <div class="spec">
+      <div><small>Матеріал</small><span contenteditable="true" id="specMat" data-ph="тип матеріалу"></span></div>
+      <div><small>Товщина</small><span contenteditable="true" data-ph="12 / 20 / 30 мм"></span></div>
+      <div><small>Кромка</small><span contenteditable="true" data-ph="профіль торця"></span></div>
+      <div><small>Поверхня</small><span contenteditable="true" data-ph="полір / матова"></span></div>
+    </div>
+
+    <div class="decors" id="decors"></div>
+
+    <div class="two">
+      <div>
+        <div class="label">Додаткові функції</div>
+        <ul class="incl" id="extras" style="font-size:12px">
+          <li contenteditable="true" data-ph="напр. виріз під варильну поверхню"></li>
+          <li contenteditable="true" data-ph="напр. інтегрована мийка з каменю"></li>
+          <li contenteditable="true" data-ph="напр. фартух до стелі"></li>
+          <li contenteditable="true" data-ph="напр. підсвітка / підсилений звис"></li>
+        </ul>
+      </div>
+      <div>
+        <div class="label">Креслення / ескіз клієнта</div>
+        <label class="sketch" id="sketch">
+          <input type="file" id="sketchIn" accept="image/*">
+          <span>Клік — додати креслення або фото</span>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <div class="label">Що далі</div>
+      <div class="steps">
+        <div class="step"><i>01</i><b>Прорахунок</b><p>Ви зараз тут: орієнтовна вартість за годину.</p></div>
+        <div class="step"><i>02</i><b>Замір</b><p>Виїжджаємо на об'єкт, знімаємо фактичну геометрію. Безкоштовно.</p></div>
+        <div class="step"><i>03</i><b>Погодження</b><p>Креслення, декор, остаточна ціна. Далі — авансова оплата.</p></div>
+        <div class="step"><i>04</i><b>Монтаж</b><p>Виготовляємо, привозимо і ставимо самі. Гарантія 5 років.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact on-dark">
+    <div class="q">Готові рухатись далі?<br>Напишіть або зателефонуйте.</div>
+    <div class="c"><b>+380 68 864 71 07</b><br>info@estone.com.ua<br>Київ, вул. Волинська, 65</div>
+  </div>
+</section>
+
+<script>
+function $(id){return document.getElementById(id)}
+var d=new Date(), ds=d.toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'});
+$('dateF').textContent=ds; $('dateF2').textContent=ds;
+
+/* фото обкладинки */
+$('hero').addEventListener('click',function(e){ if(e.target.closest('[contenteditable]'))return; $('heroIn').click(); });
+$('heroIn').addEventListener('change',function(){
+  var f=this.files[0]; if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){$('hero').style.backgroundImage='url("'+r.result+'")'};
+  r.readAsDataURL(f);
+});
+
+/* креслення */
+$('sketchIn').addEventListener('change',function(){
+  var f=this.files[0]; if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    var s=$('sketch'); s.classList.add('has');
+    var img=s.querySelector('img')||s.appendChild(document.createElement('img'));
+    img.src=r.result; s.querySelector('span').style.display='none';
+  };
+  r.readAsDataURL(f);
+});
+
+/* швидкий вибір типу матеріалу */
+$('chips').addEventListener('click',function(e){
+  var c=e.target.closest('.chip'); if(!c)return;
+  var on=c.classList.toggle('on');
+  var sel=Array.prototype.map.call(document.querySelectorAll('#chips .chip.on'),function(x){return x.textContent});
+  $('specMat').textContent=sel.join(' / ');
+});
+
+/* картки декору */
+function decor(n){
+  var el=document.createElement('div'); el.className='decor';
+  el.innerHTML=
+    '<label class="swatch"><input type="file" accept="image/*"><span>Клік — фото декору</span>'+
+    '<span class="clr noprint" title="Обрати колір-плашку"><input type="color" value="#d8c7b2"></span></label>'+
+    '<div class="in"><div class="tag">Варіант '+n+'</div>'+
+    '<div class="dn" contenteditable="true" data-ph="Назва декору"></div>'+
+    '<div class="dm" contenteditable="true" data-ph="виробник · код"></div>'+
+    '<div class="dp"><span>орієнт. від</span><b contenteditable="true" data-ph="0 000 грн"></b></div></div>';
+  var sw=el.querySelector('.swatch');
+  sw.querySelector('input[type=file]').addEventListener('change',function(){
+    var f=this.files[0]; if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){sw.style.backgroundImage='url("'+r.result+'")';sw.classList.add('has')};
+    r.readAsDataURL(f);
+  });
+  sw.querySelector('input[type=color]').addEventListener('input',function(){
+    sw.style.backgroundImage='none'; sw.style.backgroundColor=this.value; sw.classList.add('has');
+  });
+  sw.querySelector('.clr').addEventListener('click',function(e){e.stopPropagation()});
+  return el;
+}
+for(var i=1;i<=3;i++) $('decors').appendChild(decor(i));
+</script>
+</body>
+</html>
