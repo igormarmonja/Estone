@@ -48,6 +48,11 @@ button.ghost{background:transparent;color:inherit;border:1px solid currentColor}
 .hero-title{position:absolute;left:14mm;right:14mm;bottom:11mm;z-index:2}
 .eyebrow{font:600 10.5px var(--font);letter-spacing:.2em;text-transform:uppercase;color:var(--sand)}
 .hero h1{margin:6px 0 0;font:400 40px/1.05 var(--display);letter-spacing:.005em}
+.hero.compact{height:56mm}
+.hero.compact .hero-top{top:9mm}
+.hero.compact .hero-title{bottom:8mm}
+.hero.compact h1{font-size:30px}
+.hero.compact + .body2{padding-bottom:9mm}
 .hero-hint{position:absolute;right:14mm;bottom:11mm;z-index:2;font-size:10px;opacity:.6}
 
 .body1{flex:1;padding:12mm 14mm 0;display:flex;flex-direction:column;gap:9mm}
@@ -132,7 +137,7 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
 .incl.cols li{break-inside:avoid}
 .drawings{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
 .drawings figure{margin:0;background:#fff;border:1px solid var(--line);border-radius:4mm;padding:3mm 3mm 2mm;display:flex;flex-direction:column;align-items:center}
-.drawings img{height:70mm;max-width:100%;object-fit:contain}
+.drawings img{height:62mm;max-width:100%;object-fit:contain}
 .drawings figcaption{font-size:10.5px;color:var(--muted);margin-top:2px;min-width:40px}
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
 .step{background:var(--dark);color:#fff;border-radius:4mm;padding:9px 11px 10px}
@@ -174,12 +179,20 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
 
 <!-- ═════════ СТОРІНКА 1 ═════════ -->
 <section class="page">
-  <div class="p2head">
-    <div class="logo">
-      <svg viewBox="0 0 295 300" aria-hidden="true"><path d="M0 0h295v45H120v45H0z"/><path d="M0 135h295v45H120v45H0z"/><path d="M0 255h295v45H0z"/></svg>
-      ESTONE
+  <div class="hero on-dark compact" id="hero" title="Клік — замінити фото">
+    <input type="file" id="heroIn" accept="image/*" hidden>
+    <div class="hero-top">
+      <div class="logo">
+        <svg viewBox="0 0 295 300" aria-hidden="true"><path d="M0 0h295v45H120v45H0z"/><path d="M0 135h295v45H120v45H0z"/><path d="M0 255h295v45H0z"/></svg>
+        ESTONE
+      </div>
+      <small>Stone. Designed for living.<br>estone.com.ua</small>
     </div>
-    <span>Попередній прорахунок · <span id="dateF2"></span></span>
+    <div class="hero-title">
+      <div class="eyebrow">Попередній прорахунок</div>
+      <h1>Стільниці з раковинами<br>з каменю</h1>
+    </div>
+    <div class="hero-hint">клік — замінити фото</div>
   </div>
 
   <div class="body2">
@@ -217,28 +230,16 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
 
   </div>
 
-  <div class="contact on-dark">
-    <div class="q">Готові рухатись далі?<br>Напишіть або зателефонуйте.</div>
-    <div class="c"><b>+380 68 864 71 07</b><br>info@estone.com.ua<br>Київ, вул. Волинська, 65</div>
-  </div>
 </section>
 
 <!-- ═════════ СТОРІНКА 2 ═════════ -->
 <section class="page">
-  <div class="hero on-dark" id="hero" title="Клік — замінити фото">
-    <input type="file" id="heroIn" accept="image/*" hidden>
-    <div class="hero-top">
-      <div class="logo">
-        <svg viewBox="0 0 295 300" aria-hidden="true"><path d="M0 0h295v45H120v45H0z"/><path d="M0 135h295v45H120v45H0z"/><path d="M0 255h295v45H0z"/></svg>
-        ESTONE
-      </div>
-      <small>Stone. Designed for living.<br>estone.com.ua</small>
+  <div class="p2head">
+    <div class="logo">
+      <svg viewBox="0 0 295 300" aria-hidden="true"><path d="M0 0h295v45H120v45H0z"/><path d="M0 135h295v45H120v45H0z"/><path d="M0 255h295v45H0z"/></svg>
+      ESTONE
     </div>
-    <div class="hero-title">
-      <div class="eyebrow">Попередній прорахунок</div>
-      <h1>Стільниці з раковинами<br>з каменю</h1>
-    </div>
-    <div class="hero-hint">клік — замінити фото</div>
+    <span>Попередній прорахунок · <span id="dateF2"></span></span>
   </div>
 
   <div class="body1">
@@ -295,9 +296,9 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
     </div>
   </div>
 
-  <div class="foot">
-    <span><b>+380 68 864 71 07</b> · info@estone.com.ua</span>
-    <span>Київ · Alicante</span>
+  <div class="contact on-dark">
+    <div class="q">Готові рухатись далі?<br>Напишіть або зателефонуйте.</div>
+    <div class="c"><b>+380 68 864 71 07</b><br>info@estone.com.ua<br>Київ, вул. Волинська, 65</div>
   </div>
 </section>
 
