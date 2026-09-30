@@ -48,10 +48,10 @@ button.ghost{background:transparent;color:inherit;border:1px solid currentColor}
 .hero-title{position:absolute;left:14mm;right:14mm;bottom:11mm;z-index:2}
 .eyebrow{font:600 10.5px var(--font);letter-spacing:.2em;text-transform:uppercase;color:var(--sand)}
 .hero h1{margin:6px 0 0;font:400 40px/1.05 var(--display);letter-spacing:.005em}
-.hero.compact{height:56mm}
-.hero.compact .hero-top{top:9mm}
-.hero.compact .hero-title{bottom:8mm}
-.hero.compact h1{font-size:30px}
+.hero.compact{height:108mm}
+.hero.compact .hero-top{top:11mm}
+.hero.compact .hero-title{bottom:11mm}
+.hero.compact h1{font-size:40px}
 .hero.compact + .body2{padding-bottom:9mm}
 .hero-hint{position:absolute;right:14mm;bottom:11mm;z-index:2;font-size:10px;opacity:.6}
 
@@ -144,10 +144,15 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
 .own-n{font:500 19px/1.2 var(--display);min-width:40px}
 .own .dm{font-size:11px;color:var(--muted);min-height:15px}
 .own-p{text-align:right;font-size:11px;color:var(--muted);white-space:nowrap}
-.own-p b{display:block;font:500 22px/1.1 var(--display);color:var(--dark);min-width:70px}
+.own-p b{display:block;font:500 28px/1.1 var(--display);color:var(--brand);min-width:70px}
+.sinkgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.sk{background:#fff;border:1px solid var(--line);border-radius:4mm;padding:8px 8px 9px;text-align:center}
+.sk img{width:100%;height:40mm;object-fit:contain;display:block}
+.sk .sn{font:500 15px var(--display);margin-top:4px;min-width:30px}
+.sk .sp{font:600 15px var(--font);color:var(--brand);min-width:30px}
 .two2{display:grid;grid-template-columns:1.35fr 1fr;gap:7mm}
 .drawings.one{grid-template-columns:1fr}
-.drawings.one img{height:auto;width:100%;max-height:64mm}
+.drawings.one img{height:auto;width:100%;max-height:60mm}
 .sinks{list-style:none;margin:0;padding:0}
 .sinks li{display:flex;justify-content:space-between;align-items:baseline;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:3mm;padding:7px 12px;margin-bottom:5px}
 .sinks b{font:500 19px var(--display);color:var(--brand)}
@@ -212,50 +217,34 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
   </div>
 
   <div class="body2">
-    <div>
-      <div class="label">Матеріал і декор</div>
-      <h2>Ваш матеріал + три декори на вибір</h2>
-    </div>
-
     <div class="own">
       <div class="own-t">
-        <div class="tag">Стільниця 1</div>
-        <div class="own-n" contenteditable="true">З матеріалу замовника</div>
+        <div class="tag">Стільниця 1 · матеріал замовника</div>
         <div class="dm" contenteditable="true">плита 1200×600 мм · 3 шт · торець 150–160 мм</div>
       </div>
-      <div class="own-p"><span>виготовлення від</span><b contenteditable="true" data-ph="0 000 $"></b></div>
+      <div class="own-p"><b contenteditable="true">1 340 $</b></div>
     </div>
 
     <div>
-      <div class="label">Стільниця 2 · три варіанти декору</div>
+      <div class="label">Стільниця 2 · акриловий камінь · три декори</div>
       <div class="decors" id="decors"></div>
-    </div>
-
-    <div>
-      <div class="label">Що враховано в розрахунку</div>
-      <ul class="incl cols" id="extras">
-        <li contenteditable="true">Інтегровані раковини з каменю — 2 шт</li>
-        <li contenteditable="true">Торець 150–160 мм (підклейка)</li>
-        <li contenteditable="true">Робота з плитою замовника 1200×600 мм, 3 шт</li>
-        <li contenteditable="true" data-ph="додати функцію…"></li>
-      </ul>
     </div>
 
     <div class="two2">
       <div>
         <div class="label">Ескіз клієнта</div>
         <div class="drawings one">
-          <figure><img src="../../assets/img/kp/eskiz-zamovnyka.jpg" alt="Ескіз клієнта від руки"><figcaption contenteditable="true">Тумбочка, буд. 43, кв. 26 · 1180×600 мм · санвузол</figcaption></figure>
+          <figure><img src="../../assets/img/kp/eskiz-zamovnyka.jpg" alt="Ескіз клієнта від руки"><figcaption contenteditable="true">буд. 43, кв. 26 · 1180×600 мм</figcaption></figure>
         </div>
       </div>
       <div>
-        <div class="label">Раковини — на вибір з каталогу</div>
-        <ul class="sinks">
-          <li><b>М-711</b><span contenteditable="true">оберіть за каталогом</span></li>
-          <li><b>М-707</b><span contenteditable="true">оберіть за каталогом</span></li>
-          <li><b>С-806</b><span contenteditable="true">оберіть за каталогом</span></li>
+        <div class="label">Враховано</div>
+        <ul class="incl" id="extras">
+          <li contenteditable="true">Виготовлення за ескізом</li>
+          <li contenteditable="true">Торець 150–160 мм</li>
+          <li contenteditable="true">Замір і креслення</li>
+          <li contenteditable="true">Доставка і монтаж</li>
         </ul>
-        <p class="lead2" contenteditable="true">Розміри — за ескізом клієнта, остаточні після заміру. Центр раковини — за ескізом.</p>
       </div>
     </div>
   </div>
@@ -280,8 +269,7 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
       </div>
       <dl>
         <dt>Об'єкт</dt><dd contenteditable="true">буд. 43, кв. 26 (4 поверх)</dd>
-        <dt>Виріб</dt><dd contenteditable="true">Дві стільниці з раковинами · санвузол</dd>
-        <dt>Розміри</dt><dd contenteditable="true">1180×600 мм · друга — за ескізом</dd>
+        <dt>Виріб</dt><dd contenteditable="true">Дві стільниці · санвузол</dd>
         <dt>Дата</dt><dd contenteditable="true" id="dateF"></dd>
         <dt>№</dt><dd contenteditable="true" data-ph="2026-002"></dd>
       </dl>
@@ -291,20 +279,19 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
       <div class="l">
         <div class="eyebrow">Орієнтовна вартість</div>
         <div class="qrows">
-          <div><span class="ql" contenteditable="true">Стільниця 1 · з матеріалу замовника</span><span class="qv"><small contenteditable="true">від</small> <span contenteditable="true">0 000</span> <em>$</em></span></div>
-          <div><span class="ql" contenteditable="true">Стільниця 2 · декор 1</span><span class="qv"><small contenteditable="true">від</small> <span contenteditable="true">0 000</span> <em>$</em></span></div>
-          <div><span class="ql" contenteditable="true">Стільниця 2 · декор 2</span><span class="qv"><small contenteditable="true">від</small> <span contenteditable="true">0 000</span> <em>$</em></span></div>
-          <div><span class="ql" contenteditable="true">Стільниця 2 · декор 3</span><span class="qv"><small contenteditable="true">від</small> <span contenteditable="true">0 000</span> <em>$</em></span></div>
+          <div><span class="ql" contenteditable="true">Стільниця 1 · матеріал замовника</span><span class="qv"><span contenteditable="true">1 340</span> <em>$</em></span></div>
+          <div><span class="ql" contenteditable="true">Стільниця 2 · акрил М-707</span><span class="qv"><span contenteditable="true">830</span> <em>$</em></span></div>
+          <div><span class="ql" contenteditable="true">Стільниця 2 · акрил М-711</span><span class="qv"><span contenteditable="true">830</span> <em>$</em></span></div>
+          <div><span class="ql" contenteditable="true">Стільниця 2 · акрил С-806</span><span class="qv"><span contenteditable="true">885</span> <em>$</em></span></div>
         </div>
-        <div class="sub" contenteditable="true">ціна за одну стільницю · з доставкою і монтажем</div>
+        <div class="sub" contenteditable="true">без раковин · з доставкою і монтажем</div>
       </div>
       <div class="r">
         <div>
           <b>У вартість входить</b>
           <ul>
-            <li>Замір і креслення на погодження</li>
-            <li>Виготовлення та обробка торця</li>
-            <li>Робота з плитою замовника</li>
+            <li>Замір і креслення</li>
+            <li>Виготовлення</li>
             <li>Доставка і монтаж</li>
             <li>Гарантія 5 років</li>
           </ul>
@@ -312,19 +299,18 @@ h2{margin:0 0 3px;font:500 24px/1.15 var(--display)}
       </div>
     </div>
 
-    <div class="note" contenteditable="true">
-      Це орієнтовна оцінка за наданими розмірами та фото. Остаточну вартість фіксуємо після заміру на об'єкті та
-      затвердження креслення й декору — далі ціна не змінюється.
+    <div>
+      <div class="label">+ Раковина на вибір</div>
+      <div class="sinkgrid">
+        <div class="sk"><img src="../../assets/img/kp/sink-ovalna.jpg" alt="Овальна раковина"><div class="sn" contenteditable="true">Овальна</div><div class="sp" contenteditable="true">+170 $</div></div>
+        <div class="sk"><img src="../../assets/img/kp/sink-kvadratna.jpg" alt="Квадратна раковина"><div class="sn" contenteditable="true">Квадратна</div><div class="sp" contenteditable="true">+270 $</div></div>
+        <div class="sk"><img src="../../assets/img/kp/sink-lodochka.jpg" alt="Раковина-лодочка"><div class="sn" contenteditable="true">Лодочка</div><div class="sp" contenteditable="true">+270 $</div></div>
+        <div class="sk"><img src="../../assets/img/kp/sink-shchilynna.jpg" alt="Щілинна раковина"><div class="sn" contenteditable="true">Щілинна</div><div class="sp" contenteditable="true">+300 $</div></div>
+      </div>
     </div>
 
-    <div style="margin-top:2mm">
-      <div class="label">Що далі</div>
-      <div class="steps">
-        <div class="step"><i>01</i><b>Прорахунок</b><p>Ви зараз тут: орієнтовна вартість за годину.</p></div>
-        <div class="step"><i>02</i><b>Замір</b><p>Виїжджаємо на об'єкт, знімаємо фактичну геометрію. Безкоштовно.</p></div>
-        <div class="step"><i>03</i><b>Погодження</b><p>Креслення, декор, остаточна ціна. Далі — авансова оплата.</p></div>
-        <div class="step"><i>04</i><b>Монтаж</b><p>Виготовляємо, привозимо і ставимо самі. Гарантія 5 років.</p></div>
-      </div>
+    <div class="note" contenteditable="true">
+      Орієнтовна оцінка. Остаточна ціна — після заміру та погодження креслення й декору.
     </div>
   </div>
 
@@ -374,14 +360,18 @@ function decor(n){
   return el;
 }
 var DEC=[
-  {tag:'Варіант 1'},{tag:'Варіант 2'},{tag:'Варіант 3'}
+  {n:'М-707',p:'830 $'},{n:'М-711',p:'830 $'},{n:'С-806',p:'885 $'}
 ];
 DEC.forEach(function(x,i){
-  var el=decor(i+1);
-  el.querySelector('.tag').textContent=x.tag;
+  var el=decor(i+1), sw=el.querySelector('.swatch');
+  el.querySelector('.tag').textContent='Акрил · варіант '+(i+1);
+  el.querySelector('.dn').textContent=x.n;
+  el.querySelector('.dm').remove();
   var d2=el.querySelector('.dp2'), dt=el.querySelector('.dt');
   d2.parentNode.removeChild(d2); dt.parentNode.removeChild(dt);
-  el.querySelector('.dp span').textContent='Стільниця 2 · від';
+  el.querySelector('.dp span').textContent='Стільниця 2';
+  el.querySelector('.p1').textContent=x.p;
+  sw.style.backgroundColor=['#e7ded0','#e3d8c8','#d9cdbb'][i]; sw.classList.add('has');
   $('decors').appendChild(el);
 });
 </script>
