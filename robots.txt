@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
 
+# Службові файли індексувати не треба
+Disallow: /docs/
+
 Sitemap: https://estone.com.ua/sitemap.xml

@@ -1,26 +1,267 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://estone.com.ua/baza-znan/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/baza-znan/pomylky-pered-zamirom/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/baza-znan/skilky-koshtuie-stilnytsia/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/baza-znan/yaka-stilnytsia-krashche/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://estone.com.ua/interier/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/komertsiini-vyroby/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/kontakty/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/kukhnia/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/kukhnia/stilnytsi/akrylovyi-kamin/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://estone.com.ua/kukhnia/stilnytsi/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/kukhnia/stilnytsi/keramohranit/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://estone.com.ua/kukhnia/stilnytsi/kvartsovyi-kamin/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://estone.com.ua/kukhnia/stilnytsi/naturalnyi-kamin/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://estone.com.ua/materialy/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/partneram/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/pidvikonnia/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/pro-nas/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/prorahunok/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/skhody/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/tsiny/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/vanna-kimnata/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://estone.com.ua/vanna-kimnata/umyvalnyky/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://estone.com.ua/baza-znan/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/baza-znan/pomylky-pered-zamirom/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/baza-znan/skilky-koshtuie-stilnytsia/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/baza-znan/yaka-stilnytsia-krashche/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Умивальник з каменю</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-07.jpg</image:loc>
+      <image:title>Інтер&#x27;єр ванної кімнати з каменем ESTONE</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/drain-invisible.jpg</image:loc>
+      <image:title>Злив Invisible</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/drain-cover.jpg</image:loc>
+      <image:title>Злив Cover</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/drain-clickclack.jpg</image:loc>
+      <image:title>Злив Click-Clack</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/drain-black.jpg</image:loc>
+      <image:title>Прихований злив Black</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/le-06.jpg</image:loc>
+      <image:title>Мармурова чаша на постаменті ESTONE</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/vyrobnytstvo-01.jpg</image:loc>
+      <image:title>Умивальник з каменю на виробництві ESTONE</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/vyrobnytstvo-02.jpg</image:loc>
+      <image:title>Стільниця з інтегрованою чашею перед відправкою</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/vyrobnytstvo-03.jpg</image:loc>
+      <image:title>Готовий виріб з каменю в цеху ESTONE</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/interier/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/interier-onyx.jpg</image:loc>
+      <image:title>Меблевий фасад з оніксу, книжкова розкладка малюнка — ESTONE</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/komertsiini-vyroby/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/kontakty/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/kukhnia/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Умивальник з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/kukhnia/stilnytsi/akrylovyi-kamin/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/kukhnia/stilnytsi/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Умивальник з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/kukhnia/stilnytsi/keramohranit/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/kukhnia/stilnytsi/kvartsovyi-kamin/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/kukhnia/stilnytsi/naturalnyi-kamin/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/materialy/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/materialy-slab.jpg</image:loc>
+      <image:title>Плита натурального каменю на складі ESTONE</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/partneram/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/pidvikonnia/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/pro-nas/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/vyrobnytstvo-01.jpg</image:loc>
+      <image:title>Виріб з каменю в цеху ESTONE</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/prorahunok/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/skhody/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/tsiny/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/vanna-kimnata/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/cover.jpg</image:loc>
+      <image:title>Умивальник з каменю у ванній кімнаті виробництва ESTONE</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/detal-chasha.jpg</image:loc>
+      <image:title>Чаша умивальника з каменю крупним планом</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://estone.com.ua/vanna-kimnata/umyvalnyky/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/umyvalnyk-vyrobnytstvo.jpg</image:loc>
+      <image:title>Подвійний умивальник з каменю, виготовлення під розмір — ESTONE</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/drain-invisible.jpg</image:loc>
+      <image:title>Злив Invisible</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/drain-cover.jpg</image:loc>
+      <image:title>Злив Cover</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/drain-clickclack.jpg</image:loc>
+      <image:title>Злив Click-Clack</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/drain-black.jpg</image:loc>
+      <image:title>Прихований злив Black</image:title>
+    </image:image>
+  </url>
 </urlset>
