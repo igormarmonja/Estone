@@ -11,18 +11,24 @@ MODEL = os.environ.get('GEMINI_IMAGE_MODEL', 'gemini-2.5-flash-image')
 OUT = Path(__file__).resolve().parents[1] / 'assets/img'
 
 STYLE = (
-    "Minimalist architectural interior photograph, one single modern object made of stone as the hero, centred, "
-    "in a calm warm-beige limewash room (walls #E3D5C5), nothing else in the scene except at most one small ceramic vase. "
-    "Soft directional late-afternoon window light from the left with a gentle long shadow, "
-    "warm neutral colour grade in sand, clay and warm brown tones (#F5EDE3, #BCAB99, #594133), soft contrast, slightly matte blacks. "
-    "Shot on medium format, 50 mm lens, eye level, sharp material texture so the stone type is instantly recognisable. "
-    "Vertical 3:4 framing. Photorealistic. No text, no logos, no people."
+    "Close-up product photograph (not extreme macro) of the corner of a stone countertop slab, seen at 45 degrees from slightly above, "
+    "the polished top surface and the front edge both visible, the stone fills about 80 percent of the frame and is tack sharp, "
+    "so the material texture, veins and grain are clearly readable. "
+    "Behind it a softly blurred warm beige limewash wall (#E3D5C5). "
+    "Soft directional window light from the left with a gentle highlight sliding across the surface, "
+    "warm neutral colour grade (#F5EDE3, #BCAB99, #594133), soft contrast. "
+    "Medium format, 100 mm lens, f/8. Vertical 3:4 framing. Photorealistic. No text, no logos, no objects, no people."
 )
 MATERIALS = {
-    'quartz': "The object: a sleek modern kitchen island with a thick 4 cm white engineered quartz worktop with very fine soft grey veining and subtle sparkle, polished, waterfall sides in the same quartz, flush seamless edges.",
-    'porcelain': "The object: a monolithic bathroom vanity block clad entirely in large-format calacatta-look porcelain with bold grey and soft gold veins continuing across the mitred corners, an integrated rectangular basin and a matte black wall tap above.",
-    'natural': "The object: a sculptural round pedestal side table carved from natural travertine marble with visible natural pores and warm crema banding, honed matte finish, solid stone base.",
-    'solid': "The object: a wall-hung seamless warm-white acrylic solid surface washbasin with soft organic curves flowing into a shelf, satin finish, no visible joints, a brushed brass wall tap above it.",
+    'quartz': ("The material is white engineered quartz in the style of an 'Alpine Mist' quartz, shown as a horizontal kitchen countertop corner: bright white base "
+               "with clearly visible fine thin soft-grey veins running diagonally across the top and wrapping over the edge, "
+               "and at close range a tiny uniform crystalline grain with faint sparkle typical of engineered quartz; very even, regular, man-made look; polished; crisp square 20 mm edge."),
+    'natural': ("The material is natural Calacatta Gold marble: warm white crystalline base with bold, irregular golden-beige and grey veins that branch organically, "
+                "fine natural fissures and a slight translucency at the edge; the vein continues naturally over the edge; honed-polished finish, 30 mm edge."),
+    'porcelain': ("The material is large-format porcelain stoneware with a Calacatta Viola look: white base with dramatic burgundy-violet and grey veins, "
+                  "perfectly flat surface with a silky finish, thin 12 mm slab with a 45-degree mitred edge where the violet vein wraps continuously around the corner."),
+    'solid': ("The material is pure white acrylic solid surface: completely uniform matte-satin white with no veins and no grain, "
+              "a softly rounded bullnose edge and, at the corner, a seamless integrated sink bowl curving down into the surface with no joint at all."),
 }
 
 def gen(key):
