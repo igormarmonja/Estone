@@ -2,6 +2,38 @@
    Головна сторінка цей файл не використовує (у неї main.js). */
 (function () {
   const CFG = window.ESTONE_CONFIG || {};
+
+  /* ── Відправка заявки ─────────────────────────────────────
+     1) Web3Forms (лист на пошту) — якщо в config.js є web3formsKey;
+     2) власний вебхук (CRM, Google Apps Script…) — якщо є formEndpoint;
+     3) якщо нічого не налаштовано — відкриваємо WhatsApp з готовим текстом, щоб заявка не загубилась. */
+  window.sendLead = async function (data) {
+    const flat = Object.assign({}, data, { products: (data.products || []).join(', ') });
+    let sent = false;
+    if (CFG.web3formsKey) {
+      const r = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(Object.assign({
+          access_key: CFG.web3formsKey,
+          subject: 'Nueva solicitud evostone.es · ' + (flat.products || 'general'),
+          from_name: 'evostone.es',
+        }, flat)),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || j.success === false) throw new Error(j.message || r.status);
+      sent = true;
+    }
+    if (CFG.formEndpoint) {
+      const r = await fetch(CFG.formEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      if (!r.ok) throw new Error(r.status);
+      sent = true;
+    }
+    if (!sent && CFG.whatsappFallback) {
+      const text = ['Solicitud desde evostone.es', flat.name, flat.phone, flat.products, flat.comment].filter(Boolean).join('\n');
+      window.open(CFG.whatsappFallback + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
+    }
+  };
   const root = document.documentElement;
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
@@ -58,6 +90,7 @@
   let lenis = null;
   if (!reduce && window.Lenis) {
     lenis = new window.Lenis({ lerp: 0.085, anchors: false, autoRaf: !hasGsap });
+    window.__lenis = lenis;
     if (hasGsap) {
       lenis.on('scroll', ST.update);
       gsap.ticker.add((t) => lenis.raf(t * 1000));
@@ -154,10 +187,8 @@
         ts: new Date().toISOString(),
       }, utm);
       try {
-        if (CFG.formEndpoint) {
-          const r = await fetch(CFG.formEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-          if (!r.ok) throw new Error(r.status);
-        }
+        if (form.elements.botcheck && form.elements.botcheck.checked) { $('.form-ok', form).hidden = false; return; }
+        await window.sendLead(data);
         track('lead_submit', { products: data.products.join(',') });
         $('.form-ok', form).hidden = false;
       } catch (err) {
@@ -224,13 +255,15 @@
 
   /* ── Вхід першого екрана ───────────────────────────────── */
   const heroLines = $$('.lp-hero h1 .ln > span');
-  const heroRest = $$('.crumbs, .lp-hero .lead, .lp-price, .lp-actions');
+  const heroRest = $$('.crumbs, .lp-hero .lead, .lp-price, .lp-actions, .gal-filters');
   const heroMedia = $('.lp-hero-media');
   const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
   tl.from(heroLines, { yPercent: 110, duration: 1.3, stagger: 0.1 }, 0.1)
-    .from(heroRest, { autoAlpha: 0, y: 20, duration: 1.1, stagger: 0.08 }, 0.35)
-    .fromTo(heroMedia, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.5, ease: 'expo.inOut' }, 0)
-    .fromTo(heroMedia.firstElementChild || heroMedia, { scale: 1.25 }, { scale: 1, duration: 2 }, 0.2);
+    .from(heroRest, { autoAlpha: 0, y: 20, duration: 1.1, stagger: 0.08 }, 0.35);
+  if (heroMedia) {
+    tl.fromTo(heroMedia, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.5, ease: 'expo.inOut' }, 0)
+      .fromTo(heroMedia.firstElementChild || heroMedia, { scale: 1.25 }, { scale: 1, duration: 2 }, 0.2);
+  }
 
   /* Заголовки розділів — рядки з маски */
   $$('[data-lines]').forEach((h) => {

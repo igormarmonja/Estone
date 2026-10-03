@@ -3,12 +3,19 @@
    Контакти, ціни й тексти — у src/ (після правок: node build.mjs).
    ───────────────────────────────────────────────────────────── */
 window.ESTONE_CONFIG = {
-  // Куди відправляти заявки: POST JSON {name, phone, products[], comment, lang, utm…, page, ts}
-  // Підійде вебхук CRM, Google Apps Script, Make/Zapier, Telegram-бот.
-  // Поки порожнє — форма показує подяку, але нікуди не відправляє.
+  // ── Заявки з форм ─────────────────────────────────────────
+  // Web3Forms: безкоштовно, листи приходять на пошту. Ключ отримати на https://web3forms.com
+  // (вводите email, на який слати заявки → приходить Access Key). Ключ публічний, його можна тримати тут.
+  web3formsKey: '',
+
+  // Додатково або замість: вебхук CRM / Google Apps Script / Make. POST JSON
+  // {name, phone, products[], comment, lang, landing?, utm…, page, ts}
   formEndpoint: '',
 
-  // Аналітика (порожнє = не підключається).
+  // Якщо обидва поля порожні — після «Enviar» відкриється WhatsApp з текстом заявки.
+  whatsappFallback: 'https://wa.me/34652692097',
+
+  // ── Аналітика (порожнє = не підключається) ────────────────
   // ⚠ Перед підключенням потрібен банер згоди на cookies (RGPD).
   ga4Id: '',
   metaPixelId: '',

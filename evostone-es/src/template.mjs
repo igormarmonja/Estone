@@ -316,6 +316,7 @@ ${alternates}
         <figcaption>${esc(t.projects.items[i])}</figcaption>
       </figure>`).join('\n      ')}
     </div>
+    ${lang === 'es' ? `<a class="btn btn-dark gal-cta" href="${base}galeria/" data-magnetic>Ver galería completa ${ARROW}</a>` : ''}
   </div>
 </section>`;
 
@@ -375,6 +376,7 @@ ${alternates}
         </fieldset>
         <label class="field"><span>${esc(f.measures)}</span><textarea name="comment" rows="3" placeholder="${esc(f.measuresPh)}"></textarea></label>
         <label class="consent"><input type="checkbox" name="consent" required><span>${esc(f.consent)}</span></label>
+        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <input type="hidden" name="lang" value="${lang}">
         <div class="form-actions">
           <button class="btn btn-light" type="submit" data-magnetic data-sending="${esc(f.sending)}">${esc(f.submit)} ${ARROW}</button>
@@ -407,7 +409,7 @@ ${alternates}
     </div>
     ${lang === 'es' ? `<nav class="footer-services" aria-label="Servicios">
       <p class="label">Servicios</p>
-      <ul>${LANDINGS.map((l) => `<li><a href="${base}${l.slug}/">${esc(l.h1.join(' '))}</a></li>`).join('')}</ul>
+      <ul><li><a href="${base}galeria/">Galería de trabajos</a></li>${LANDINGS.map((l) => `<li><a href="${base}${l.slug}/">${esc(l.h1.join(' '))}</a></li>`).join('')}</ul>
     </nav>` : ''}
     <p class="footer-word" aria-hidden="true">${SITE.brand}</p>
     <div class="footer-bottom">

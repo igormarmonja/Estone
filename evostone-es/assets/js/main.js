@@ -3,6 +3,38 @@
    Якщо бібліотеки не завантажились, сторінка лишається робочою без анімацій. */
 (function () {
   const CFG = window.ESTONE_CONFIG || {};
+
+  /* ── Відправка заявки ─────────────────────────────────────
+     1) Web3Forms (лист на пошту) — якщо в config.js є web3formsKey;
+     2) власний вебхук (CRM, Google Apps Script…) — якщо є formEndpoint;
+     3) якщо нічого не налаштовано — відкриваємо WhatsApp з готовим текстом, щоб заявка не загубилась. */
+  window.sendLead = async function (data) {
+    const flat = Object.assign({}, data, { products: (data.products || []).join(', ') });
+    let sent = false;
+    if (CFG.web3formsKey) {
+      const r = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(Object.assign({
+          access_key: CFG.web3formsKey,
+          subject: 'Nueva solicitud evostone.es · ' + (flat.products || 'general'),
+          from_name: 'evostone.es',
+        }, flat)),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || j.success === false) throw new Error(j.message || r.status);
+      sent = true;
+    }
+    if (CFG.formEndpoint) {
+      const r = await fetch(CFG.formEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      if (!r.ok) throw new Error(r.status);
+      sent = true;
+    }
+    if (!sent && CFG.whatsappFallback) {
+      const text = ['Solicitud desde evostone.es', flat.name, flat.phone, flat.products, flat.comment].filter(Boolean).join('\n');
+      window.open(CFG.whatsappFallback + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
+    }
+  };
   const root = document.documentElement;
   const $ = (s, c = document) => c.querySelector(s);
   const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
@@ -262,10 +294,8 @@
       }, utm);
 
       try {
-        if (CFG.formEndpoint) {
-          const r = await fetch(CFG.formEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-          if (!r.ok) throw new Error(r.status);
-        }
+        if (form.elements.botcheck && form.elements.botcheck.checked) { $('.form-ok', form).hidden = false; return; }
+        await window.sendLead(data);
         track('lead_submit', { products: data.products.join(','), lang: data.lang });
         $('.form-ok', form).hidden = false;
       } catch (err) {

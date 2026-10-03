@@ -87,6 +87,7 @@ export function renderLanding(p, all, c, t) {
   <a href="${base}" class="logo" aria-label="${SITE.brand}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
   <nav class="main-nav" aria-label="Main">
     ${nav.map(([id, l]) => `<a href="${base}#${id}">${esc(l)}</a>`).join('\n    ')}
+    <a href="${base}galeria/">Galería</a>
     <a href="#contacto">${esc(t.nav.contact)}</a>
   </nav>
   <div class="header-right">
@@ -98,7 +99,8 @@ export function renderLanding(p, all, c, t) {
 <div class="menu" id="menu" aria-hidden="true">
   <nav>
     ${nav.map(([id, l], i) => `<a href="${base}#${id}"><small>${pad(i + 1)}</small>${esc(l)}</a>`).join('\n    ')}
-    <a href="#contacto"><small>${pad(nav.length + 1)}</small>${esc(t.nav.contact)}</a>
+    <a href="${base}galeria/"><small>${pad(nav.length + 1)}</small>Galería</a>
+    <a href="#contacto"><small>${pad(nav.length + 2)}</small>${esc(t.nav.contact)}</a>
   </nav>
   <div class="menu-foot">
     <a href="${SITE.whatsapp}" target="_blank" rel="noopener" data-track="whatsapp">${WA} WhatsApp</a>
@@ -206,6 +208,7 @@ export function renderLanding(p, all, c, t) {
         </div>
         <label class="field"><span>${esc(t.contact.form.measures)}</span><textarea id="f-comment" name="comment" rows="3" placeholder="${esc(t.contact.form.measuresPh)}"></textarea></label>
         <label class="consent"><input id="f-consent" type="checkbox" name="consent" required><span>${esc(t.contact.form.consent)}</span></label>
+        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <input type="hidden" name="lang" value="es">
         <input type="hidden" name="product" value="${esc(p.chip)}">
         <input type="hidden" name="landing" value="${esc(p.slug)}">
@@ -234,7 +237,7 @@ export function renderLanding(p, all, c, t) {
   <div class="wrap">
     <div class="footer-top">
       <p>${esc(t.footer.tagline)}</p>
-      <nav class="lp-foot-links">${all.map((x) => `<a href="${base}${x.slug}/"${x.slug === p.slug ? ' aria-current="page"' : ''}>${esc(x.h1.join(' '))}</a>`).join('')}</nav>
+      <nav class="lp-foot-links"><a href="${base}galeria/">Galería de trabajos</a>${all.map((x) => `<a href="${base}${x.slug}/"${x.slug === p.slug ? ' aria-current="page"' : ''}>${esc(x.h1.join(' '))}</a>`).join('')}</nav>
     </div>
     <p class="footer-word" aria-hidden="true">${SITE.brand}</p>
     <div class="footer-bottom">

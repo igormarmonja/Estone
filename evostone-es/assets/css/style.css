@@ -578,3 +578,5 @@ html.js [data-reveal]{opacity:0;transform:translateY(30px);}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;}
   html.js [data-reveal],html.js .manifesto-text .w{opacity:1;transform:none;}
 }
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0;}
+.gal-cta{margin-top:clamp(32px,4vw,56px);}
