@@ -4,7 +4,7 @@
 Запуск:  python tools/gen_materials.py            → assets/img/m-*.jpg
          python tools/gen_materials.py quartz     → тільки одна
 Промти й пояснення — docs/ES_PROMPTS_materiales.md (тримати синхронно)."""
-import base64, json, os, sys, urllib.request
+import base64, io, json, os, sys, urllib.request
 from pathlib import Path
 
 MODEL = os.environ.get('GEMINI_IMAGE_MODEL', 'gemini-2.5-flash-image')
@@ -39,7 +39,12 @@ def gen(key):
     r = json.load(urllib.request.urlopen(req, timeout=240))
     for part in r['candidates'][0]['content']['parts']:
         if 'inlineData' in part:
-            (OUT / f'm-{key}.jpg').write_bytes(base64.b64decode(part['inlineData']['data']))
+            raw = base64.b64decode(part['inlineData']['data'])
+            try:                                   # Gemini віддає PNG — зберігаємо справжній JPEG
+                from PIL import Image
+                Image.open(io.BytesIO(raw)).convert('RGB').save(OUT / f'm-{key}.jpg', 'JPEG', quality=84, optimize=True, progressive=True)
+            except ImportError:
+                (OUT / f'm-{key}.png').write_bytes(raw)
             print('✓', f'm-{key}.jpg'); return
     raise SystemExit('немає зображення у відповіді: ' + json.dumps(r)[:400])
 
