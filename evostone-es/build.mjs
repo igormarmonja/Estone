@@ -1,64 +1,60 @@
 /* Збирає статичні сторінки: node build.mjs
-   index.html (ES), en/index.html, ru/index.html,
-   посадкові <slug>/index.html (src/landings/es.mjs), sitemap.xml */
-import { mkdirSync, writeFileSync } from 'node:fs';
+   Головна: index.html (ES), en/, ru/, uk/
+   Посадкові й галерея: ES у корені (/<slug>/, /galeria/), RU і UK у /ru/…, /uk/…
+   + sitemap.xml (з hreflang і картинками галереї), robots.txt */
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE, LANGS } from './src/data.mjs';
+import { SITE, LANGS, LANDING_LANGS } from './src/data.mjs';
 import { render } from './src/template.mjs';
 import { renderLanding } from './src/landing-template.mjs';
-import { pages as landings, common as landingCommon } from './src/landings/es.mjs';
 import { renderGallery } from './src/gallery-template.mjs';
-import { readFileSync, existsSync } from 'node:fs';
 
 const root = dirname(fileURLToPath(import.meta.url));
+const write = (rel, html) => { const out = join(root, rel); mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, html); };
 
+/* Посадкові/галерея кожної мови */
+const LP = {};
+for (const L of LANDING_LANGS) {
+  const m = await import(`./src/landings/${L.code}.mjs`);
+  const gp = join(root, `src/gallery/${L.code}.json`);
+  LP[L.code] = { pages: m.pages, common: m.common, gallery: existsSync(gp) ? JSON.parse(readFileSync(gp, 'utf8')) : [] };
+}
+
+/* Головні */
 for (const l of LANGS) {
   const { default: t } = await import(`./src/content/${l.code}.mjs`);
-  const out = join(root, l.path, 'index.html');
-  mkdirSync(dirname(out), { recursive: true });
-  writeFileSync(out, render(t, l.code));
+  write(join(l.path, 'index.html'), render(t, l.code, LP[l.code] || null));
   console.log('✓', l.path);
 }
 
-/* Посадкові сторінки (ES) — тексти меню/форми/футера беремо з головної */
-const { default: es } = await import('./src/content/es.mjs');
-for (const p of landings) {
-  const out = join(root, p.slug, 'index.html');
-  mkdirSync(dirname(out), { recursive: true });
-  writeFileSync(out, renderLanding(p, landings, landingCommon, es));
-}
-console.log('✓', landings.length, 'посадкових сторінок');
-
-/* Галерея */
-const galPath = join(root, 'src/gallery/es.json');
-const gallery = existsSync(galPath) ? JSON.parse(readFileSync(galPath, 'utf8')) : [];
-if (gallery.length) {
-  mkdirSync(join(root, 'galeria'), { recursive: true });
-  writeFileSync(join(root, 'galeria/index.html'), renderGallery(gallery, landings, es));
-  console.log('✓ /galeria/', gallery.length, 'фото');
+for (const L of LANDING_LANGS) {
+  const { default: t } = await import(`./src/content/${L.code}.mjs`);
+  const { pages, common, gallery } = LP[L.code];
+  for (const p of pages) write(`${L.prefix}${p.slug}/index.html`, renderLanding(p, pages, common, t, L, LANDING_LANGS));
+  if (gallery.length) write(`${L.prefix}galeria/index.html`, renderGallery(gallery, pages, t, common, L, LANDING_LANGS));
+  console.log(`✓ ${L.code}: ${pages.length} посадкових, галерея ${gallery.length} фото`);
 }
 
+/* sitemap */
 const today = new Date().toISOString().slice(0, 10);
-const alts = LANGS.map((l) => `    <xhtml:link rel="alternate" hreflang="${l.hreflang}" href="${SITE.domain}${l.path}"/>`).join('\n');
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+const url = (loc, alts, extra = '') => `  <url>
+    <loc>${loc}</loc>
+    <lastmod>${today}</lastmod>
+${alts}${extra}
+  </url>`;
+const mainAlts = LANGS.map((l) => `    <xhtml:link rel="alternate" hreflang="${l.hreflang}" href="${SITE.domain}${l.path}"/>`).join('\n');
+const lpAlts = (path) => LANDING_LANGS.map((L) => `    <xhtml:link rel="alternate" hreflang="${L.hreflang}" href="${SITE.domain}/${L.prefix}${path}"/>`).join('\n');
+const urls = [
+  ...LANGS.map((l) => url(SITE.domain + l.path, mainAlts)),
+  ...LANDING_LANGS.flatMap((L) => LP[L.code].pages.map((p) => url(`${SITE.domain}/${L.prefix}${p.slug}/`, lpAlts(p.slug + '/')))),
+  ...LANDING_LANGS.filter((L) => LP[L.code].gallery.length).map((L) => url(`${SITE.domain}/${L.prefix}galeria/`, lpAlts('galeria/'),
+    '\n' + LP[L.code].gallery.map((g) => `    <image:image><image:loc>${SITE.domain}/assets/img/galeria/${g.file}</image:loc><image:title>${g.title.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</image:title></image:image>`).join('\n'))),
+];
+writeFileSync(join(root, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${LANGS.map((l) => `  <url>
-    <loc>${SITE.domain}${l.path}</loc>
-    <lastmod>${today}</lastmod>
-${alts}
-  </url>`).join('\n')}
-${landings.map((p) => `  <url>
-    <loc>${SITE.domain}/${p.slug}/</loc>
-    <lastmod>${today}</lastmod>
-  </url>`).join('\n')}
-${gallery.length ? `  <url>
-    <loc>${SITE.domain}/galeria/</loc>
-    <lastmod>${today}</lastmod>
-${gallery.map((g) => `    <image:image><image:loc>${SITE.domain}/assets/img/galeria/${g.file}</image:loc></image:image>`).join('\n')}
-  </url>
-` : ''}</urlset>
-`;
-writeFileSync(join(root, 'sitemap.xml'), sitemap);
+${urls.join('\n')}
+</urlset>
+`);
 writeFileSync(join(root, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE.domain}/sitemap.xml\n`);
-console.log('✓ sitemap.xml, robots.txt');
+console.log('✓ sitemap.xml (' + urls.length + ' URL), robots.txt');

@@ -26,6 +26,25 @@ export const common = {
   },
   more: 'Ver',
   back: 'Todos los productos',
+  galleryNav: 'Galería',
+  galleryFull: 'Galería de trabajos',
+  galleryCta: 'Ver galería completa',
+  moreInfo: 'Más información',
+  services: 'Servicios',
+  illustrative: 'Imágenes ilustrativas. Pide fotos de trabajos reales por WhatsApp.',
+  gallery: {
+    title: 'Galería de trabajos en piedra: cocinas, baños y escaleras | ESTONE',
+    description: 'Galería de {n} trabajos en piedra: encimeras de cocina, lavabos a medida, escaleras, chimeneas, mesas de mármol y porcelánico. Taller propio en Novelda, Alicante.',
+    h1: ['Galería', 'de trabajos'],
+    lead: 'Encimeras, lavabos, escaleras, chimeneas y mobiliario que han salido de nuestro taller. Pulsa una foto para verla en grande.',
+    filter: 'Filtrar por tipo',
+    all: 'Todos',
+    view: 'Ver',
+    ctaLabel: '¿Te gusta lo que ves?',
+    ctaH2: ['Hacemos', 'el tuyo'],
+    photo: 'Foto', close: 'Cerrar', prev: 'Anterior', next: 'Siguiente',
+    cats: { cocinas: 'Cocinas', banos: 'Baños', escaleras: 'Escaleras', revestimientos: 'Revestimientos y chimeneas', mobiliario: 'Mobiliario', esculturas: 'Esculturas', alfeizares: 'Alféizares', taller: 'En el taller' },
+  },
 };
 
 export const pages = [

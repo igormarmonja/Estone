@@ -11,9 +11,11 @@ const WA = '<svg class="ico ico-fill" viewBox="0 0 24 24" aria-hidden="true"><pa
 const LOGO = '<svg class="logo-mark" viewBox="0 0 295 300" aria-hidden="true"><path d="M0 0h295v45H120v45H0z"/><path d="M0 135h295v45H120v45H0z"/><path d="M0 255h295v45H0z"/></svg>';
 
 /* t — тексти головної (content/es.mjs): назви розділів меню, форма, футер, price() */
-export function renderLanding(p, all, c, t) {
-  const base = '../';
-  const url = `${SITE.domain}/${p.slug}/`;
+/* L — мова сторінки: { code, prefix ('' | 'ru/' | 'uk/'), hreflang, og }; alts — усі мовні версії (для hreflang) */
+export function renderLanding(p, all, c, t, L = { code: 'es', prefix: '', hreflang: 'es-ES', og: 'es_ES' }, alts = []) {
+  const base = L.prefix ? '../../' : '../';     // до кореня сайту (assets)
+  const home = base + L.prefix;                  // до головної цієї мови
+  const url = `${SITE.domain}/${L.prefix}${p.slug}/`;
   const year = new Date().getFullYear();
   const hero = p.img || `lp-${p.slug}.jpg`;
   const gallery = p.gallery || [1, 2, 3].map((i) => `lp-${p.slug}-${i}.jpg`);
@@ -39,7 +41,7 @@ export function renderLanding(p, all, c, t) {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: c.home, item: SITE.domain + '/' },
+          { '@type': 'ListItem', position: 1, name: c.home, item: SITE.domain + '/' + L.prefix },
           { '@type': 'ListItem', position: 2, name, item: url },
         ],
       },
@@ -56,14 +58,15 @@ export function renderLanding(p, all, c, t) {
   ];
 
   return `<!DOCTYPE html>
-<html lang="es">
+<html lang="${L.code}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(p.title)}</title>
 <meta name="description" content="${esc(p.description)}">
 <link rel="canonical" href="${url}">
-<link rel="alternate" hreflang="es-ES" href="${url}">
+${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hreflang}" href="${SITE.domain}/${a.prefix}${p.slug}/">`).join('\n')}
+<link rel="alternate" hreflang="x-default" href="${SITE.domain}/${p.slug}/">
 <link rel="icon" href="${base}favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F5EDE3">
 <meta property="og:type" content="website">
@@ -71,7 +74,7 @@ export function renderLanding(p, all, c, t) {
 <meta property="og:title" content="${esc(p.title)}">
 <meta property="og:description" content="${esc(p.description)}">
 <meta property="og:image" content="${SITE.domain}/assets/img/${hero}">
-<meta property="og:locale" content="es_ES">
+<meta property="og:locale" content="${L.og}">
 <link rel="preload" href="${base}assets/fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="${base}assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${base}assets/css/style.css">
@@ -84,10 +87,10 @@ export function renderLanding(p, all, c, t) {
 <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label"></span></div>
 
 <header class="site-header" id="siteHeader">
-  <a href="${base}" class="logo" aria-label="${SITE.brand}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
+  <a href="${home}" class="logo" aria-label="${SITE.brand}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
   <nav class="main-nav" aria-label="Main">
-    ${nav.map(([id, l]) => `<a href="${base}#${id}">${esc(l)}</a>`).join('\n    ')}
-    <a href="${base}galeria/">Galería</a>
+    ${nav.map(([id, l]) => `<a href="${home}#${id}">${esc(l)}</a>`).join('\n    ')}
+    <a href="${home}galeria/">${esc(c.galleryNav)}</a>
     <a href="#contacto">${esc(t.nav.contact)}</a>
   </nav>
   <div class="header-right">
@@ -98,8 +101,8 @@ export function renderLanding(p, all, c, t) {
 
 <div class="menu" id="menu" aria-hidden="true">
   <nav>
-    ${nav.map(([id, l], i) => `<a href="${base}#${id}"><small>${pad(i + 1)}</small>${esc(l)}</a>`).join('\n    ')}
-    <a href="${base}galeria/"><small>${pad(nav.length + 1)}</small>Galería</a>
+    ${nav.map(([id, l], i) => `<a href="${home}#${id}"><small>${pad(i + 1)}</small>${esc(l)}</a>`).join('\n    ')}
+    <a href="${home}galeria/"><small>${pad(nav.length + 1)}</small>${esc(c.galleryNav)}</a>
     <a href="#contacto"><small>${pad(nav.length + 2)}</small>${esc(t.nav.contact)}</a>
   </nav>
   <div class="menu-foot">
@@ -113,7 +116,7 @@ export function renderLanding(p, all, c, t) {
 <section class="lp-hero" data-bg="paper">
   <div class="wrap lp-hero-grid">
     <div class="lp-hero-text">
-      <nav class="crumbs" aria-label="Breadcrumb"><a href="${base}">${esc(c.home)}</a><span aria-hidden="true">/</span><span aria-current="page">${esc(name)}</span></nav>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="${home}">${esc(c.home)}</a><span aria-hidden="true">/</span><span aria-current="page">${esc(name)}</span></nav>
       <h1 data-lines>${lines(p.h1)}</h1>
       <p class="lead">${esc(p.sub)}</p>
       <p class="lp-price">${esc(t.price(price))}</p>
@@ -156,7 +159,7 @@ export function renderLanding(p, all, c, t) {
     <div class="lp-gal">
       ${gallery.map((g, i) => `<figure class="lp-gal-item lp-gal-${i + 1}" data-clip>${img(g, `${name} — ${i + 1}`)}</figure>`).join('\n      ')}
     </div>
-    ${p.illustrative ? '<p class="note lp-illus">Imágenes ilustrativas. Pide fotos de trabajos reales por WhatsApp.</p>' : ''}
+    ${p.illustrative ? `<p class="note lp-illus">${esc(c.illustrative)}</p>` : ''}
   </div>
 </section>
 
@@ -190,9 +193,9 @@ export function renderLanding(p, all, c, t) {
     <p class="label">${esc(c.label.related)}</p>
     <h2 data-lines>${lines(c.relatedH2)}</h2>
     <ul class="lp-rel">
-      ${p.related.map(bySlug).filter(Boolean).map((r) => `<li data-reveal><a href="${base}${r.slug}/"><span class="lp-rel-name">${esc(r.h1.join(' '))}</span><span class="lp-rel-sub">${esc(r.sub)}</span>${ARROW}</a></li>`).join('\n      ')}
+      ${p.related.map(bySlug).filter(Boolean).map((r) => `<li data-reveal><a href="${home}${r.slug}/"><span class="lp-rel-name">${esc(r.h1.join(' '))}</span><span class="lp-rel-sub">${esc(r.sub)}</span>${ARROW}</a></li>`).join('\n      ')}
     </ul>
-    <a class="link-btn" href="${base}#productos">${esc(c.back)} ${ARROW}</a>
+    <a class="link-btn" href="${home}#productos">${esc(c.back)} ${ARROW}</a>
   </div>
 </section>
 
@@ -210,7 +213,7 @@ export function renderLanding(p, all, c, t) {
         <label class="field"><span>${esc(t.contact.form.measures)}</span><textarea id="f-comment" name="comment" rows="3" placeholder="${esc(t.contact.form.measuresPh)}"></textarea></label>
         <label class="consent"><input id="f-consent" type="checkbox" name="consent" required><span>${esc(t.contact.form.consent)}</span></label>
         <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <input type="hidden" name="lang" value="es">
+        <input type="hidden" name="lang" value="${L.code}">
         <input type="hidden" name="product" value="${esc(p.chip)}">
         <input type="hidden" name="landing" value="${esc(p.slug)}">
         <div class="form-actions">
@@ -238,14 +241,14 @@ export function renderLanding(p, all, c, t) {
   <div class="wrap">
     <div class="footer-top">
       <p>${esc(t.footer.tagline)}</p>
-      <nav class="lp-foot-links"><a href="${base}galeria/">Galería de trabajos</a>${all.map((x) => `<a href="${base}${x.slug}/"${x.slug === p.slug ? ' aria-current="page"' : ''}>${esc(x.h1.join(' '))}</a>`).join('')}</nav>
+      <nav class="lp-foot-links"><a href="${home}galeria/">${esc(c.galleryFull)}</a>${all.map((x) => `<a href="${home}${x.slug}/"${x.slug === p.slug ? ' aria-current="page"' : ''}>${esc(x.h1.join(' '))}</a>`).join('')}</nav>
     </div>
     <p class="footer-word" aria-hidden="true">${SITE.brand}</p>
     <div class="footer-bottom">
       <span>© ${year} ${SITE.brand}. ${esc(t.footer.rights)}</span>
       <!-- TODO: юридичні сторінки (Aviso legal / Privacidad / Cookies) -->
       <nav>${t.footer.legal.map((x) => `<a href="#" aria-disabled="true">${esc(x)}</a>`).join('')}</nav>
-      <a href="${base}">evostone.es</a>
+      <a href="${home}">evostone.es</a>
     </div>
   </div>
 </footer>

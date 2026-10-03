@@ -36,7 +36,7 @@ export default {
     sub: 'Encimeras, lavabos, revestimientos y piezas únicas. Medimos, fabricamos e instalamos en toda la Costa Blanca.',
     cta: 'Pedir presupuesto',
     whatsapp: 'Escríbenos por WhatsApp',
-    trust: ['14 años de oficio', 'Taller propio', 'Instalación propia', 'ES · EN · RU'],
+    trust: ['14 años de oficio', 'Taller propio', 'Instalación propia', 'ES · EN · RU · UA'],
     scroll: 'Desliza',
     imgAlt: 'Encimera de piedra fabricada por ESTONE',
   },

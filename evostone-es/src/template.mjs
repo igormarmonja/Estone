@@ -1,6 +1,5 @@
 /* HTML-шаблон лендингу. Один шаблон на всі мови: тексти приходять із content/<мова>.mjs. */
 import { SITE, LANGS, PRICES, PRODUCTS, MATERIALS, SERIES, SINKS, PROCESS_IMG, PROJECT_IMG } from './data.mjs';
-import { pages as LANDINGS } from './landings/es.mjs';
 
 /* Посадкові сторінки (поки тільки ES), прив'язані до продуктів головної */
 const PRODUCT_LANDINGS = {
@@ -13,7 +12,7 @@ const PRODUCT_LANDINGS = {
   cutting: ['corte-de-piedra-a-medida'],
   waterjet: ['corte-por-chorro-de-agua'],
 };
-const landingName = (slug) => { const l = LANDINGS.find((x) => x.slug === slug); return l ? l.h1.join(' ') : slug; };
+/* LP = { pages, common } посадкових цієї мови (або null). Посилання відносні: головна лежить у корені своєї мови. */
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const pad = (n) => String(n).padStart(2, '0');
@@ -30,7 +29,8 @@ const ARROW = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="
 const WA = '<svg class="ico ico-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.2-.2-.2-.5-.3Z"/></svg>';
 const LOGO = '<svg class="logo-mark" viewBox="0 0 295 300" aria-hidden="true"><path d="M0 0h295v45H120v45H0z"/><path d="M0 135h295v45H120v45H0z"/><path d="M0 255h295v45H0z"/></svg>';
 
-export function render(t, lang) {
+export function render(t, lang, LP = null) {
+  const landingName = (slug) => { const l = LP && LP.pages.find((x) => x.slug === slug); return l ? l.h1.join(' ') : slug; };
   const L = LANGS.find((l) => l.code === lang);
   const base = L.path === '/' ? '' : '../';
   const url = SITE.domain + L.path;
@@ -316,7 +316,7 @@ ${alternates}
         <figcaption>${esc(t.projects.items[i])}</figcaption>
       </figure>`).join('\n      ')}
     </div>
-    ${lang === 'es' ? `<a class="btn btn-dark gal-cta" href="${base}galeria/" data-magnetic>Ver galería completa ${ARROW}</a>` : ''}
+    ${LP ? `<a class="btn btn-dark gal-cta" href="galeria/" data-magnetic>${esc(LP.common.galleryCta)} ${ARROW}</a>` : ''}
   </div>
 </section>`;
 
@@ -407,9 +407,9 @@ ${alternates}
       <nav>${navItems.map(([id, label]) => `<a href="#${id}">${esc(label)}</a>`).join('')}</nav>
       <nav class="lang" aria-label="${esc(t.a11y.lang)}">${langSwitch}</nav>
     </div>
-    ${lang === 'es' ? `<nav class="footer-services" aria-label="Servicios">
-      <p class="label">Servicios</p>
-      <ul><li><a href="${base}galeria/">Galería de trabajos</a></li>${LANDINGS.map((l) => `<li><a href="${base}${l.slug}/">${esc(l.h1.join(' '))}</a></li>`).join('')}</ul>
+    ${LP ? `<nav class="footer-services" aria-label="${esc(LP.common.services)}">
+      <p class="label">${esc(LP.common.services)}</p>
+      <ul><li><a href="galeria/">${esc(LP.common.galleryFull)}</a></li>${LP.pages.map((l) => `<li><a href="${l.slug}/">${esc(l.h1.join(' '))}</a></li>`).join('')}</ul>
     </nav>` : ''}
     <p class="footer-word" aria-hidden="true">${SITE.brand}</p>
     <div class="footer-bottom">
@@ -434,9 +434,9 @@ ${alternates}
       <p class="drawer-text">${esc(it.text)}</p>
       <ul class="drawer-list">${it.bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>
       <ul class="tags">${it.tags.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-      ${lang === 'es' && PRODUCT_LANDINGS[p.id] ? `<div class="drawer-links">
-        <p class="label">Más información</p>
-        <ul>${PRODUCT_LANDINGS[p.id].map((s) => `<li><a href="${base}${s}/">${esc(landingName(s))} ${ARROW}</a></li>`).join('')}</ul>
+      ${LP && PRODUCT_LANDINGS[p.id] ? `<div class="drawer-links">
+        <p class="label">${esc(LP.common.moreInfo)}</p>
+        <ul>${PRODUCT_LANDINGS[p.id].map((s) => `<li><a href="${s}/">${esc(landingName(s))} ${ARROW}</a></li>`).join('')}</ul>
       </div>` : ''}
       <div class="drawer-foot">
         <span class="price">${esc(t.price(PRICES[p.id]))}</span>

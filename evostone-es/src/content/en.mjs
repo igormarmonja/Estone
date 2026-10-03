@@ -36,7 +36,7 @@ export default {
     sub: 'Worktops, basins, cladding and one-off pieces. We measure, make and install across the Costa Blanca.',
     cta: 'Get a quote',
     whatsapp: 'Message us on WhatsApp',
-    trust: ['14 years of craft', 'Own workshop', 'Own installers', 'ES · EN · RU'],
+    trust: ['14 years of craft', 'Own workshop', 'Own installers', 'ES · EN · RU · UA'],
     scroll: 'Scroll',
     imgAlt: 'Stone worktop made by ESTONE',
   },

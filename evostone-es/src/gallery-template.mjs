@@ -14,26 +14,29 @@ export const GALLERY_CATS = {
   mobiliario: 'Mobiliario', esculturas: 'Esculturas', alfeizares: 'Alféizares', taller: 'En el taller',
 };
 
-export function renderGallery(items, landings, t) {
-  const base = '../';
-  const url = `${SITE.domain}/galeria/`;
+/* c — common посадкових цієї мови (тексти в c.gallery), L — мова, alts — усі мовні версії */
+export function renderGallery(items, landings, t, c = null, L = { code: 'es', prefix: '', hreflang: 'es-ES', og: 'es_ES' }, alts = []) {
+  const G = c.gallery;
+  const base = L.prefix ? '../../' : '../';
+  const home = base + L.prefix;
+  const url = `${SITE.domain}/${L.prefix}galeria/`;
   const year = new Date().getFullYear();
-  const title = 'Galería de trabajos en piedra: cocinas, baños y escaleras | ESTONE';
-  const description = `Galería de ${items.length} trabajos en piedra: encimeras de cocina, lavabos a medida, escaleras, chimeneas, mesas de mármol y porcelánico. Taller propio en Novelda, Alicante.`;
-  const cats = Object.keys(GALLERY_CATS).filter((c) => items.some((i) => i.cat === c));
+  const title = G.title;
+  const description = G.description.replace('{n}', items.length);
+  const cats = Object.keys(G.cats).filter((c) => items.some((i) => i.cat === c));
 
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'ImageGallery', name: 'Galería de trabajos ESTONE', url, description,
+        '@type': 'ImageGallery', name: c.galleryFull + ' · ESTONE', url, description,
         image: items.map((i) => ({ '@type': 'ImageObject', contentUrl: `${SITE.domain}/assets/img/galeria/${i.file}`, name: i.title, width: i.w, height: i.h })),
       },
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE.domain + '/' },
-          { '@type': 'ListItem', position: 2, name: 'Galería', item: url },
+          { '@type': 'ListItem', position: 1, name: c.home, item: SITE.domain + '/' + L.prefix },
+          { '@type': 'ListItem', position: 2, name: c.galleryNav, item: url },
         ],
       },
     ],
@@ -42,14 +45,15 @@ export function renderGallery(items, landings, t) {
   const nav = [['productos', t.nav.products], ['coleccion', t.nav.collection], ['materiales', t.nav.materials], ['profesionales', t.nav.pros], ['contacto', t.nav.contact]];
 
   return `<!DOCTYPE html>
-<html lang="es">
+<html lang="${L.code}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${url}">
-<link rel="alternate" hreflang="es-ES" href="${url}">
+${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hreflang}" href="${SITE.domain}/${a.prefix}galeria/">`).join('\n')}
+<link rel="alternate" hreflang="x-default" href="${SITE.domain}/galeria/">
 <link rel="icon" href="${base}favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#F5EDE3">
 <meta property="og:type" content="website">
@@ -57,7 +61,7 @@ export function renderGallery(items, landings, t) {
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${SITE.domain}/assets/img/galeria/${items[0].file}">
-<meta property="og:locale" content="es_ES">
+<meta property="og:locale" content="${L.og}">
 <link rel="preload" href="${base}assets/fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${base}assets/css/style.css">
 <link rel="stylesheet" href="${base}assets/css/landing.css">
@@ -70,19 +74,19 @@ export function renderGallery(items, landings, t) {
 <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label"></span></div>
 
 <header class="site-header" id="siteHeader">
-  <a href="${base}" class="logo" aria-label="${SITE.brand}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
+  <a href="${home}" class="logo" aria-label="${SITE.brand}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
   <nav class="main-nav" aria-label="Main">
-    ${nav.map(([id, l]) => `<a href="${base}#${id}">${esc(l)}</a>`).join('\n    ')}
+    ${nav.map(([id, l]) => `<a href="${home}#${id}">${esc(l)}</a>`).join('\n    ')}
   </nav>
   <div class="header-right">
-    <a href="${base}#contacto" class="btn btn-dark btn-sm" data-magnetic>${esc(t.nav.cta)}</a>
+    <a href="${home}#contacto" class="btn btn-dark btn-sm" data-magnetic>${esc(t.nav.cta)}</a>
     <button class="burger" id="burger" aria-label="${esc(t.a11y.menu)}" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </div>
 </header>
 
 <div class="menu" id="menu" aria-hidden="true">
   <nav>
-    ${nav.map(([id, l], i) => `<a href="${base}#${id}"><small>${pad(i + 1)}</small>${esc(l)}</a>`).join('\n    ')}
+    ${nav.map(([id, l], i) => `<a href="${home}#${id}"><small>${pad(i + 1)}</small>${esc(l)}</a>`).join('\n    ')}
   </nav>
   <div class="menu-foot">
     <a href="${SITE.whatsapp}" target="_blank" rel="noopener" data-track="whatsapp">${WA} WhatsApp</a>
@@ -93,12 +97,12 @@ export function renderGallery(items, landings, t) {
 <main id="main">
 <section class="lp-hero gal-hero" data-bg="paper">
   <div class="wrap">
-    <nav class="crumbs" aria-label="Breadcrumb"><a href="${base}">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">Galería</span></nav>
-    <h1 data-lines>${lines(['Galería', 'de trabajos'])}</h1>
-    <p class="lead">Encimeras, lavabos, escaleras, chimeneas y mobiliario que han salido de nuestro taller. Pulsa una foto para verla en grande.</p>
-    <div class="gal-filters" role="toolbar" aria-label="Filtrar por tipo">
-      <button type="button" class="chip-f is-active" data-filter="all">Todos <sup>${items.length}</sup></button>
-      ${cats.map((c) => `<button type="button" class="chip-f" data-filter="${c}">${esc(GALLERY_CATS[c])} <sup>${items.filter((i) => i.cat === c).length}</sup></button>`).join('\n      ')}
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="${home}">${esc(c.home)}</a><span aria-hidden="true">/</span><span aria-current="page">${esc(c.galleryNav)}</span></nav>
+    <h1 data-lines>${lines(G.h1)}</h1>
+    <p class="lead">${esc(G.lead)}</p>
+    <div class="gal-filters" role="toolbar" aria-label="${esc(G.filter)}">
+      <button type="button" class="chip-f is-active" data-filter="all">${esc(G.all)} <sup>${items.length}</sup></button>
+      ${cats.map((c) => `<button type="button" class="chip-f" data-filter="${c}">${esc(G.cats[c])} <sup>${items.filter((i) => i.cat === c).length}</sup></button>`).join('\n      ')}
     </div>
   </div>
 </section>
@@ -108,7 +112,7 @@ export function renderGallery(items, landings, t) {
     <ul class="gal-grid">
       ${items.map((i, k) => `<li class="gal-item" data-cat="${i.cat}">
         <figure>
-          <button type="button" class="gal-open" data-index="${k}" data-cursor="Ver" aria-label="${esc(i.title)}">
+          <button type="button" class="gal-open" data-index="${k}" data-cursor="${esc(G.view)}" aria-label="${esc(i.title)}">
             <img src="${base}assets/img/galeria/t/${i.file}" data-full="${base}assets/img/galeria/${i.file}" alt="${esc(i.title)}" width="${i.w}" height="${i.h}" loading="${k < 6 ? 'eager' : 'lazy'}" decoding="async">
           </button>
           <figcaption>${esc(i.title)}</figcaption>
@@ -120,34 +124,34 @@ export function renderGallery(items, landings, t) {
 
 <section class="sec lp-related" data-bg="brand">
   <div class="wrap">
-    <p class="label">¿Te gusta lo que ves?</p>
-    <h2 data-lines>${lines(['Hacemos', 'el tuyo'])}</h2>
+    <p class="label">${esc(G.ctaLabel)}</p>
+    <h2 data-lines>${lines(G.ctaH2)}</h2>
     <ul class="lp-rel">
-      ${['encimeras-de-cocina-a-medida', 'lavabos-a-medida', 'escaleras-de-marmol', 'chimeneas-de-marmol'].map((s) => landings.find((x) => x.slug === s)).filter(Boolean).map((r) => `<li><a href="${base}${r.slug}/"><span class="lp-rel-name">${esc(r.h1.join(' '))}</span><span class="lp-rel-sub">${esc(r.sub)}</span>${ARROW}</a></li>`).join('\n      ')}
+      ${['encimeras-de-cocina-a-medida', 'lavabos-a-medida', 'escaleras-de-marmol', 'chimeneas-de-marmol'].map((s) => landings.find((x) => x.slug === s)).filter(Boolean).map((r) => `<li><a href="${home}${r.slug}/"><span class="lp-rel-name">${esc(r.h1.join(' '))}</span><span class="lp-rel-sub">${esc(r.sub)}</span>${ARROW}</a></li>`).join('\n      ')}
     </ul>
-    <a class="btn btn-light" href="${base}#contacto" data-magnetic>Pedir presupuesto ${ARROW}</a>
+    <a class="btn btn-light" href="${home}#contacto" data-magnetic>${esc(c.cta)} ${ARROW}</a>
   </div>
 </section>
 </main>
 
-<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Foto">
-  <button type="button" class="lb-close" data-lb="close" aria-label="Cerrar"><span></span><span></span></button>
-  <button type="button" class="lb-nav lb-prev" data-lb="prev" aria-label="Anterior">${ARROW}</button>
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="${esc(G.photo)}">
+  <button type="button" class="lb-close" data-lb="close" aria-label="${esc(G.close)}"><span></span><span></span></button>
+  <button type="button" class="lb-nav lb-prev" data-lb="prev" aria-label="${esc(G.prev)}">${ARROW}</button>
   <figure class="lb-stage"><img alt=""><figcaption><span class="lb-title"></span><span class="lb-count"></span></figcaption></figure>
-  <button type="button" class="lb-nav lb-next" data-lb="next" aria-label="Siguiente">${ARROW}</button>
+  <button type="button" class="lb-nav lb-next" data-lb="next" aria-label="${esc(G.next)}">${ARROW}</button>
 </div>
 
 <footer class="footer" data-bg="dark">
   <div class="wrap">
     <div class="footer-top">
       <p>${esc(t.footer.tagline)}</p>
-      <nav class="lp-foot-links">${landings.map((x) => `<a href="${base}${x.slug}/">${esc(x.h1.join(' '))}</a>`).join('')}</nav>
+      <nav class="lp-foot-links">${landings.map((x) => `<a href="${home}${x.slug}/">${esc(x.h1.join(' '))}</a>`).join('')}</nav>
     </div>
     <p class="footer-word" aria-hidden="true">${SITE.brand}</p>
     <div class="footer-bottom">
       <span>© ${year} ${SITE.brand}. ${esc(t.footer.rights)}</span>
       <nav>${t.footer.legal.map((x) => `<a href="#" aria-disabled="true">${esc(x)}</a>`).join('')}</nav>
-      <a href="${base}">evostone.es</a>
+      <a href="${home}">evostone.es</a>
     </div>
   </div>
 </footer>

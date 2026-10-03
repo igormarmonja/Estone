@@ -23,6 +23,14 @@ export const LANGS = [
   { code: 'es', path: '/',    label: 'ES', hreflang: 'es-ES' },
   { code: 'en', path: '/en/', label: 'EN', hreflang: 'en' },
   { code: 'ru', path: '/ru/', label: 'RU', hreflang: 'ru' },
+  { code: 'uk', path: '/uk/', label: 'UA', hreflang: 'uk' },
+];
+
+/* Мови, для яких є посадкові сторінки й галерея (src/landings/<code>.mjs, src/gallery/<code>.json) */
+export const LANDING_LANGS = [
+  { code: 'es', prefix: '',    hreflang: 'es-ES', og: 'es_ES' },
+  { code: 'ru', prefix: 'ru/', hreflang: 'ru',    og: 'ru_RU' },
+  { code: 'uk', prefix: 'uk/', hreflang: 'uk',    og: 'uk_UA' },
 ];
 
 /* Ціни «від», у євро. ⚠ ОРІЄНТОВНІ — перевірити перед запуском.

@@ -580,3 +580,5 @@ html.js [data-reveal]{opacity:0;transform:translateY(30px);}
 }
 .hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0;}
 .gal-cta{margin-top:clamp(32px,4vw,56px);}
+/* Довші слова в RU/UK: трохи менший заголовок першого екрана */
+html[lang=uk] .hero-title,html[lang=ru] .hero-title{font-size:clamp(52px,10vw,160px);}
