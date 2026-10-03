@@ -9,31 +9,35 @@
 ~/.venvs/estone-photo/bin/python evostone-es/tools/gen_scenes.py s-design    # один кадр
 ```
 
-## Плашки матеріалів
+## Плашки матеріалів (з пошуком референсів у Google)
+
+Модель спершу **сама шукає в інтернеті реальні фото матеріалу** (інструмент `google_search` у Nano Banana Pro), потім генерує кадр за ними. Знайдені джерела під час останньої генерації: caesarstoneus.com, marble.com, marblesystems.com, msisurfaces.com, ciero.ca, novatileandstone.com, corian.com.
+
+Промт = опис матеріалу (з інструкцією «спочатку знайди фото») + спільна частина.
 
 ### Спільна частина
 ```
-Real photograph for a premium stone supplier catalogue. Close-up of the corner of an installed kitchen countertop in a real, bright home, seen at about 45 degrees from slightly above: the top surface and the front edge are both visible and the stone fills most of the frame, tack sharp, so the natural pattern, grain and finish of the material are unmistakable. Natural daylight from a large window on the left, true-to-life colours and an accurate neutral white balance, exactly how the stone looks in person. Real reflections of the window on the surface, very subtle real-world imperfections. Background softly out of focus: a warm white wall and light natural oak cabinetry; one plain ceramic cup far behind, out of focus. Shot on a full-frame camera with a 90 mm lens at f/5.6, natural contrast, no stylised colour grading. Vertical 3:4. Must look like a real photo, not a 3D render or CGI. No text, no logos, no people.
+Then create a real photograph for a premium stone supplier catalogue, part of a consistent set of four: identical camera angle, light and setting in every image. Close-up of the front corner of an installed kitchen countertop in a calm, modern Mediterranean home, seen at about 45 degrees from slightly above; the top surface and the front edge are both visible, the stone fills about 70 percent of the frame and is tack sharp. Soft natural morning daylight from a large window on the left, true-to-life colours exactly like the real reference photos you found, accurate neutral white balance, real soft reflections, natural contrast, no colour grading, no filters. Background softly out of focus: a warm white plaster wall and pale natural oak cabinet fronts. Full-frame camera, 90 mm lens, f/5.6. Vertical 3:4. It must be indistinguishable from a real photograph, not a 3D render. No text, no logos, no people, no extra objects.
 ```
 
 ### m-quartz.jpg
 ```
-Material: white engineered quartz like 'Alpine Mist': a clean bright white base with thin, soft, light-grey veins that drift diagonally and wrap naturally over the edge; up close a fine, even, sand-like crystalline grain. Polished, 20 mm square edge with a tiny eased arris.
+First search the web for real photos of white quartz countertops with fine grey veining, such as Caesarstone 'Alpine Mist' or Silestone 'Lagoon', to learn the exact look. The countertop is this WHITE quartz (not grey, not beige): a bright clean white base with thin, soft, light-grey veins and a fine even crystalline grain visible up close, polished, 20 mm edge.
 ```
 
 ### m-natural.jpg
 ```
-Material: genuine Calacatta Gold natural marble: creamy warm-white crystalline base, bold irregular veins in taupe-grey with honey-gold accents, tiny natural pits and a faint crystalline sparkle, the vein continuing over the edge as in real quarried stone. Honed finish with a soft sheen, 20 mm eased edge.
+First search the web for real photos of natural Calacatta Gold marble slabs and countertops to learn its exact colours and veining. The countertop is genuine Calacatta Gold marble: warm white crystalline base, bold irregular grey veins with golden-honey accents that continue over the edge, honed with a soft sheen, 20 mm edge.
 ```
 
 ### m-porcelain.jpg
 ```
-Material: large-format porcelain slab with a Calacatta Viola design: white body with wide veins in true burgundy, plum and violet tones with a soft grey haze, polished glossy finish, 12 mm slab with a 45-degree mitred edge forming a 4 cm apron, the violet vein matched continuously around the corner.
+First search the web for real photos of Calacatta Viola porcelain / sintered stone countertops to learn the exact colours and veining. The countertop is large-format Calacatta Viola porcelain: white base with wide burgundy-violet veins with grey haze, polished, 12 mm slab with a 45-degree mitred edge forming a 4 cm apron, the vein matched around the corner.
 ```
 
 ### m-solid.jpg
 ```
-Material: pure white acrylic solid surface like 'Glacier White': perfectly uniform neutral white with no veins or grain, satin matte finish, a softly rounded edge and a seamless integrated sink bowl in the same material curving down from the top with no joint at all.
+First search the web for real photos of white acrylic solid surface countertops with integrated sinks (such as Corian Glacier White) to learn the exact look. The countertop is pure white solid surface: perfectly uniform warm-neutral white, no veins, satin matte finish, softly rounded edge, with the rim of a seamless integrated sink of the same material visible at the corner, no joints.
 ```
 
 ## Сцени (гідрорізка, фасади, процес)

@@ -1,55 +1,60 @@
 #!/usr/bin/env python3
-"""Генерує 4 плашки матеріалів через Gemini (один стиль для всіх).
-Ключ: змінна GEMINI_API_KEY або ключ, який середовище підставляє саме (x-goog-api-key).
-Запуск:  python tools/gen_materials.py            → assets/img/m-*.jpg
-         python tools/gen_materials.py quartz     → тільки одна
-Промти й пояснення — docs/ES_PROMPTS_materiales.md (тримати синхронно)."""
+"""Генерує 4 плашки матеріалів через Gemini Nano Banana Pro з пошуком референсів у Google.
+Модель спершу сама шукає в інтернеті реальні фото конкретного матеріалу (Caesarstone Alpine Mist,
+Calacatta Gold, Calacatta Viola, Corian Glacier White), а потім генерує кадр за ними.
+Запуск:  ~/.venvs/estone-photo/bin/python tools/gen_materials.py           → assets/img/m-*.jpg
+         ~/.venvs/estone-photo/bin/python tools/gen_materials.py quartz    → тільки одна
+Промти — docs/ES_PROMPTS_materiales.md."""
 import base64, io, json, os, sys, urllib.request
 from pathlib import Path
+from PIL import Image
 
 MODEL = os.environ.get('GEMINI_IMAGE_MODEL', 'gemini-3-pro-image-preview')  # Nano Banana Pro
 OUT = Path(__file__).resolve().parents[1] / 'assets/img'
 
 STYLE = (
-    "Real photograph for a premium stone supplier catalogue. Close-up of the corner of an installed kitchen countertop "
-    "in a real, bright home, seen at about 45 degrees from slightly above: the top surface and the front edge are both visible "
-    "and the stone fills most of the frame, tack sharp, so the natural pattern, grain and finish of the material are unmistakable. "
-    "Natural daylight from a large window on the left, true-to-life colours and an accurate neutral white balance, "
-    "exactly how the stone looks in person. Real reflections of the window on the surface, very subtle real-world imperfections. "
-    "Background softly out of focus: a warm white wall and light natural oak cabinetry; one plain ceramic cup far behind, out of focus. "
-    "Shot on a full-frame camera with a 90 mm lens at f/5.6, natural contrast, no stylised colour grading. "
-    "Vertical 3:4. Must look like a real photo, not a 3D render or CGI. No text, no logos, no people."
+    "Then create a real photograph for a premium stone supplier catalogue, part of a consistent set of four: identical camera angle, light and setting in every image. "
+    "Close-up of the front corner of an installed kitchen countertop in a calm, modern Mediterranean home, seen at about 45 degrees from slightly above; "
+    "the top surface and the front edge are both visible, the stone fills about 70 percent of the frame and is tack sharp. "
+    "Soft natural morning daylight from a large window on the left, true-to-life colours exactly like the real reference photos you found, "
+    "accurate neutral white balance, real soft reflections, natural contrast, no colour grading, no filters. "
+    "Background softly out of focus: a warm white plaster wall and pale natural oak cabinet fronts. "
+    "Full-frame camera, 90 mm lens, f/5.6. Vertical 3:4. It must be indistinguishable from a real photograph, not a 3D render. "
+    "No text, no logos, no people, no extra objects."
 )
 MATERIALS = {
-    'quartz': ("Material: white engineered quartz like 'Alpine Mist': a clean bright white base with thin, soft, light-grey veins that drift diagonally "
-               "and wrap naturally over the edge; up close a fine, even, sand-like crystalline grain. Polished, 20 mm square edge with a tiny eased arris."),
-    'natural': ("Material: genuine Calacatta Gold natural marble: creamy warm-white crystalline base, bold irregular veins in taupe-grey with honey-gold accents, "
-                "tiny natural pits and a faint crystalline sparkle, the vein continuing over the edge as in real quarried stone. Honed finish with a soft sheen, 20 mm eased edge."),
-    'porcelain': ("Material: large-format porcelain slab with a Calacatta Viola design: white body with wide veins in true burgundy, plum and violet tones with a soft grey haze, "
-                  "polished glossy finish, 12 mm slab with a 45-degree mitred edge forming a 4 cm apron, the violet vein matched continuously around the corner."),
-    'solid': ("Material: pure white acrylic solid surface like 'Glacier White': perfectly uniform neutral white with no veins or grain, satin matte finish, "
-              "a softly rounded edge and a seamless integrated sink bowl in the same material curving down from the top with no joint at all."),
+    'quartz': ("First search the web for real photos of white quartz countertops with fine grey veining, such as Caesarstone 'Alpine Mist' or Silestone 'Lagoon', "
+               "to learn the exact look. The countertop is this WHITE quartz (not grey, not beige): a bright clean white base with thin, soft, light-grey veins "
+               "and a fine even crystalline grain visible up close, polished, 20 mm edge."),
+    'natural': ("First search the web for real photos of natural Calacatta Gold marble slabs and countertops to learn its exact colours and veining. "
+                "The countertop is genuine Calacatta Gold marble: warm white crystalline base, bold irregular grey veins with golden-honey accents that continue over the edge, honed with a soft sheen, 20 mm edge."),
+    'porcelain': ("First search the web for real photos of Calacatta Viola porcelain / sintered stone countertops to learn the exact colours and veining. "
+                  "The countertop is large-format Calacatta Viola porcelain: white base with wide burgundy-violet veins with grey haze, polished, 12 mm slab with a 45-degree mitred edge forming a 4 cm apron, the vein matched around the corner."),
+    'solid': ("First search the web for real photos of white acrylic solid surface countertops with integrated sinks (such as Corian Glacier White) to learn the exact look. "
+              "The countertop is pure white solid surface: perfectly uniform warm-neutral white, no veins, satin matte finish, softly rounded edge, "
+              "with the rim of a seamless integrated sink of the same material visible at the corner, no joints."),
 }
 
 def gen(key):
-    body = {"contents": [{"parts": [{"text": STYLE + " " + MATERIALS[key]}]}],
-            "generationConfig": {"responseModalities": ["IMAGE"], "imageConfig": {"aspectRatio": "3:4"}}}
+    body = {"contents": [{"parts": [{"text": MATERIALS[key] + " " + STYLE}]}],
+            "tools": [{"google_search": {}}],
+            "generationConfig": {"responseModalities": ["TEXT", "IMAGE"], "imageConfig": {"aspectRatio": "3:4"}}}
     headers = {"Content-Type": "application/json"}
     if os.environ.get('GEMINI_API_KEY'):
         headers["x-goog-api-key"] = os.environ['GEMINI_API_KEY']
     req = urllib.request.Request(f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent",
                                  data=json.dumps(body).encode(), headers=headers)
-    r = json.load(urllib.request.urlopen(req, timeout=240))
-    for part in r['candidates'][0]['content']['parts']:
+    r = json.load(urllib.request.urlopen(req, timeout=300))
+    c = r['candidates'][0]
+    for part in c['content']['parts']:
         if 'inlineData' in part:
-            raw = base64.b64decode(part['inlineData']['data'])
-            try:                                   # Gemini віддає PNG — зберігаємо справжній JPEG
-                from PIL import Image
-                Image.open(io.BytesIO(raw)).convert('RGB').save(OUT / f'm-{key}.jpg', 'JPEG', quality=84, optimize=True, progressive=True)
-            except ImportError:
-                (OUT / f'm-{key}.png').write_bytes(raw)
-            print('✓', f'm-{key}.jpg'); return
-    raise SystemExit('немає зображення у відповіді: ' + json.dumps(r)[:400])
+            im = Image.open(io.BytesIO(base64.b64decode(part['inlineData']['data']))).convert('RGB')
+            im.thumbnail((1600, 1600), Image.LANCZOS)
+            im.save(OUT / f'm-{key}.jpg', 'JPEG', quality=84, optimize=True, progressive=True)
+            src = [x.get('web', {}).get('title') for x in c.get('groundingMetadata', {}).get('groundingChunks', [])]
+            print('✓', f'm-{key}.jpg', '· референси:', ', '.join(filter(None, src))[:200])
+            return
+    raise SystemExit('немає зображення: ' + json.dumps(r)[:400])
 
 for k in (sys.argv[1:] or MATERIALS):
     gen(k)
