@@ -7,28 +7,28 @@
 import base64, io, json, os, sys, urllib.request
 from pathlib import Path
 
-MODEL = os.environ.get('GEMINI_IMAGE_MODEL', 'gemini-2.5-flash-image')
+MODEL = os.environ.get('GEMINI_IMAGE_MODEL', 'gemini-3-pro-image-preview')  # Nano Banana Pro
 OUT = Path(__file__).resolve().parents[1] / 'assets/img'
 
 STYLE = (
-    "Close-up product photograph (not extreme macro) of the corner of a stone countertop slab, seen at 45 degrees from slightly above, "
-    "the polished top surface and the front edge both visible, the stone fills about 80 percent of the frame and is tack sharp, "
-    "so the material texture, veins and grain are clearly readable. "
-    "Behind it a softly blurred warm beige limewash wall (#E3D5C5). "
-    "Soft directional window light from the left with a gentle highlight sliding across the surface, "
-    "warm neutral colour grade (#F5EDE3, #BCAB99, #594133), soft contrast. "
-    "Medium format, 100 mm lens, f/8. Vertical 3:4 framing. Photorealistic. No text, no logos, no objects, no people."
+    "Real photograph for a premium stone supplier catalogue. Close-up of the corner of an installed kitchen countertop "
+    "in a real, bright home, seen at about 45 degrees from slightly above: the top surface and the front edge are both visible "
+    "and the stone fills most of the frame, tack sharp, so the natural pattern, grain and finish of the material are unmistakable. "
+    "Natural daylight from a large window on the left, true-to-life colours and an accurate neutral white balance, "
+    "exactly how the stone looks in person. Real reflections of the window on the surface, very subtle real-world imperfections. "
+    "Background softly out of focus: a warm white wall and light natural oak cabinetry; one plain ceramic cup far behind, out of focus. "
+    "Shot on a full-frame camera with a 90 mm lens at f/5.6, natural contrast, no stylised colour grading. "
+    "Vertical 3:4. Must look like a real photo, not a 3D render or CGI. No text, no logos, no people."
 )
 MATERIALS = {
-    'quartz': ("The material is white engineered quartz in the style of an 'Alpine Mist' quartz, shown as a horizontal kitchen countertop corner: bright white base "
-               "with clearly visible fine thin soft-grey veins running diagonally across the top and wrapping over the edge, "
-               "and at close range a tiny uniform crystalline grain with faint sparkle typical of engineered quartz; very even, regular, man-made look; polished; crisp square 20 mm edge."),
-    'natural': ("The material is natural Calacatta Gold marble: warm white crystalline base with bold, irregular golden-beige and grey veins that branch organically, "
-                "fine natural fissures and a slight translucency at the edge; the vein continues naturally over the edge; honed-polished finish, 30 mm edge."),
-    'porcelain': ("The material is large-format porcelain stoneware with a Calacatta Viola look: white base with dramatic burgundy-violet and grey veins, "
-                  "perfectly flat surface with a silky finish, thin 12 mm slab with a 45-degree mitred edge where the violet vein wraps continuously around the corner."),
-    'solid': ("The material is pure white acrylic solid surface: completely uniform matte-satin white with no veins and no grain, "
-              "a softly rounded bullnose edge and, at the corner, a seamless integrated sink bowl curving down into the surface with no joint at all."),
+    'quartz': ("Material: white engineered quartz like 'Alpine Mist': a clean bright white base with thin, soft, light-grey veins that drift diagonally "
+               "and wrap naturally over the edge; up close a fine, even, sand-like crystalline grain. Polished, 20 mm square edge with a tiny eased arris."),
+    'natural': ("Material: genuine Calacatta Gold natural marble: creamy warm-white crystalline base, bold irregular veins in taupe-grey with honey-gold accents, "
+                "tiny natural pits and a faint crystalline sparkle, the vein continuing over the edge as in real quarried stone. Honed finish with a soft sheen, 20 mm eased edge."),
+    'porcelain': ("Material: large-format porcelain slab with a Calacatta Viola design: white body with wide veins in true burgundy, plum and violet tones with a soft grey haze, "
+                  "polished glossy finish, 12 mm slab with a 45-degree mitred edge forming a 4 cm apron, the violet vein matched continuously around the corner."),
+    'solid': ("Material: pure white acrylic solid surface like 'Glacier White': perfectly uniform neutral white with no veins or grain, satin matte finish, "
+              "a softly rounded edge and a seamless integrated sink bowl in the same material curving down from the top with no joint at all."),
 }
 
 def gen(key):
