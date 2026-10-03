@@ -156,6 +156,7 @@ export function renderLanding(p, all, c, t) {
     <div class="lp-gal">
       ${gallery.map((g, i) => `<figure class="lp-gal-item lp-gal-${i + 1}" data-clip>${img(g, `${name} — ${i + 1}`)}</figure>`).join('\n      ')}
     </div>
+    ${p.illustrative ? '<p class="note lp-illus">Imágenes ilustrativas. Pide fotos de trabajos reales por WhatsApp.</p>' : ''}
   </div>
 </section>
 

@@ -437,7 +437,7 @@ export const pages = [
     related: ['porcelanico-gran-formato', 'esculturas-de-marmol', 'mesas-de-marmol'],
   },
   {
-    slug: 'corte-por-chorro-de-agua', chip: 'waterjet', price: 'waterjet',
+    slug: 'corte-por-chorro-de-agua', illustrative: true, chip: 'waterjet', price: 'waterjet',
     title: 'Corte por chorro de agua (waterjet) en Alicante | Piedra, vidrio, metal',
     description: 'Servicio de corte por chorro de agua en Novelda, Alicante: piedra, porcelánico, vidrio, metal y más. Marquetería, logotipos, piezas a plano DXF. Particulares y empresas.',
     h1: ['Corte por', 'chorro de agua'],
@@ -518,7 +518,7 @@ export const pages = [
     related: ['chimeneas-de-marmol', 'mesas-de-marmol', 'lavabos-de-piedra'],
   },
   {
-    slug: 'fachadas-ventiladas', chip: 'cladding', price: null,
+    slug: 'fachadas-ventiladas', illustrative: true, chip: 'cladding', price: null,
     title: 'Fachada ventilada de porcelánico y piedra en Alicante | ESTONE',
     description: 'Fachadas ventiladas de porcelánico gran formato y piedra natural para viviendas y edificios. Cortado a plano, anclajes ocultos, suministro y montaje en la Costa Blanca.',
     h1: ['Fachadas', 'ventiladas'],
