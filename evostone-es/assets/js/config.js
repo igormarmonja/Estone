@@ -6,7 +6,7 @@ window.ESTONE_CONFIG = {
   // ── Заявки з форм ─────────────────────────────────────────
   // Web3Forms: безкоштовно, листи приходять на пошту. Ключ отримати на https://web3forms.com
   // (вводите email, на який слати заявки → приходить Access Key). Ключ публічний, його можна тримати тут.
-  web3formsKey: '',
+  web3formsKey: '7352ab2b-2010-4902-ba92-ceb6eb6f4790',
 
   // Додатково або замість: вебхук CRM / Google Apps Script / Make. POST JSON
   // {name, phone, products[], comment, lang, landing?, utm…, page, ts}
