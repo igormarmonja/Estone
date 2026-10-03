@@ -11,21 +11,18 @@ MODEL = os.environ.get('GEMINI_IMAGE_MODEL', 'gemini-2.5-flash-image')
 OUT = Path(__file__).resolve().parents[1] / 'assets/img'
 
 STYLE = (
-    "Editorial product photograph of a single stone sample slab, about 40 x 30 cm and 2 cm thick, "
-    "standing upright and slightly turned (about 15 degrees) on a warm beige limewash plaster plinth, "
-    "against a seamless warm beige limewash wall in the same tone (#E3D5C5). "
-    "Soft directional late-afternoon window light from the left, gentle long shadow to the right, "
-    "the polished or honed edge of the slab clearly visible. "
-    "Warm neutral colour grade, soft contrast, slightly matte blacks, palette of sand, clay and warm brown (#F5EDE3, #BCAB99, #594133). "
-    "Shot on medium format, 100 mm lens, f/5.6, sharp stone texture, shallow falloff on the background. "
-    "Vertical 3:4 framing, slab centred and filling about 60 percent of the frame. "
-    "No text, no logos, no hands, no people, no plants, no other objects."
+    "Minimalist architectural interior photograph, one single modern object made of stone as the hero, centred, "
+    "in a calm warm-beige limewash room (walls #E3D5C5), nothing else in the scene except at most one small ceramic vase. "
+    "Soft directional late-afternoon window light from the left with a gentle long shadow, "
+    "warm neutral colour grade in sand, clay and warm brown tones (#F5EDE3, #BCAB99, #594133), soft contrast, slightly matte blacks. "
+    "Shot on medium format, 50 mm lens, eye level, sharp material texture so the stone type is instantly recognisable. "
+    "Vertical 3:4 framing. Photorealistic. No text, no logos, no people."
 )
 MATERIALS = {
-    'quartz': "The slab is engineered quartz: bright warm white with very fine soft grey cloud veining and tiny sparkle, polished high-gloss surface, crisp square edge.",
-    'porcelain': "The slab is large-format porcelain stoneware with a calacatta look: warm white base with bold flowing veins in grey and soft gold, silky matte finish, thin 12 mm mitred edge.",
-    'natural': "The slab is natural marble (warm crema / light travertine tone) with irregular organic veining and natural tonal variation, honed finish, slightly rough chiselled natural edge on one side.",
-    'solid': "The slab is acrylic solid surface: seamless uniform warm white, satin finish, softly rounded bullnose edge, with a shallow integrated curved basin carved into the top showing its seamless continuity.",
+    'quartz': "The object: a sleek modern kitchen island with a thick 4 cm white engineered quartz worktop with very fine soft grey veining and subtle sparkle, polished, waterfall sides in the same quartz, flush seamless edges.",
+    'porcelain': "The object: a monolithic bathroom vanity block clad entirely in large-format calacatta-look porcelain with bold grey and soft gold veins continuing across the mitred corners, an integrated rectangular basin and a matte black wall tap above.",
+    'natural': "The object: a sculptural round pedestal side table carved from natural travertine marble with visible natural pores and warm crema banding, honed matte finish, solid stone base.",
+    'solid': "The object: a wall-hung seamless warm-white acrylic solid surface washbasin with soft organic curves flowing into a shelf, satin finish, no visible joints, a brushed brass wall tap above it.",
 }
 
 def gen(key):
