@@ -210,7 +210,7 @@ html.seen .preloader{display:none;}
 /* ── 01 Hero ─────────────────────────────────────────── */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;color:var(--c-paper);overflow:hidden;background:var(--c-dark);}
 .hero-media{position:absolute;inset:0;}
-.hero-media img{width:100%;height:100%;object-fit:cover;object-position:70% 60%;}
+.hero-media img{width:100%;height:100%;object-fit:cover;object-position:60% 72%;}
 .hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(40,28,21,.55) 0%,rgba(40,28,21,.1) 35%,rgba(40,28,21,.2) 55%,rgba(40,28,21,.82) 100%);}
 .hero-inner{position:relative;padding-top:140px;padding-bottom:clamp(96px,11vw,150px);}
 .hero .label{color:rgba(245,237,227,.75);}
@@ -448,6 +448,17 @@ html:not(.js) .step,.step.is-active{opacity:1;}
 }
 .footer-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 32px;font-size:12px;color:var(--mute);font-family:var(--font-mono);letter-spacing:.04em;}
 .footer-bottom nav{display:flex;gap:20px;}
+
+/* ── Посилання на посадкові ─────────────────────────── */
+.drawer-links{margin:4px 0 8px;}
+.drawer-links ul{display:grid;border-top:1px solid var(--line);}
+.drawer-links a{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-family:var(--font-display);font-size:16px;text-transform:uppercase;letter-spacing:.02em;transition:color .3s,padding .4s var(--ease);}
+.drawer-links a:hover{color:var(--c-brand);padding-left:6px;}
+.footer-services{margin-top:clamp(40px,5vw,72px);padding-top:28px;border-top:1px solid var(--line);}
+.footer-services ul{columns:4 200px;column-gap:32px;}
+.footer-services li{break-inside:avoid;padding:5px 0;}
+.footer-services a{font-size:14px;opacity:.8;transition:opacity .3s;}
+.footer-services a:hover{opacity:1;text-decoration:underline;text-underline-offset:4px;}
 
 /* ── Drawer ──────────────────────────────────────────── */
 .drawer{position:fixed;inset:0;z-index:150;visibility:hidden;pointer-events:none;}

@@ -1,5 +1,19 @@
 /* HTML-шаблон лендингу. Один шаблон на всі мови: тексти приходять із content/<мова>.mjs. */
 import { SITE, LANGS, PRICES, PRODUCTS, MATERIALS, SERIES, SINKS, PROCESS_IMG, PROJECT_IMG } from './data.mjs';
+import { pages as LANDINGS } from './landings/es.mjs';
+
+/* Посадкові сторінки (поки тільки ES), прив'язані до продуктів головної */
+const PRODUCT_LANDINGS = {
+  kitchen: ['encimeras-de-cocina-a-medida', 'encimeras-de-cuarzo', 'encimeras-porcelanicas', 'encimeras-de-granito', 'encimeras-de-marmol', 'islas-de-cocina', 'fregaderos-de-piedra'],
+  bath: ['lavabos-a-medida', 'lavabos-de-piedra', 'platos-de-ducha-a-medida'],
+  cladding: ['porcelanico-gran-formato', 'fachadas-ventiladas'],
+  stairs: ['escaleras-de-marmol'],
+  furniture: ['mesas-de-marmol', 'mesas-de-porcelanico'],
+  sculpture: ['esculturas-de-marmol', 'chimeneas-de-marmol'],
+  cutting: ['corte-de-piedra-a-medida'],
+  waterjet: ['corte-por-chorro-de-agua'],
+};
+const landingName = (slug) => { const l = LANDINGS.find((x) => x.slug === slug); return l ? l.h1.join(' ') : slug; };
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const pad = (n) => String(n).padStart(2, '0');
@@ -391,6 +405,10 @@ ${alternates}
       <nav>${navItems.map(([id, label]) => `<a href="#${id}">${esc(label)}</a>`).join('')}</nav>
       <nav class="lang" aria-label="${esc(t.a11y.lang)}">${langSwitch}</nav>
     </div>
+    ${lang === 'es' ? `<nav class="footer-services" aria-label="Servicios">
+      <p class="label">Servicios</p>
+      <ul>${LANDINGS.map((l) => `<li><a href="${base}${l.slug}/">${esc(l.h1.join(' '))}</a></li>`).join('')}</ul>
+    </nav>` : ''}
     <p class="footer-word" aria-hidden="true">${SITE.brand}</p>
     <div class="footer-bottom">
       <span>© ${year} ${SITE.brand}. ${esc(t.footer.rights)}</span>
@@ -414,6 +432,10 @@ ${alternates}
       <p class="drawer-text">${esc(it.text)}</p>
       <ul class="drawer-list">${it.bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>
       <ul class="tags">${it.tags.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+      ${lang === 'es' && PRODUCT_LANDINGS[p.id] ? `<div class="drawer-links">
+        <p class="label">Más información</p>
+        <ul>${PRODUCT_LANDINGS[p.id].map((s) => `<li><a href="${base}${s}/">${esc(landingName(s))} ${ARROW}</a></li>`).join('')}</ul>
+      </div>` : ''}
       <div class="drawer-foot">
         <span class="price">${esc(t.price(PRICES[p.id]))}</span>
         <a href="#contacto" class="btn btn-dark" data-chip="${p.id}" data-close>${esc(t.products.quote)} ${ARROW}</a>
