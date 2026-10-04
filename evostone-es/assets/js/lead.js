@@ -1,4 +1,4 @@
-/* ESTONE España — заявки: попап і форми.
+/* Evostone (Stone Evolution) España — заявки: попап і форми.
    Підключається після main.js / landing.js (беремо з них window.sendLead і window.__ui).
    · Кнопки з data-lead відкривають попап #leadModal; значення data-lead (або data-chip) — продукт,
      який одразу відмічається у формі. Без JS кнопки лишаються звичайними посиланнями на #contacto.

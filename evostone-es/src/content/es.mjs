@@ -3,7 +3,7 @@ export default {
   meta: {
     htmlLang: 'es',
     ogLocale: 'es_ES',
-    title: 'Encimeras y piedra a medida en Alicante | Taller en Novelda · ESTONE',
+    title: 'Encimeras y piedra a medida en Alicante | Taller en Novelda · Evostone',
     description: 'Encimeras de cocina y baño, lavabos, revestimiento gran formato, escaleras, muebles y corte waterjet. Taller propio en Novelda: medimos, fabricamos e instalamos en la Costa Blanca.',
   },
 
@@ -38,7 +38,7 @@ export default {
     whatsapp: 'Escríbenos por WhatsApp',
     trust: ['14 años de oficio', 'Taller propio', 'Instalación propia', 'ES · EN · RU · UA'],
     scroll: 'Desliza',
-    imgAlt: 'Encimera de piedra fabricada por ESTONE',
+    imgAlt: 'Encimera de piedra fabricada por Evostone',
   },
 
   manifesto: {

@@ -1,7 +1,7 @@
 # ESTONE: сайти групи
 
 - `/` (корінь репозиторію): estone.com.ua, український сайт. Структура й SEO: `docs/ESTONE_COM_UA_struktura_v1.md`.
-- `evostone-es/`: evostone.es, лендинг для Іспанії (ES/EN/RU). Структура: `docs/ES_LANDING_estructura_v1.md`, інструкції: `evostone-es/README.md`.
+- `evostone-es/`: evostone.es, лендинг для Іспанії (ES/EN/RU/UA). Бренд в Іспанії: **Stone Evolution** (повна назва, бо ESTONE там зайнята), скорочено **Evostone**. Назву ESTONE на іспанському сайті не використовуємо, крім посилання на український сайт. Структура: `docs/ES_LANDING_estructura_v1.md`, інструкції: `evostone-es/README.md`.
 
 ## Затверджений шаблон лендингу
 Лендинг `evostone-es/` клієнт затвердив як еталон. Будь-який новий лендинг (інший ринок, бренд чи мова) робимо за скілом `.claude/skills/scroll-landing/SKILL.md`: копіюємо `evostone-es/` і міняємо дані й тексти. Архітектуру з нуля не пишемо.

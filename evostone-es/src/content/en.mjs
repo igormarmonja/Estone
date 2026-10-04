@@ -3,7 +3,7 @@ export default {
   meta: {
     htmlLang: 'en',
     ogLocale: 'en_GB',
-    title: 'Stone Worktops & Bespoke Stonework in Alicante | Novelda Workshop · ESTONE',
+    title: 'Stone Worktops & Bespoke Stonework in Alicante | Novelda Workshop · Evostone',
     description: 'Kitchen and bathroom worktops, stone basins, large-format cladding, staircases, furniture and waterjet cutting. Our own workshop in Novelda: we measure, make and install across the Costa Blanca.',
   },
 
@@ -38,7 +38,7 @@ export default {
     whatsapp: 'Message us on WhatsApp',
     trust: ['14 years of craft', 'Own workshop', 'Own installers', 'ES · EN · RU · UA'],
     scroll: 'Scroll',
-    imgAlt: 'Stone worktop made by ESTONE',
+    imgAlt: 'Stone worktop made by Evostone',
   },
 
   manifesto: {

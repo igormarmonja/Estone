@@ -33,7 +33,7 @@ export const common = {
   services: 'Servicios',
   illustrative: 'Imágenes ilustrativas. Pide fotos de trabajos reales por WhatsApp.',
   gallery: {
-    title: 'Galería de trabajos en piedra: cocinas, baños y escaleras | ESTONE',
+    title: 'Galería de trabajos en piedra: cocinas, baños y escaleras | Evostone',
     description: 'Galería de {n} trabajos en piedra: encimeras de cocina, lavabos a medida, escaleras, chimeneas, mesas de mármol y porcelánico. Taller propio en Novelda, Alicante.',
     h1: ['Galería', 'de trabajos'],
     lead: 'Encimeras, lavabos, escaleras, chimeneas y mobiliario que han salido de nuestro taller. Pulsa una foto para verla en grande.',
@@ -50,7 +50,7 @@ export const common = {
 export const pages = [
   {
     slug: 'encimeras-de-cuarzo', chip: 'kitchen', price: 'kitchen',
-    title: 'Encimeras de cuarzo a medida en Alicante | ESTONE',
+    title: 'Encimeras de cuarzo a medida en Alicante | Evostone',
     description: 'Encimeras de cuarzo para cocina y baño fabricadas a medida en nuestro taller de Novelda. Medición, fregadero integrado e instalación en la Costa Blanca.',
     h1: ['Encimeras', 'de cuarzo'],
     sub: 'A medida, con fregadero y frontal a juego. Fabricadas en Novelda e instaladas por nuestro equipo.',
@@ -104,7 +104,7 @@ export const pages = [
   },
   {
     slug: 'encimeras-porcelanicas', chip: 'kitchen', price: 'kitchen',
-    title: 'Encimeras porcelánicas y de piedra sinterizada a medida | ESTONE',
+    title: 'Encimeras porcelánicas y de piedra sinterizada a medida | Evostone',
     description: 'Encimeras porcelánicas a medida: resisten el calor, los arañazos y el sol. Placas de 12 y 20 mm, fregadero integrado e instalación en Alicante.',
     h1: ['Encimeras', 'porcelánicas'],
     sub: 'Porcelánico y piedra sinterizada: la encimera que aguanta calor, sol y uso intensivo.',
@@ -131,7 +131,7 @@ export const pages = [
   },
   {
     slug: 'encimeras-de-granito', chip: 'kitchen', price: 'kitchen',
-    title: 'Encimeras de granito a medida en Alicante | ESTONE',
+    title: 'Encimeras de granito a medida en Alicante | Evostone',
     description: 'Encimeras de granito natural para cocina y exterior, cortadas a medida en Novelda. Pulido, apomazado o flameado. Medición e instalación en la Costa Blanca.',
     h1: ['Encimeras', 'de granito'],
     sub: 'Piedra natural dura y resistente, para cocinas interiores y de exterior.',
@@ -158,7 +158,7 @@ export const pages = [
   },
   {
     slug: 'encimeras-de-marmol', chip: 'kitchen', price: 'kitchen',
-    title: 'Encimeras de mármol a medida desde Novelda | ESTONE',
+    title: 'Encimeras de mármol a medida desde Novelda | Evostone',
     description: 'Encimeras de mármol para cocina y baño seleccionadas y cortadas en Novelda, la capital del mármol. Placas únicas, acabado pulido o mate, instalación propia.',
     h1: ['Encimeras', 'de mármol'],
     sub: 'Placas seleccionadas en Novelda, la capital del mármol. Cada encimera es única.',
@@ -185,7 +185,7 @@ export const pages = [
   },
   {
     slug: 'platos-de-ducha-a-medida', chip: 'bath', price: null,
-    title: 'Platos de ducha a medida en piedra y solid surface | ESTONE',
+    title: 'Platos de ducha a medida en piedra y solid surface | Evostone',
     description: 'Platos de ducha a medida de piedra, porcelánico o solid surface, enrasados con el suelo y con desagüe lineal oculto. Fabricación en Novelda, Alicante.',
     h1: ['Platos de ducha', 'a medida'],
     sub: 'Enrasados con el suelo, del mismo material que el baño y con desagüe oculto.',
@@ -213,7 +213,7 @@ export const pages = [
   {
     slug: 'lavabos-de-piedra', chip: 'bath', price: 'bath',
     img: 'le-02.jpg', gallery: ['le-06.jpg', 'le-04.jpg', 'ka-06.jpg'],
-    title: 'Lavabos de piedra natural y mármol a medida | ESTONE',
+    title: 'Lavabos de piedra natural y mármol a medida | Evostone',
     description: 'Lavabos de piedra natural y mármol tallados a mano o por CNC: cuencos sobre encimera, pedestales y encimeras con lavabo. Colección Leonardo y piezas a medida.',
     h1: ['Lavabos', 'de piedra'],
     sub: 'Cuencos, pedestales y encimeras talladas en mármol y piedra natural. No hay dos iguales.',
@@ -241,7 +241,7 @@ export const pages = [
   {
     slug: 'lavabos-a-medida', chip: 'bath', price: 'bath',
     img: 'ka-07.jpg', gallery: ['mo-01.jpg', 'sa-02.jpg', 'ka-05.jpg'],
-    title: 'Lavabos a medida y encimeras de baño con lavabo integrado | ESTONE',
+    title: 'Lavabos a medida y encimeras de baño con lavabo integrado | Evostone',
     description: 'Encimeras de baño con lavabo integrado sin juntas: solid surface, porcelánico y cuarzo. Desagüe de ranura oculto, dobles lavabos y formas a medida.',
     h1: ['Lavabos', 'a medida'],
     sub: 'Encimera y lavabo en una sola pieza, sin juntas donde se acumule la suciedad.',
@@ -268,7 +268,7 @@ export const pages = [
   },
   {
     slug: 'mesas-de-marmol', chip: 'furniture', price: 'furniture',
-    title: 'Mesas de mármol a medida: comedor, centro y exterior | ESTONE',
+    title: 'Mesas de mármol a medida: comedor, centro y exterior | Evostone',
     description: 'Mesas de mármol a medida para comedor, salón y exterior. Tableros de una sola placa, patas de piedra, metal o madera. Fabricadas en Novelda, Alicante.',
     h1: ['Mesas', 'de mármol'],
     sub: 'Tableros de una sola placa para comedor, salón y terraza, en la medida que necesitas.',
@@ -295,7 +295,7 @@ export const pages = [
   },
   {
     slug: 'mesas-de-porcelanico', chip: 'furniture', price: 'furniture',
-    title: 'Mesas de porcelánico y cerámica a medida | Interior y exterior | ESTONE',
+    title: 'Mesas de porcelánico y cerámica a medida | Interior y exterior | Evostone',
     description: 'Mesas de porcelánico y cerámica a medida para comedor, cocina y terraza. Resisten calor, rayas y sol. Tableros ligeros, cantos en inglete, base a elegir.',
     h1: ['Mesas', 'de porcelánico'],
     sub: 'La estética del mármol con la resistencia de la cerámica, dentro y fuera de casa.',
@@ -322,7 +322,7 @@ export const pages = [
   },
   {
     slug: 'escaleras-de-marmol', chip: 'stairs', price: 'stairs',
-    title: 'Escaleras de mármol y granito a medida: peldaños y zanquines | ESTONE',
+    title: 'Escaleras de mármol y granito a medida: peldaños y zanquines | Evostone',
     description: 'Escaleras de mármol, granito y porcelánico a medida: peldaños de una pieza, tabicas, zanquines, escaleras voladas y de caracol. Medición e instalación en Alicante.',
     h1: ['Escaleras', 'de mármol'],
     sub: 'Peldaños de una pieza cortados para su sitio, con antideslizante y luz integrada.',
@@ -349,7 +349,7 @@ export const pages = [
   },
   {
     slug: 'porcelanico-gran-formato', chip: 'cladding', price: 'cladding',
-    title: 'Revestimiento de porcelánico gran formato a medida | ESTONE',
+    title: 'Revestimiento de porcelánico gran formato a medida | Evostone',
     description: 'Revestimiento de paredes, duchas y chimeneas con porcelánico gran formato de hasta 3,2 × 1,6 m. Cortado a medida, casi sin juntas, con veta continua.',
     h1: ['Porcelánico', 'gran formato'],
     sub: 'Paredes, duchas y chimeneas con placas XXL de hasta 3,2 × 1,6 m, casi sin juntas.',
@@ -376,7 +376,7 @@ export const pages = [
   },
   {
     slug: 'fregaderos-de-piedra', chip: 'kitchen', price: null,
-    title: 'Fregaderos de piedra a medida integrados en la encimera | ESTONE',
+    title: 'Fregaderos de piedra a medida integrados en la encimera | Evostone',
     description: 'Fregaderos de piedra a medida: integrados en la encimera de cuarzo, porcelánico o mármol, sin juntas visibles, con escurridor fresado. Fabricación en Novelda.',
     h1: ['Fregaderos', 'de piedra'],
     sub: 'El fregadero sale de la misma piedra que la encimera: sin juntas, sin contraste, sin suciedad.',
@@ -403,7 +403,7 @@ export const pages = [
   },
   {
     slug: 'islas-de-cocina', chip: 'kitchen', price: 'kitchen',
-    title: 'Islas de cocina de piedra con encimera en cascada | ESTONE',
+    title: 'Islas de cocina de piedra con encimera en cascada | Evostone',
     description: 'Islas de cocina de cuarzo, porcelánico y mármol: encimera de una pieza, laterales en cascada con veta continua, barra y fregadero integrado. A medida en Alicante.',
     h1: ['Islas', 'de cocina'],
     sub: 'Encimera de una pieza y laterales en cascada con la veta continua hasta el suelo.',
@@ -430,7 +430,7 @@ export const pages = [
   },
   {
     slug: 'chimeneas-de-marmol', chip: 'sculpture', price: null,
-    title: 'Chimeneas de mármol y revestimiento de chimeneas en piedra | ESTONE',
+    title: 'Chimeneas de mármol y revestimiento de chimeneas en piedra | Evostone',
     description: 'Chimeneas de mármol a medida: portales clásicos y modernos, revestimiento de chimeneas en porcelánico gran formato y piedra natural. Talla CNC en Novelda.',
     h1: ['Chimeneas', 'de mármol'],
     sub: 'Portales tallados y revestimientos modernos en piedra natural o porcelánico.',
@@ -511,7 +511,7 @@ export const pages = [
   },
   {
     slug: 'esculturas-de-marmol', chip: 'sculpture', price: 'sculpture',
-    title: 'Esculturas de mármol modernas a medida | Talla CNC y a mano | ESTONE',
+    title: 'Esculturas de mármol modernas a medida | Talla CNC y a mano | Evostone',
     description: 'Esculturas de mármol modernas para interior y jardín: formas abstractas y orgánicas, relieves, fuentes y piezas de autor. Modelado 3D, talla CNC y acabado a mano en Novelda.',
     h1: ['Esculturas', 'de mármol'],
     sub: 'Piezas contemporáneas para casa, jardín y espacios públicos, talladas en Novelda.',
@@ -538,7 +538,7 @@ export const pages = [
   },
   {
     slug: 'fachadas-ventiladas', illustrative: true, chip: 'cladding', price: null,
-    title: 'Fachada ventilada de porcelánico y piedra en Alicante | ESTONE',
+    title: 'Fachada ventilada de porcelánico y piedra en Alicante | Evostone',
     description: 'Fachadas ventiladas de porcelánico gran formato y piedra natural para viviendas y edificios. Cortado a plano, anclajes ocultos, suministro y montaje en la Costa Blanca.',
     h1: ['Fachadas', 'ventiladas'],
     sub: 'Porcelánico gran formato y piedra natural cortados a plano para tu fachada.',
@@ -565,7 +565,7 @@ export const pages = [
   },
   {
     slug: 'marmoleria-alicante', chip: 'other', price: null,
-    title: 'Marmolería en Alicante: taller propio en Novelda | ESTONE',
+    title: 'Marmolería en Alicante: taller propio en Novelda | Evostone',
     description: 'Marmolería en la provincia de Alicante con taller propio en Novelda: encimeras, baños, escaleras, mesas, chimeneas y corte waterjet. Medición e instalación en la Costa Blanca.',
     h1: ['Marmolería', 'en Alicante'],
     sub: 'Taller propio en Novelda. Medimos, fabricamos e instalamos en toda la provincia.',

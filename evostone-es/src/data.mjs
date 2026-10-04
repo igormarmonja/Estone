@@ -6,7 +6,8 @@
 
 export const SITE = {
   domain: 'https://evostone.es',
-  brand: 'ESTONE',
+  brand: 'Evostone',                    // коротка назва (логотип, заголовки)
+  legalName: 'Stone Evolution',         // повна назва компанії в Іспанії (ESTONE там зайнята)
   phone: '+34652692097',
   phoneDisplay: '+34 652 69 20 97',
   whatsapp: 'https://wa.me/34652692097',

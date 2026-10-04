@@ -30,7 +30,7 @@ export function renderGallery(items, landings, t, c = null, L = { code: 'es', pr
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': 'ImageGallery', name: c.galleryFull + ' · ESTONE', url, description,
+        '@type': 'ImageGallery', name: c.galleryFull + ' · ' + SITE.brand, url, description,
         image: items.map((i) => ({ '@type': 'ImageObject', contentUrl: `${SITE.domain}/assets/img/galeria/${i.file}`, name: i.title, width: i.w, height: i.h })),
       },
       {
@@ -75,7 +75,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
 <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label"></span></div>
 
 <header class="site-header" id="siteHeader">
-  <a href="${home}" class="logo" aria-label="${SITE.brand}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
+  <a href="${home}" class="logo" aria-label="${SITE.brand} — ${SITE.legalName}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
   <nav class="main-nav" aria-label="Main">
     ${nav.map(([id, l]) => `<a href="${home}#${id}">${esc(l)}</a>`).join('\n    ')}
   </nav>
@@ -150,7 +150,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
     </div>
     <p class="footer-word" aria-hidden="true">${SITE.brand}</p>
     <div class="footer-bottom">
-      <span>© ${year} ${SITE.brand}. ${esc(t.footer.rights)}</span>
+      <span>© ${year} ${SITE.legalName} (${SITE.brand}). ${esc(t.footer.rights)}</span>
       <nav>${t.footer.legal.map((x) => `<a href="#" aria-disabled="true">${esc(x)}</a>`).join('')}</nav>
       <a href="${home}">evostone.es</a>
     </div>

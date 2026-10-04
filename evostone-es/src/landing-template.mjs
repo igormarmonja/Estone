@@ -36,7 +36,7 @@ export function renderLanding(p, all, c, t, L = { code: 'es', prefix: '', hrefla
         description: p.description,
         url,
         areaServed: ['Alicante', 'Costa Blanca', 'Murcia', 'Valencia'],
-        provider: { '@type': 'HomeAndConstructionBusiness', '@id': SITE.domain + '/#business', name: SITE.brand, telephone: SITE.phone, address: { '@type': 'PostalAddress', streetAddress: "L'Estació de Novelda", addressLocality: 'Novelda', addressRegion: 'Alicante', postalCode: '03660', addressCountry: 'ES' } },
+        provider: { '@type': 'HomeAndConstructionBusiness', '@id': SITE.domain + '/#business', name: SITE.brand, legalName: SITE.legalName, telephone: SITE.phone, address: { '@type': 'PostalAddress', streetAddress: "L'Estació de Novelda", addressLocality: 'Novelda', addressRegion: 'Alicante', postalCode: '03660', addressCountry: 'ES' } },
         ...(price ? { offers: { '@type': 'Offer', priceCurrency: 'EUR', price: price.from, description: t.price(price) } } : {}),
       },
       {
@@ -88,7 +88,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
 <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label"></span></div>
 
 <header class="site-header" id="siteHeader">
-  <a href="${home}" class="logo" aria-label="${SITE.brand}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
+  <a href="${home}" class="logo" aria-label="${SITE.brand} — ${SITE.legalName}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
   <nav class="main-nav" aria-label="Main">
     ${nav.map(([id, l]) => `<a href="${home}#${id}">${esc(l)}</a>`).join('\n    ')}
     <a href="${home}galeria/">${esc(c.galleryNav)}</a>
@@ -246,7 +246,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
     </div>
     <p class="footer-word" aria-hidden="true">${SITE.brand}</p>
     <div class="footer-bottom">
-      <span>© ${year} ${SITE.brand}. ${esc(t.footer.rights)}</span>
+      <span>© ${year} ${SITE.legalName} (${SITE.brand}). ${esc(t.footer.rights)}</span>
       <!-- TODO: юридичні сторінки (Aviso legal / Privacidad / Cookies) -->
       <nav>${t.footer.legal.map((x) => `<a href="#" aria-disabled="true">${esc(x)}</a>`).join('')}</nav>
       <a href="${home}">evostone.es</a>

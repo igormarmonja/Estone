@@ -49,6 +49,8 @@ export function render(t, lang, LP = null) {
         '@type': 'HomeAndConstructionBusiness',
         '@id': SITE.domain + '/#business',
         name: SITE.brand,
+        legalName: SITE.legalName,
+        alternateName: [SITE.legalName, 'Evo Stone'],
         url,
         description: t.meta.description,
         telephone: SITE.phone,
@@ -115,7 +117,7 @@ ${alternates}
 <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label"></span></div>
 
 <header class="site-header" id="siteHeader">
-  <a href="#main" class="logo" aria-label="${SITE.brand}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
+  <a href="#main" class="logo" aria-label="${SITE.brand} — ${SITE.legalName}">${LOGO}<span class="logo-word">${SITE.brand}</span></a>
   <nav class="main-nav" aria-label="Main">
     ${navItems.map(([id, label]) => `<a href="#${id}">${esc(label)}</a>`).join('\n    ')}
   </nav>
@@ -414,7 +416,7 @@ ${alternates}
     </nav>` : ''}
     <p class="footer-word" aria-hidden="true">${SITE.brand}</p>
     <div class="footer-bottom">
-      <span>© ${year} ${SITE.brand}. ${esc(t.footer.rights)}</span>
+      <span>© ${year} ${SITE.legalName} (${SITE.brand}). ${esc(t.footer.rights)}</span>
       <!-- TODO: юридичні сторінки (Aviso legal / Privacidad / Cookies) — дані компанії надішле клієнт -->
       <nav>${t.footer.legal.map((x) => `<a href="#" aria-disabled="true">${esc(x)}</a>`).join('')}</nav>
       <a href="${SITE.uaSite}" target="_blank" rel="noopener">${esc(t.footer.ua)} ↗</a>
