@@ -11,7 +11,7 @@ export const SITE = {
   phone: '+34652692097',
   phoneDisplay: '+34 652 69 20 97',
   whatsapp: 'https://wa.me/34652692097',
-  email: 'info@estone.com.ua',          // TODO: поштова скринька на evostone.es
+  email: 'info@evostone.es',
   address: "L'Estació de Novelda, 03660 Novelda, Alicante",
   mapUrl: 'https://maps.google.com/?q=L%27Estaci%C3%B3+de+Novelda,+Alicante',
   geo: { lat: 38.3847, lng: -0.7711 },   // TODO: точні координати цеху
