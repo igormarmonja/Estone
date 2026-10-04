@@ -644,3 +644,6 @@ section h2{
 .post-soon{opacity:.55;}
 .post-soon:hover{transform:none;box-shadow:none;border-color:var(--line);}
 @media (max-width:900px){.posts{grid-template-columns:1fr;}}
+
+.form-note-error{color:var(--rust-2);font-weight:500;}
+.form-note-error a{color:var(--rust-2);text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}

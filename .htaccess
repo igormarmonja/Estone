@@ -1,0 +1,7 @@
+# Файл із заявками не має відкриватись з браузера
+<FilesMatch "^leads\.csv$">
+  Require all denied
+</FilesMatch>
+
+# Службові файли
+RedirectMatch 404 ^/docs/

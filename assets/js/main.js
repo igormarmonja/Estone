@@ -340,13 +340,17 @@
       btn.disabled = true;
       btn.textContent = 'Надсилаємо…';
 
+      let sent = true;
       if (CFG.formEndpoint) {
+        sent = false;
         try {
-          await fetch(CFG.formEndpoint, {
+          const res = await fetch(CFG.formEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
           });
+          sent = res.ok;
+          if (!res.ok) console.warn('ESTONE: сервер відповів', res.status);
         } catch (err) {
           console.warn('ESTONE: не вдалось надіслати заявку', err);
         }
@@ -354,10 +358,32 @@
         console.info('ESTONE: formEndpoint не заданий у config.js. Заявка:', payload);
       }
 
-      track('lead_submit', { form: payload.form, source: utm.utm_source || 'direct' });
-      form.reset();
       btn.disabled = false;
       btn.textContent = original;
+
+      /* Заявка не пройшла — не вдаємо, що все добре: даємо телефон */
+      if (!sent) {
+        const note = form.querySelector('.form-note');
+        if (note) {
+          if (!note.dataset.original) note.dataset.original = note.innerHTML;
+          const tel = CFG.phone ? `<a href="tel:${CFG.phone}">${CFG.phoneDisplay || CFG.phone}</a>` : '';
+          note.innerHTML = `Не вдалося надіслати заявку. Зателефонуйте нам${tel ? ': ' + tel : ''} — ми на зв'язку.`;
+          note.classList.add('form-note-error');
+        }
+        form.classList.add('has-error');
+        setTimeout(() => form.classList.remove('has-error'), 1600);
+        track('lead_error', { form: payload.form });
+        return;
+      }
+
+      const note = form.querySelector('.form-note');
+      if (note && note.dataset.original) {
+        note.innerHTML = note.dataset.original;
+        note.classList.remove('form-note-error');
+      }
+
+      track('lead_submit', { form: payload.form, source: utm.utm_source || 'direct' });
+      form.reset();
       showThanks();
     });
   });

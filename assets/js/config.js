@@ -20,8 +20,9 @@ window.ESTONE_CONFIG = {
   // ── Куди відправляти заявки ───────────────────────────────
   // POST з JSON: {name, phone, size, comment, utm..., page, ts}
   // Підійде вебхук CRM, Google Apps Script, Telegram-бот, SendPulse тощо.
-  // Поки порожнє — форма показує подяку, але нікуди не відправляє.
-  formEndpoint: '',
+  // Працює з файлом send.php, який лежить у корені сайту.
+  // Залиште як є, якщо send.php залито на хостинг.
+  formEndpoint: '/send.php',
 
   // ── Аналітика ─────────────────────────────────────────────
   ga4Id:        '',   // G-XXXXXXXXXX
