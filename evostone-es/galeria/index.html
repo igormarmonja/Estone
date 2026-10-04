@@ -39,7 +39,7 @@
     <a href="../#contacto">Contacto</a>
   </nav>
   <div class="header-right">
-    <a href="../#contacto" class="btn btn-dark btn-sm" data-magnetic>Presupuesto</a>
+    <a href="../#contacto" class="btn btn-dark btn-sm" data-magnetic data-lead>Presupuesto</a>
     <button class="burger" id="burger" aria-label="Menú" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </div>
 </header>
@@ -671,7 +671,7 @@
       <li><a href="../escaleras-de-marmol/"><span class="lp-rel-name">Escaleras de mármol</span><span class="lp-rel-sub">Peldaños de una pieza cortados para su sitio, con antideslizante y luz integrada.</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
       <li><a href="../chimeneas-de-marmol/"><span class="lp-rel-name">Chimeneas de mármol</span><span class="lp-rel-sub">Portales tallados y revestimientos modernos en piedra natural o porcelánico.</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
     </ul>
-    <a class="btn btn-light" href="../#contacto" data-magnetic>Pedir presupuesto <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <a class="btn btn-light" href="../#contacto" data-magnetic data-lead>Pedir presupuesto <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
   </div>
 </section>
 </main>
@@ -698,11 +698,54 @@
   </div>
 </footer>
 
+<div class="lead-modal" id="leadModal" aria-hidden="true">
+  <div class="lead-modal-overlay" data-lead-close></div>
+  <div class="lead-modal-panel" role="dialog" aria-modal="true" aria-labelledby="leadModalTitle" tabindex="-1" data-lenis-prevent>
+    <button class="lead-modal-close" type="button" data-lead-close aria-label="Cerrar"><span></span><span></span></button>
+    <h2 class="lead-modal-title" id="leadModalTitle">Pide tu<br>presupuesto</h2>
+    <form class="form" id="leadModalForm" data-lead-form novalidate>
+      <p class="lead">Mándanos medidas aproximadas o una foto. Te respondemos con un precio orientativo en 24 horas.</p>
+      <div class="field-row">
+        <label class="field"><span>Nombre</span><input name="name" autocomplete="name" required></label>
+        <label class="field"><span>Teléfono o WhatsApp</span><input name="phone" type="tel" autocomplete="tel" inputmode="tel" required></label>
+      </div>
+      <fieldset class="chips">
+        <legend>¿Qué necesitas?</legend>
+        <label class="chip"><input type="checkbox" name="product" value="kitchen"><span>Encimeras de cocina</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="bath"><span>Baño: encimeras y lavabos</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="cladding"><span>Revestimiento gran formato</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="stairs"><span>Escaleras</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="furniture"><span>Mobiliario de piedra</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="sculpture"><span>Esculturas y piezas únicas</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="cutting"><span>Corte a medida</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="waterjet"><span>Corte por chorro de agua</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="pro"><span>Profesional</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="other"><span>Otro</span></label>
+      </fieldset>
+      <label class="field"><span>Medidas o comentario</span><textarea name="comment" rows="2" placeholder="Por ejemplo: encimera en L, 3,2 + 1,8 m, cuarzo blanco"></textarea></label>
+      <label class="consent"><input type="checkbox" name="consent" required><span>Acepto la política de privacidad y que me contactéis sobre mi solicitud.</span></label>
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <input type="hidden" name="lang" value="es">
+      <input type="hidden" name="source" value="popup">
+      <div class="form-actions">
+        <button class="btn btn-light" type="submit" data-sending="Enviando…">Enviar solicitud <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <a class="link-btn link-light" href="https://wa.me/34652692097" target="_blank" rel="noopener" data-track="whatsapp"><svg class="ico ico-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg> WhatsApp</a>
+      </div>
+      <p class="form-error" role="alert" hidden>No se ha podido enviar. Escríbenos por WhatsApp o llámanos.</p>
+      <div class="form-ok" hidden>
+        <h3>Recibido</h3>
+        <p>Te escribimos en breve. Si tienes fotos o planos, mándalos por WhatsApp.</p>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="../assets/js/config.js"></script>
 <script src="../assets/vendor/gsap.min.js" defer></script>
 <script src="../assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="../assets/vendor/lenis.min.js" defer></script>
 <script src="../assets/js/landing.js" defer></script>
 <script src="../assets/js/gallery.js" defer></script>
+<script src="../assets/js/lead.js" defer></script>
 </body>
 </html>

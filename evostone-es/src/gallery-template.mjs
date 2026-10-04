@@ -1,6 +1,7 @@
 /* Сторінка /galeria/ (ES). Фото й підписи — src/gallery/es.json (генерує tools/build_gallery.py).
    Шапка, меню, футер і поведінка — як на посадкових (landing.css + landing.js) + gallery.js. */
-import { SITE } from './data.mjs';
+import { SITE, PRODUCTS } from './data.mjs';
+import { renderLeadModal } from './lead-modal.mjs';
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const pad = (n) => String(n).padStart(2, '0');
@@ -79,7 +80,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
     ${nav.map(([id, l]) => `<a href="${home}#${id}">${esc(l)}</a>`).join('\n    ')}
   </nav>
   <div class="header-right">
-    <a href="${home}#contacto" class="btn btn-dark btn-sm" data-magnetic>${esc(t.nav.cta)}</a>
+    <a href="${home}#contacto" class="btn btn-dark btn-sm" data-magnetic data-lead>${esc(t.nav.cta)}</a>
     <button class="burger" id="burger" aria-label="${esc(t.a11y.menu)}" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </div>
 </header>
@@ -129,7 +130,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
     <ul class="lp-rel">
       ${['encimeras-de-cocina-a-medida', 'lavabos-a-medida', 'escaleras-de-marmol', 'chimeneas-de-marmol'].map((s) => landings.find((x) => x.slug === s)).filter(Boolean).map((r) => `<li><a href="${home}${r.slug}/"><span class="lp-rel-name">${esc(r.h1.join(' '))}</span><span class="lp-rel-sub">${esc(r.sub)}</span>${ARROW}</a></li>`).join('\n      ')}
     </ul>
-    <a class="btn btn-light" href="${home}#contacto" data-magnetic>${esc(c.cta)} ${ARROW}</a>
+    <a class="btn btn-light" href="${home}#contacto" data-magnetic data-lead>${esc(c.cta)} ${ARROW}</a>
   </div>
 </section>
 </main>
@@ -155,6 +156,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
     </div>
   </div>
 </footer>
+${renderLeadModal({ t, lang: L.code, title: c.contact.h2, intro: c.contact.intro, chips: [...PRODUCTS.map((p) => ({ v: p.id, l: t.products.items[p.id].title })), { v: 'pro', l: t.pros.chip }, { v: 'other', l: t.contact.other }] })}
 
 <script src="${base}assets/js/config.js"></script>
 <script src="${base}assets/vendor/gsap.min.js" defer></script>
@@ -162,6 +164,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
 <script src="${base}assets/vendor/lenis.min.js" defer></script>
 <script src="${base}assets/js/landing.js" defer></script>
 <script src="${base}assets/js/gallery.js" defer></script>
+<script src="${base}assets/js/lead.js" defer></script>
 </body>
 </html>
 `;

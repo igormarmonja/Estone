@@ -39,7 +39,7 @@
     <a href="../../ru/#contacto">Контакты</a>
   </nav>
   <div class="header-right">
-    <a href="../../ru/#contacto" class="btn btn-dark btn-sm" data-magnetic>Расчёт</a>
+    <a href="../../ru/#contacto" class="btn btn-dark btn-sm" data-magnetic data-lead>Расчёт</a>
     <button class="burger" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </div>
 </header>
@@ -671,7 +671,7 @@
       <li><a href="../../ru/escaleras-de-marmol/"><span class="lp-rel-name">Лестницы из мрамора</span><span class="lp-rel-sub">Цельные ступени, вырезанные точно под размер, с противоскользящим покрытием и встроенной подсветкой.</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
       <li><a href="../../ru/chimeneas-de-marmol/"><span class="lp-rel-name">Камины из мрамора</span><span class="lp-rel-sub">Резные порталы и современная облицовка из натурального камня или керамогранита.</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
     </ul>
-    <a class="btn btn-light" href="../../ru/#contacto" data-magnetic>Рассчитать стоимость <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <a class="btn btn-light" href="../../ru/#contacto" data-magnetic data-lead>Рассчитать стоимость <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
   </div>
 </section>
 </main>
@@ -698,11 +698,54 @@
   </div>
 </footer>
 
+<div class="lead-modal" id="leadModal" aria-hidden="true">
+  <div class="lead-modal-overlay" data-lead-close></div>
+  <div class="lead-modal-panel" role="dialog" aria-modal="true" aria-labelledby="leadModalTitle" tabindex="-1" data-lenis-prevent>
+    <button class="lead-modal-close" type="button" data-lead-close aria-label="Закрыть"><span></span><span></span></button>
+    <h2 class="lead-modal-title" id="leadModalTitle">Рассчитайте<br>стоимость</h2>
+    <form class="form" id="leadModalForm" data-lead-form novalidate>
+      <p class="lead">Отправьте нам примерные размеры или фото. Мы пришлем предварительный расчет стоимости в течение 24 часов.</p>
+      <div class="field-row">
+        <label class="field"><span>Имя</span><input name="name" autocomplete="name" required></label>
+        <label class="field"><span>Телефон или WhatsApp</span><input name="phone" type="tel" autocomplete="tel" inputmode="tel" required></label>
+      </div>
+      <fieldset class="chips">
+        <legend>Что вам нужно?</legend>
+        <label class="chip"><input type="checkbox" name="product" value="kitchen"><span>Кухонные столешницы</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="bath"><span>Ванная: столешницы и раковины</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="cladding"><span>Облицовка крупным форматом</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="stairs"><span>Лестницы</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="furniture"><span>Мебель из камня</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="sculpture"><span>Скульптуры и штучные изделия</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="cutting"><span>Порезка на заказ</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="waterjet"><span>Гидроабразивная резка</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="pro"><span>Партнёр</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="other"><span>Другое</span></label>
+      </fieldset>
+      <label class="field"><span>Размеры или комментарий</span><textarea name="comment" rows="2" placeholder="Например: угловая столешница 3,2 + 1,8 м, белый кварц"></textarea></label>
+      <label class="consent"><input type="checkbox" name="consent" required><span>Принимаю политику конфиденциальности и согласен на связь по моей заявке.</span></label>
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <input type="hidden" name="lang" value="ru">
+      <input type="hidden" name="source" value="popup">
+      <div class="form-actions">
+        <button class="btn btn-light" type="submit" data-sending="Отправляем…">Отправить заявку <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <a class="link-btn link-light" href="https://wa.me/34652692097" target="_blank" rel="noopener" data-track="whatsapp"><svg class="ico ico-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg> WhatsApp</a>
+      </div>
+      <p class="form-error" role="alert" hidden>Не удалось отправить. Напишите нам в WhatsApp или позвоните.</p>
+      <div class="form-ok" hidden>
+        <h3>Получили</h3>
+        <p>Скоро свяжемся. Если есть фото или чертежи — пришлите их в WhatsApp.</p>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="../../assets/js/config.js"></script>
 <script src="../../assets/vendor/gsap.min.js" defer></script>
 <script src="../../assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="../../assets/vendor/lenis.min.js" defer></script>
 <script src="../../assets/js/landing.js" defer></script>
 <script src="../../assets/js/gallery.js" defer></script>
+<script src="../../assets/js/lead.js" defer></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 /* Шаблон посадкової сторінки під пошуковий запит.
    Окремий від головної (src/template.mjs): свої стилі (landing.css) і скрипт (landing.js). */
 import { SITE, PRICES } from './data.mjs';
+import { renderLeadModal } from './lead-modal.mjs';
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const pad = (n) => String(n).padStart(2, '0');
@@ -94,7 +95,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
     <a href="#contacto">${esc(t.nav.contact)}</a>
   </nav>
   <div class="header-right">
-    <a href="#contacto" class="btn btn-dark btn-sm" data-magnetic>${esc(t.nav.cta)}</a>
+    <a href="#contacto" class="btn btn-dark btn-sm" data-magnetic data-lead>${esc(t.nav.cta)}</a>
     <button class="burger" id="burger" aria-label="${esc(t.a11y.menu)}" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </div>
 </header>
@@ -121,7 +122,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
       <p class="lead">${esc(p.sub)}</p>
       <p class="lp-price">${esc(t.price(price))}</p>
       <div class="lp-actions">
-        <a href="#contacto" class="btn btn-dark" data-magnetic data-track="lp_cta">${esc(c.cta)} ${ARROW}</a>
+        <a href="#contacto" class="btn btn-dark" data-magnetic data-track="lp_cta" data-lead>${esc(c.cta)} ${ARROW}</a>
         <a href="${SITE.whatsapp}" class="btn btn-ghost" target="_blank" rel="noopener" data-track="whatsapp">${WA} ${esc(c.whatsapp)}</a>
       </div>
     </div>
@@ -204,7 +205,7 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
     <p class="label">${esc(c.contact.label)}</p>
     <h2 class="contact-title" data-lines>${lines(c.contact.h2)}</h2>
     <div class="contact-grid">
-      <form class="form" id="leadForm" novalidate>
+      <form class="form" id="leadForm" data-lead-form novalidate>
         <p class="lead">${esc(c.contact.intro)}</p>
         <div class="field-row">
           <label class="field"><span>${esc(t.contact.form.name)}</span><input id="f-name" name="name" autocomplete="name" required></label>
@@ -252,12 +253,14 @@ ${(alts.length ? alts : [L]).map((a) => `<link rel="alternate" hreflang="${a.hre
     </div>
   </div>
 </footer>
+${renderLeadModal({ t, lang: L.code, title: c.contact.h2, intro: c.contact.intro, product: p.chip, landing: p.slug })}
 
 <script src="${base}assets/js/config.js"></script>
 <script src="${base}assets/vendor/gsap.min.js" defer></script>
 <script src="${base}assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="${base}assets/vendor/lenis.min.js" defer></script>
 <script src="${base}assets/js/landing.js" defer></script>
+<script src="${base}assets/js/lead.js" defer></script>
 </body>
 </html>
 `;

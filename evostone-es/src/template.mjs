@@ -1,5 +1,6 @@
 /* HTML-шаблон лендингу. Один шаблон на всі мови: тексти приходять із content/<мова>.mjs. */
 import { SITE, LANGS, PRICES, PRODUCTS, MATERIALS, SERIES, SINKS, PROCESS_IMG, PROJECT_IMG } from './data.mjs';
+import { renderLeadModal } from './lead-modal.mjs';
 
 /* Посадкові сторінки (поки тільки ES), прив'язані до продуктів головної */
 const PRODUCT_LANDINGS = {
@@ -120,7 +121,7 @@ ${alternates}
   </nav>
   <div class="header-right">
     <nav class="lang" aria-label="${esc(t.a11y.lang)}">${langSwitch}</nav>
-    <a href="#contacto" class="btn btn-dark btn-sm" data-magnetic>${esc(t.nav.cta)}</a>
+    <a href="#contacto" class="btn btn-dark btn-sm" data-magnetic data-lead>${esc(t.nav.cta)}</a>
     <button class="burger" id="burger" aria-label="${esc(t.a11y.menu)}" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </div>
 </header>
@@ -149,7 +150,7 @@ ${alternates}
     <div class="hero-bottom" data-hero-fade>
       <p class="hero-sub">${esc(t.hero.sub)}</p>
       <div class="hero-actions">
-        <a href="#contacto" class="btn btn-light" data-magnetic data-track="hero_cta">${esc(t.hero.cta)} ${ARROW}</a>
+        <a href="#contacto" class="btn btn-light" data-magnetic data-track="hero_cta" data-lead>${esc(t.hero.cta)} ${ARROW}</a>
         <a href="${SITE.whatsapp}" class="btn btn-outline-light" target="_blank" rel="noopener" data-track="whatsapp">${WA} ${esc(t.hero.whatsapp)}</a>
       </div>
     </div>
@@ -204,7 +205,7 @@ ${alternates}
       <article class="panel panel-end">
         <h3>${esc(t.products.end.title)}</h3>
         <p>${esc(t.products.end.text)}</p>
-        <a href="#contacto" class="btn btn-dark" data-magnetic data-chip="other">${esc(t.products.end.cta)} ${ARROW}</a>
+        <a href="#contacto" class="btn btn-dark" data-magnetic data-lead="other">${esc(t.products.end.cta)} ${ARROW}</a>
       </article>
     </div>
     <div class="wrap products-foot">
@@ -334,7 +335,7 @@ ${alternates}
     <ul class="rows">
       ${t.pros.rows.map((r, i) => `<li data-reveal><span class="row-num">${pad(i + 1)}</span><h3>${esc(r.t)}</h3><p>${esc(r.d)}</p>${ARROW}</li>`).join('\n      ')}
     </ul>
-    <a href="#contacto" class="btn btn-light" data-magnetic data-chip="pro">${esc(t.pros.cta)} ${ARROW}</a>
+    <a href="#contacto" class="btn btn-light" data-magnetic data-lead="pro">${esc(t.pros.cta)} ${ARROW}</a>
   </div>
 </section>`;
 
@@ -364,7 +365,7 @@ ${alternates}
     <p class="label"><span class="num">09</span>${esc(t.contact.label)}</p>
     <h2 class="contact-title" data-lines>${lines(t.contact.h2)}</h2>
     <div class="contact-grid">
-      <form class="form" id="leadForm" novalidate>
+      <form class="form" id="leadForm" data-lead-form novalidate>
         <p class="lead">${esc(t.contact.intro)}</p>
         <div class="field-row">
           <label class="field"><span>${esc(f.name)}</span><input name="name" autocomplete="name" required></label>
@@ -440,7 +441,7 @@ ${alternates}
       </div>` : ''}
       <div class="drawer-foot">
         <span class="price">${esc(t.price(PRICES[p.id]))}</span>
-        <a href="#contacto" class="btn btn-dark" data-chip="${p.id}" data-close>${esc(t.products.quote)} ${ARROW}</a>
+        <a href="#contacto" class="btn btn-dark" data-lead="${p.id}" data-close>${esc(t.products.quote)} ${ARROW}</a>
       </div>
     </article>`;
   }).join('');
@@ -460,7 +461,7 @@ ${alternates}
       </ul>
       <div class="drawer-foot">
         <span class="price">${esc(t.price(PRICES.bath))}</span>
-        <a href="#contacto" class="btn btn-dark" data-chip="bath" data-close>${esc(t.drawer.quote)} ${ARROW}</a>
+        <a href="#contacto" class="btn btn-dark" data-lead="bath" data-close>${esc(t.drawer.quote)} ${ARROW}</a>
       </div>
     </article>`).join('');
 
@@ -479,7 +480,8 @@ ${alternates}
 <script src="${base}assets/vendor/gsap.min.js" defer></script>
 <script src="${base}assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="${base}assets/vendor/lenis.min.js" defer></script>
-<script src="${base}assets/js/main.js" defer></script>`;
+<script src="${base}assets/js/main.js" defer></script>
+<script src="${base}assets/js/lead.js" defer></script>`;
 
   return `${head}
 <body>
@@ -498,6 +500,7 @@ ${contact}
 </main>
 ${footer}
 ${drawer}
+${renderLeadModal({ t, lang, title: t.contact.h2, intro: t.contact.intro, chips })}
 ${scripts}
 </body>
 </html>

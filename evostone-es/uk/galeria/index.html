@@ -39,7 +39,7 @@
     <a href="../../uk/#contacto">Контакти</a>
   </nav>
   <div class="header-right">
-    <a href="../../uk/#contacto" class="btn btn-dark btn-sm" data-magnetic>Розрахунок</a>
+    <a href="../../uk/#contacto" class="btn btn-dark btn-sm" data-magnetic data-lead>Розрахунок</a>
     <button class="burger" id="burger" aria-label="Меню" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </div>
 </header>
@@ -671,7 +671,7 @@
       <li><a href="../../uk/escaleras-de-marmol/"><span class="lp-rel-name">Сходи з мармуру</span><span class="lp-rel-sub">Цільні сходинки, викроєні точно під розмір, з протиковзким покриттям та вбудованим підсвічуванням.</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
       <li><a href="../../uk/chimeneas-de-marmol/"><span class="lp-rel-name">Каміни з мармуру</span><span class="lp-rel-sub">Різьблені портали та сучасне облицювання з натурального каменю або керамограніту.</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
     </ul>
-    <a class="btn btn-light" href="../../uk/#contacto" data-magnetic>Розрахувати вартість <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <a class="btn btn-light" href="../../uk/#contacto" data-magnetic data-lead>Розрахувати вартість <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
   </div>
 </section>
 </main>
@@ -698,11 +698,54 @@
   </div>
 </footer>
 
+<div class="lead-modal" id="leadModal" aria-hidden="true">
+  <div class="lead-modal-overlay" data-lead-close></div>
+  <div class="lead-modal-panel" role="dialog" aria-modal="true" aria-labelledby="leadModalTitle" tabindex="-1" data-lenis-prevent>
+    <button class="lead-modal-close" type="button" data-lead-close aria-label="Закрити"><span></span><span></span></button>
+    <h2 class="lead-modal-title" id="leadModalTitle">Отримайте<br>розрахунок вартості</h2>
+    <form class="form" id="leadModalForm" data-lead-form novalidate>
+      <p class="lead">Надішліть нам приблизні розміри або фото. Ми надамо орієнтовну вартість протягом 24 годин.</p>
+      <div class="field-row">
+        <label class="field"><span>Ім’я</span><input name="name" autocomplete="name" required></label>
+        <label class="field"><span>Телефон або WhatsApp</span><input name="phone" type="tel" autocomplete="tel" inputmode="tel" required></label>
+      </div>
+      <fieldset class="chips">
+        <legend>Що вам потрібно?</legend>
+        <label class="chip"><input type="checkbox" name="product" value="kitchen"><span>Кухонні стільниці</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="bath"><span>Ванна: стільниці та умивальники</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="cladding"><span>Облицювання великим форматом</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="stairs"><span>Сходи</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="furniture"><span>Меблі з каменю</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="sculpture"><span>Скульптури та унікальні вироби</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="cutting"><span>Порізка на замовлення</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="waterjet"><span>Гідроабразивне різання</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="pro"><span>Партнер</span></label>
+        <label class="chip"><input type="checkbox" name="product" value="other"><span>Інше</span></label>
+      </fieldset>
+      <label class="field"><span>Розміри або коментар</span><textarea name="comment" rows="2" placeholder="Наприклад: кутова стільниця 3,2 + 1,8 м, білий кварц"></textarea></label>
+      <label class="consent"><input type="checkbox" name="consent" required><span>Приймаю політику конфіденційності та погоджуюся на зв’язок за моєю заявкою.</span></label>
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <input type="hidden" name="lang" value="uk">
+      <input type="hidden" name="source" value="popup">
+      <div class="form-actions">
+        <button class="btn btn-light" type="submit" data-sending="Надсилаємо…">Надіслати заявку <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <a class="link-btn link-light" href="https://wa.me/34652692097" target="_blank" rel="noopener" data-track="whatsapp"><svg class="ico ico-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg> WhatsApp</a>
+      </div>
+      <p class="form-error" role="alert" hidden>Не вдалося надіслати. Напишіть нам у WhatsApp або зателефонуйте.</p>
+      <div class="form-ok" hidden>
+        <h3>Отримали</h3>
+        <p>Скоро зв’яжемося. Якщо є фото або креслення — надішліть їх у WhatsApp.</p>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="../../assets/js/config.js"></script>
 <script src="../../assets/vendor/gsap.min.js" defer></script>
 <script src="../../assets/vendor/ScrollTrigger.min.js" defer></script>
 <script src="../../assets/vendor/lenis.min.js" defer></script>
 <script src="../../assets/js/landing.js" defer></script>
 <script src="../../assets/js/gallery.js" defer></script>
+<script src="../../assets/js/lead.js" defer></script>
 </body>
 </html>

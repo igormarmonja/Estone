@@ -149,59 +149,8 @@
     });
   });
 
-  /* ── Форма ─────────────────────────────────────────────── */
-  const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
-  let utm = {};
-  try { utm = JSON.parse(sessionStorage.getItem('es_utm') || '{}'); } catch (_) {}
-  const q = new URLSearchParams(location.search);
-  UTM.forEach((k) => { if (q.get(k)) utm[k] = q.get(k); });
-  try { sessionStorage.setItem('es_utm', JSON.stringify(utm)); } catch (_) {}
-
-  const form = $('#leadForm');
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const f = form.elements;
-      let ok = true;
-      [[f.name, f.name.value.trim().length > 1], [f.phone, f.phone.value.replace(/\D/g, '').length >= 7]].forEach(([el, valid]) => {
-        el.closest('.field').classList.toggle('is-invalid', !valid);
-        if (!valid) ok = false;
-      });
-      f.consent.closest('.consent').classList.toggle('is-invalid', !f.consent.checked);
-      if (!f.consent.checked) ok = false;
-      if (!ok) { (form.querySelector('.is-invalid input') || f.consent).focus(); return; }
-
-      const btn = form.querySelector('[type=submit]');
-      const label = btn.innerHTML;
-      btn.disabled = true;
-      btn.textContent = btn.dataset.sending;
-      $('.form-error', form).hidden = true;
-      const data = Object.assign({
-        name: f.name.value.trim(),
-        phone: f.phone.value.trim(),
-        products: [f.product.value],
-        landing: f.landing.value,
-        comment: f.comment.value.trim(),
-        lang: f.lang.value,
-        page: location.href,
-        ts: new Date().toISOString(),
-      }, utm);
-      try {
-        if (form.elements.botcheck && form.elements.botcheck.checked) { $('.form-ok', form).hidden = false; return; }
-        await window.sendLead(data);
-        track('lead_submit', { products: data.products.join(',') });
-        $('.form-ok', form).hidden = false;
-      } catch (err) {
-        $('.form-error', form).hidden = false;
-        btn.disabled = false;
-        btn.innerHTML = label;
-      }
-    });
-    $$('input', form).forEach((i) => i.addEventListener('input', () => {
-      const w = i.closest('.field, .consent');
-      if (w) w.classList.remove('is-invalid');
-    }));
-  }
+  /* Форми й попап заявки — assets/js/lead.js */
+  window.__ui = { track, lenis, toggleMenu };
 
   /* ── Курсор і магнітні кнопки ──────────────────────────── */
   if (finePointer && hasGsap && !reduce) {

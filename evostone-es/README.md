@@ -21,7 +21,9 @@
    ```
    Команда перезаписує `index.html`, `en/index.html`, `ru/index.html`, `sitemap.xml`, `robots.txt`. Руками ці файли не правимо.
 
-Без перезбирання: `assets/js/config.js` (куди відправляти заявки, аналітика), `assets/css/style.css`, `assets/js/main.js`.
+Без перезбирання: `assets/js/config.js` (куди відправляти заявки, аналітика), `assets/css/style.css`, `assets/js/main.js`, `assets/js/lead.js`.
+
+**Заявки.** Кнопки з атрибутом `data-lead` (у шапці, на першому екрані, «Pedir presupuesto» у картках, у галереї) відкривають попап із формою. Значення атрибута, наприклад `data-lead="kitchen"`, одразу відмічає продукт. Розмітка попапу — `src/lead-modal.mjs`, логіка попапу й відправки всіх форм — `assets/js/lead.js`, стилі — блок «Попап заявки» в кінці `style.css`. Без JS кнопки ведуть до форми внизу сторінки. Посилання з `#solicitud` у кінці адреси відкриває попап одразу (зручно для реклами). Заявки з попапу мають поле `source: popup`.
 
 Переглянути локально: `python3 -m http.server` у цій папці, потім http://localhost:8000.
 

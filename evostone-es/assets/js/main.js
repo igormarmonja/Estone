@@ -199,14 +199,6 @@
     else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
   });
 
-  /* Кнопки «Presupuesto para esto» відмічають продукт у формі */
-  document.addEventListener('click', (e) => {
-    const el = e.target.closest('[data-chip]');
-    if (!el) return;
-    const box = $(`.chips input[value="${el.dataset.chip}"]`);
-    if (box) box.checked = true;
-  });
-
   /* ── Колекція раковин ──────────────────────────────────── */
   const tabs = $$('.series-tab');
   function setSeries(id) {
@@ -253,62 +245,8 @@
   });
   function refresh() { if (hasGsap) ST.refresh(); if (lenis) lenis.resize(); }
 
-  /* ── Форма ─────────────────────────────────────────────── */
-  const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'fbclid'];
-  let utm = {};
-  try { utm = JSON.parse(sessionStorage.getItem('es_utm') || '{}'); } catch (_) {}
-  const q = new URLSearchParams(location.search);
-  UTM.forEach((k) => { if (q.get(k)) utm[k] = q.get(k); });
-  try { sessionStorage.setItem('es_utm', JSON.stringify(utm)); } catch (_) {}
-
-  const form = $('#leadForm');
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = form.elements.name;
-      const phone = form.elements.phone;
-      const consent = form.elements.consent;
-      let ok = true;
-      [[name, name.value.trim().length > 1], [phone, phone.value.replace(/\D/g, '').length >= 7]].forEach(([el, valid]) => {
-        el.closest('.field').classList.toggle('is-invalid', !valid);
-        if (!valid) ok = false;
-      });
-      consent.closest('.consent').classList.toggle('is-invalid', !consent.checked);
-      if (!consent.checked) ok = false;
-      if (!ok) { (form.querySelector('.is-invalid input') || consent).focus(); return; }
-
-      const btn = form.querySelector('[type=submit]');
-      const label = btn.innerHTML;
-      btn.disabled = true;
-      btn.textContent = btn.dataset.sending;
-      $('.form-error', form).hidden = true;
-
-      const data = Object.assign({
-        name: name.value.trim(),
-        phone: phone.value.trim(),
-        products: $$('input[name=product]:checked', form).map((i) => i.value),
-        comment: form.elements.comment.value.trim(),
-        lang: form.elements.lang.value,
-        page: location.href,
-        ts: new Date().toISOString(),
-      }, utm);
-
-      try {
-        if (form.elements.botcheck && form.elements.botcheck.checked) { $('.form-ok', form).hidden = false; return; }
-        await window.sendLead(data);
-        track('lead_submit', { products: data.products.join(','), lang: data.lang });
-        $('.form-ok', form).hidden = false;
-      } catch (err) {
-        $('.form-error', form).hidden = false;
-        btn.disabled = false;
-        btn.innerHTML = label;
-      }
-    });
-    $$('input', form).forEach((i) => i.addEventListener('input', () => {
-      const f = i.closest('.field, .consent');
-      if (f) f.classList.remove('is-invalid');
-    }));
-  }
+  /* Форми й попап заявки — assets/js/lead.js */
+  window.__ui = { track, lenis, closeDrawer, toggleMenu };
 
   /* ── Курсор і магнітні кнопки (тільки миша) ────────────── */
   if (finePointer && hasGsap && !reduce) {
