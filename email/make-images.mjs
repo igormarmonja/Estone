@@ -30,6 +30,7 @@ const JOBS = [
     ['p-alaior-beige.jpg', 'ka-01.jpg', 252, 290, 'center 70%'],
     ['p-marble.jpg', 'le-06.jpg', 520, 360, 'center 65%'],
     ['p-viola.jpg', 'le-02.jpg', 600, 340, 'center 72%'],
+    ['p-sand.jpg', 'drain-black.jpg', 600, 340, 'center 30%'],
     ['p-tops.jpg', 'sa-03.jpg', 163, 210, 'center'],
     ['p-sinks.jpg', 'ka-05.jpg', 163, 210, 'center'],
     ['p-furniture.jpg', 'ka-08.jpg', 163, 210, 'center'],
@@ -37,6 +38,12 @@ const JOBS = [
     ['p-cat-2.jpg', 'mo-02.jpg', 163, 163, 'center 60%'],
     ['p-cat-3.jpg', 'le-04.jpg', 163, 163, 'center 70%'],
   ].map(([file, src, w, h, pos]) => ({ file, w, h, html: `<div style="position:absolute;inset:0;background:url(${dataUrl(src)}) ${pos}/cover"></div>` })),
+  // Заглушки під фото, яких ще немає: щоб замінити, покласти фото з цим іменем у email/img/
+  ...[['p-why.jpg', 520, 300], ['p-slot-1.jpg', 252, 290], ['p-slot-2.jpg', 252, 290], ['p-slot-3.jpg', 252, 290], ['p-slot-4.jpg', 252, 290]]
+    .map(([file, w, h]) => ({ file, w, h, html: `<div style="position:absolute;inset:0;background:#D9C3B0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-family:'Fixel Display',sans-serif;color:#8A4F2A;line-height:1">
+      <div style="position:absolute;inset:10px;border:1px dashed rgba(138,79,42,.45);border-radius:6px"></div>
+      <div style="font-size:22px;letter-spacing:.2em">ФОТО</div>
+      <div style="font-family:'Fixel Text',sans-serif;font-size:12px;letter-spacing:.06em;color:#7a5e4d">${file}</div></div>` })),
   { file: 'logo-light.png', w: 22, h: 22, png: true, html: `<svg viewBox="0 0 295 300" width="22" height="22" fill="#F5EDE3">${LOGO}</svg>` },
   { file: 'wa-light.png', w: 16, h: 16, png: true, html: `<svg viewBox="0 0 24 24" width="16" height="16" fill="#F5EDE3"><path d="${WA}"/></svg>` },
   { file: 'wa-dark.png', w: 16, h: 16, png: true, html: `<svg viewBox="0 0 24 24" width="16" height="16" fill="#594133"><path d="${WA}"/></svg>` },
