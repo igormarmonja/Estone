@@ -343,23 +343,30 @@
     });
   }
 
-  /* ── Карусель робіт ─────────────────────────────────────── */
+  /* ── Карусель робіт і галерея ───────────────────────────── */
   const worksViewport = document.getElementById('worksTrack');
   const works = window.WORKS || [];
+  let gallery = null;
+  let galleryIndex = 0;
+
   if (worksViewport && works.length) {
     const line = worksViewport.querySelector('.works-line');
-    const slide = (w) => `
-      <figure class="works-item">
+    const slide = (w, i) => `
+      <button class="works-item" type="button" data-gallery="${i}" aria-label="${w.title}">
         <img src="${imgBase}${w.img}" alt="${w.title} — робота ESTONE" loading="lazy">
-        <figcaption class="works-caption">
+        <span class="works-caption">
           <span class="works-title">${w.title}</span>
           <span class="works-meta">${w.meta}</span>
-        </figcaption>
-      </figure>`;
+        </span>
+      </button>`;
     /* двічі — щоб стрічка зациклювалась без стрибка */
     line.innerHTML = works.map(slide).join('') + works.map(slide).join('');
 
-    const step = () => worksViewport.clientWidth * 0.6;
+    /* крок прокрутки — одна картка, а не півекрана */
+    const step = () => {
+      const card = line.querySelector('.works-item');
+      return card ? card.offsetWidth + 12 : 300;
+    };
     document.querySelectorAll('[data-works]').forEach(btn => {
       btn.addEventListener('click', () => {
         const dir = btn.dataset.works === 'next' ? 1 : -1;
@@ -373,6 +380,119 @@
       if (worksViewport.scrollLeft >= half) worksViewport.scrollLeft -= half;
       else if (worksViewport.scrollLeft <= 0) worksViewport.scrollLeft += half;
     }, { passive: true });
+
+    /* тягнути мишею, як на телефоні */
+    let dragging = false, startX = 0, startLeft = 0, moved = 0;
+    worksViewport.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'touch') return;
+      dragging = true; moved = 0;
+      startX = e.clientX; startLeft = worksViewport.scrollLeft;
+      worksViewport.classList.add('is-dragging');
+    });
+    window.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const d = e.clientX - startX;
+      moved = Math.max(moved, Math.abs(d));
+      worksViewport.scrollLeft = startLeft - d;
+    });
+    window.addEventListener('pointerup', () => {
+      if (!dragging) return;
+      dragging = false;
+      worksViewport.classList.remove('is-dragging');
+    });
+
+    line.addEventListener('click', e => {
+      const item = e.target.closest('[data-gallery]');
+      if (!item || moved > 6) return;         /* не відкриваємо після перетягування */
+      openGallery(Number(item.dataset.gallery) % works.length);
+    });
+  }
+
+  /* ── Галерея на весь екран ──────────────────────────────── */
+  function buildGallery() {
+    if (gallery) return gallery;
+    gallery = document.createElement('div');
+    gallery.className = 'gallery';
+    gallery.setAttribute('role', 'dialog');
+    gallery.setAttribute('aria-modal', 'true');
+    gallery.innerHTML = `
+      <button class="gallery-close" type="button" aria-label="Закрити">&times;</button>
+      <button class="gallery-nav gallery-prev" type="button" aria-label="Попереднє">←</button>
+      <button class="gallery-nav gallery-next" type="button" aria-label="Наступне">→</button>
+      <figure class="gallery-stage">
+        <img alt="">
+        <figcaption>
+          <span class="gallery-title"></span>
+          <span class="gallery-meta"></span>
+        </figcaption>
+      </figure>
+      <div class="gallery-counter"></div>
+      <div class="gallery-thumbs"></div>`;
+    document.body.appendChild(gallery);
+
+    gallery.querySelector('.gallery-close').addEventListener('click', closeGallery);
+    gallery.querySelector('.gallery-prev').addEventListener('click', () => stepGallery(-1));
+    gallery.querySelector('.gallery-next').addEventListener('click', () => stepGallery(1));
+    gallery.addEventListener('click', e => {
+      if (e.target === gallery || e.target.classList.contains('gallery-stage')) closeGallery();
+    });
+    gallery.querySelector('.gallery-thumbs').addEventListener('click', e => {
+      const t = e.target.closest('[data-thumb]');
+      if (t) showGallery(Number(t.dataset.thumb));
+    });
+    window.addEventListener('keydown', e => {
+      if (!gallery.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closeGallery();
+      if (e.key === 'ArrowRight') stepGallery(1);
+      if (e.key === 'ArrowLeft') stepGallery(-1);
+    });
+
+    /* свайп на телефоні */
+    let x0 = null;
+    gallery.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+    gallery.addEventListener('touchend', e => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 50) stepGallery(dx < 0 ? 1 : -1);
+      x0 = null;
+    }, { passive: true });
+
+    gallery.querySelector('.gallery-thumbs').innerHTML = works.map((w, i) =>
+      `<button class="gallery-thumb" type="button" data-thumb="${i}" aria-label="${w.title}">
+         <img src="${imgBase}${w.img}" alt="" loading="lazy">
+       </button>`).join('');
+    return gallery;
+  }
+
+  function showGallery(i) {
+    const el = buildGallery();
+    galleryIndex = (i + works.length) % works.length;
+    const w = works[galleryIndex];
+    const img = el.querySelector('.gallery-stage img');
+    img.src = imgBase + w.img;
+    img.alt = w.title + ' — робота ESTONE';
+    el.querySelector('.gallery-title').textContent = w.title;
+    el.querySelector('.gallery-meta').textContent = w.meta || '';
+    el.querySelector('.gallery-counter').textContent = (galleryIndex + 1) + ' / ' + works.length;
+    el.querySelectorAll('[data-thumb]').forEach(t => {
+      t.classList.toggle('is-active', Number(t.dataset.thumb) === galleryIndex);
+    });
+    const active = el.querySelector('[data-thumb].is-active');
+    if (active) active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }
+
+  function openGallery(i) {
+    const el = buildGallery();
+    showGallery(i);
+    el.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    track('gallery_open', { index: i });
+  }
+  function stepGallery(d) { showGallery(galleryIndex + d); }
+  function closeGallery() {
+    if (!gallery) return;
+    gallery.classList.remove('is-open');
+    document.body.style.overflow = '';
   }
 
   /* ── Попап із формою ────────────────────────────────────── */

@@ -169,6 +169,19 @@
     </image:image>
   </url>
   <url>
+    <loc>https://estone.com.ua/obiekty/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/vyrobnytstvo-01.jpg</image:loc>
+      <image:title>Виріб з каменю в цеху ESTONE</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://estone.com.ua/assets/img/ka-06.jpg</image:loc>
+      <image:title>Ванна кімната — вироби з каменю</image:title>
+    </image:image>
+  </url>
+  <url>
     <loc>https://estone.com.ua/partneram/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
