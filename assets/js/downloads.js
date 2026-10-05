@@ -13,7 +13,14 @@ window.DOWNLOADS = [
     title: 'Умивальники ESTONE Bath 2026',
     file:  'files/estone-bath-2026.pdf',
     desc:  '23 моделі в чотирьох серіях: Leonardo, Monet, Kazimir, Salvador. Форми, матеріали, типи зливу.',
-    meta:  'PDF',
+    meta:  'PDF · 5 МБ',
+  },
+  {
+    group: 'Каталоги',
+    title: 'Лукбук ESTONE',
+    file:  'files/estone-lookbook.pdf',
+    desc:  'Портфоліо реалізованих обʼєктів: кухні, ванні, ресепшн-стійки, сходи. 20 сторінок з фото й описами.',
+    meta:  'PDF · 24 МБ',
   },
   {
     group: 'Презентації',

@@ -727,6 +727,89 @@
     });
   }
 
+
+  /* ── Каталог декорів ────────────────────────────────────── */
+  const decorGrid = document.getElementById('decorGrid');
+  if (decorGrid && window.DECORS) {
+    const all = window.DECORS;
+    const hex = window.DECOR_COLORS || {};
+    let fBrand = 'Усі', fColor = 'Усі', query = '';
+
+    const brands = ['Усі', ...new Set(all.map(d => d.brand))];
+    const colors = ['Усі', ...new Set(all.map(d => d.color))];
+
+    const chips = document.getElementById('decorFilters');
+    if (chips) {
+      chips.innerHTML = `
+        <div class="decor-row">
+          <span class="decor-row-label">Бренд</span>
+          <div class="decor-chips">${brands.map(b =>
+            `<button class="filter-tab${b === 'Усі' ? ' is-active' : ''}" data-brand="${b}">${b}</button>`).join('')}</div>
+        </div>
+        <div class="decor-row">
+          <span class="decor-row-label">Колір</span>
+          <div class="decor-chips">${colors.map(c =>
+            `<button class="filter-tab${c === 'Усі' ? ' is-active' : ''}" data-color="${c}">
+               ${c === 'Усі' ? '' : `<span class="color-dot" style="background:${hex[c] || '#ccc'}"></span>`}${c}
+             </button>`).join('')}</div>
+        </div>
+        <input class="decor-search" id="decorSearch" type="search" placeholder="Пошук за назвою…">`;
+
+      chips.addEventListener('click', e => {
+        const b = e.target.closest('[data-brand]');
+        const c = e.target.closest('[data-color]');
+        if (b) {
+          fBrand = b.dataset.brand;
+          chips.querySelectorAll('[data-brand]').forEach(x => x.classList.toggle('is-active', x === b));
+        }
+        if (c) {
+          fColor = c.dataset.color;
+          chips.querySelectorAll('[data-color]').forEach(x => x.classList.toggle('is-active', x === c));
+        }
+        if (b || c) { render(); track('decor_filter', { brand: fBrand, color: fColor }); }
+      });
+      chips.querySelector('#decorSearch').addEventListener('input', e => {
+        query = e.target.value.trim().toLowerCase();
+        render();
+      });
+    }
+
+    const counter = document.getElementById('decorCount');
+
+    function render() {
+      const list = all.filter(d =>
+        (fBrand === 'Усі' || d.brand === fBrand) &&
+        (fColor === 'Усі' || d.color === fColor) &&
+        (!query || d.name.toLowerCase().includes(query) || d.color.toLowerCase().includes(query)));
+
+      if (counter) {
+        counter.textContent = list.length
+          ? `${list.length} ${list.length % 10 === 1 && list.length % 100 !== 11 ? 'декор' : (list.length % 10 >= 2 && list.length % 10 <= 4 && (list.length % 100 < 10 || list.length % 100 >= 20) ? 'декори' : 'декорів')}`
+          : 'нічого не знайшли';
+      }
+
+      decorGrid.innerHTML = list.map(d => `
+        <article class="decor-card">
+          <div class="decor-photo">
+            <img src="${d.img}" alt="${d.name} — ${d.brand}, декор ${d.color.toLowerCase()}"
+                 loading="lazy" referrerpolicy="no-referrer"
+                 onerror="this.closest('.decor-photo').classList.add('no-photo');this.remove();">
+            <span class="decor-brand">${d.brand}</span>
+          </div>
+          <div class="decor-body">
+            <h3>${d.name}</h3>
+            <p class="decor-color"><span class="color-dot" style="background:${hex[d.color] || '#ccc'}"></span>${d.color}</p>
+            <div class="decor-foot">
+              <span class="decor-price">${d.price !== null ? String(d.price).replace('.', ',') + ' €/м²' : 'уточнити'}</span>
+              <span class="decor-thick">${d.thick || ''}</span>
+            </div>
+            <p class="decor-note">${d.note || ''}</p>
+          </div>
+        </article>`).join('');
+    }
+    render();
+  }
+
   /* ── Рік у підвалі ──────────────────────────────────────── */
   const year = document.getElementById('year');
   if (year) year.textContent = new Date().getFullYear();
