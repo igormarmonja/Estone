@@ -708,3 +708,44 @@ section h2{
 @media (max-width:620px){
   .works-item{width:240px;height:180px;}
 }
+
+/* Короткий попап і месенджери у вікні */
+.lead-form [hidden]{display:none !important;}
+.popup-contacts{flex-direction:column;align-items:stretch;gap:10px;}
+.popup-or{
+  margin:0;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);
+}
+.popup-contacts .messengers{margin:0;flex-wrap:wrap;}
+.popup-contacts .messenger{flex:1 1 auto;text-align:center;font-weight:500;}
+.messenger-telegram:hover{background:#dff0fb;border-color:#9fd4f0;color:#1b6f99;}
+.messenger-viber:hover{background:#eee3f7;border-color:#c6a9e4;color:#5b2a86;}
+.messenger-whatsapp:hover{background:#e3f6e6;border-color:#a8dcb0;color:#1f7a35;}
+.popup-phone{font-size:19px;font-weight:600;color:var(--text);text-align:center;margin-top:2px;}
+.popup-phone:hover{color:var(--brand);}
+.popup-compact .popup-sub{margin-bottom:18px;}
+
+/* Соцмережі */
+.socials{display:flex;flex-wrap:wrap;gap:10px;}
+.social{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:11px 20px;border-radius:var(--r-pill);
+  border:1px solid var(--line);background:var(--card);color:var(--text);
+  font-size:14px;font-weight:500;
+  transition:transform .3s var(--ease),background .3s var(--ease),border-color .3s var(--ease),color .3s var(--ease);
+}
+.social:hover{transform:translateY(-2px);background:var(--brand);border-color:var(--brand);color:var(--paper);}
+.socials-light .social{background:rgba(245,237,227,.08);border-color:rgba(245,237,227,.2);color:var(--paper);}
+.socials-light .social:hover{background:var(--paper);color:var(--dark);border-color:var(--paper);}
+
+/* Блок підписки на соцмережі */
+.social-cta{background:var(--dark);padding:60px 0;}
+.social-inner{display:grid;grid-template-columns:1.4fr .6fr;gap:40px;align-items:center;}
+.social-cta h2{color:var(--paper);margin-bottom:12px;}
+.social-cta p{color:rgba(245,237,227,.68);max-width:600px;}
+.social-cta .socials{justify-content:flex-end;}
+.footer-socials{padding-top:26px;}
+@media (max-width:860px){
+  .social-inner{grid-template-columns:1fr;gap:22px;}
+  .social-cta .socials{justify-content:flex-start;}
+}

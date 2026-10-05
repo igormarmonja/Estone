@@ -12,10 +12,16 @@ window.ESTONE_CONFIG = {
   phoneEsDisplay: '+34 652 69 20 97',
   email:          'info@estone.com.ua',
 
-  // ── Месенджери (лишіть порожнім — кнопка сховається) ──────
-  telegram: '',   // https://t.me/estone
-  viber:    '',   // viber://chat?number=%2B380688647107
-  whatsapp: '',   // https://wa.me/380688647107
+  // ── Месенджери ────────────────────────────────────────────
+  // Viber і WhatsApp будуються автоматично з номера phone.
+  // Щоб вимкнути якийсь — впишіть 'off'. Щоб задати свій — вставте посилання.
+  telegram: '',   // ОБОВ'ЯЗКОВО ВПИСАТИ: https://t.me/ваш_логін
+  viber:    '',   // авто з phone
+  whatsapp: '',   // авто з phone
+
+  // ── Соцмережі (порожнє — блок не показується) ─────────────
+  instagram: '',  // ВПИШІТЬ: https://www.instagram.com/ваш_акаунт/
+  facebook:  '',  // https://www.facebook.com/ваша_сторінка
 
   // ── Куди відправляти заявки ───────────────────────────────
   // POST з JSON: {name, phone, size, comment, utm..., page, ts}

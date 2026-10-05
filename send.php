@@ -79,6 +79,7 @@ $phone   = clean($in['phone']   ?? '', 40);
 $product = clean($in['product'] ?? '', 120);
 $size    = clean($in['size']    ?? '', 200);
 $comment = clean($in['comment'] ?? '', 1500, true);
+$model   = clean($in['model']   ?? '', 60);
 $form    = clean($in['form']    ?? '', 60);
 $page    = clean($in['page']    ?? '', 300);
 
@@ -122,9 +123,9 @@ if ($fh = @fopen($CSV_FILE, 'a')) {
     if (flock($fh, LOCK_EX)) {
         if ($isNew) {
             fwrite($fh, "\xEF\xBB\xBF"); // щоб Excel не ламав кирилицю
-            fputcsv($fh, ['Дата','Ім\'я','Телефон','Що цікавить','Розміри','Коментар','Форма','Сторінка','Джерело','IP'], ';');
+            fputcsv($fh, ['Дата','Ім\'я','Телефон','Модель','Що цікавить','Розміри','Коментар','Форма','Сторінка','Джерело','IP'], ';');
         }
-        fputcsv($fh, [$when, $name, $phone, $product, $size, $comment, $form, $page, $source, $ip], ';');
+        fputcsv($fh, [$when, $name, $phone, $model, $product, $size, $comment, $form, $page, $source, $ip], ';');
         flock($fh, LOCK_UN);
     }
     fclose($fh);
@@ -136,6 +137,7 @@ if ($TELEGRAM_TOKEN && $TELEGRAM_CHAT) {
     $lines = ["🔔 <b>Нова заявка з сайту</b>", ''];
     $lines[] = "👤 <b>" . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . "</b>";
     $lines[] = "📞 " . htmlspecialchars($phone, ENT_QUOTES, 'UTF-8');
+    if ($model)   { $lines[] = "🏷 Модель <b>" . htmlspecialchars($model, ENT_QUOTES, 'UTF-8') . "</b>"; }
     if ($product) { $lines[] = "🧱 " . htmlspecialchars($product, ENT_QUOTES, 'UTF-8'); }
     if ($size)    { $lines[] = "📐 " . htmlspecialchars($size, ENT_QUOTES, 'UTF-8'); }
     if ($comment) { $lines[] = "💬 " . htmlspecialchars($comment, ENT_QUOTES, 'UTF-8'); }
@@ -179,6 +181,7 @@ if ($MAIL_ON && $MAIL_TO) {
     $body = "Нова заявка з estone.com.ua\n\n"
           . "Ім'я:         $name\n"
           . "Телефон:      $phone\n"
+          . ($model   ? "Модель:       $model\n"   : '')
           . ($product ? "Цікавить:     $product\n" : '')
           . ($size    ? "Розміри:      $size\n"    : '')
           . ($comment ? "Коментар:     $comment\n" : '')

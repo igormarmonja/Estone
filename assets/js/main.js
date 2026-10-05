@@ -50,16 +50,47 @@
       if (!el.textContent.trim()) el.textContent = CFG.email;
     });
 
+    /* Viber і WhatsApp будуються з номера, якщо не задані вручну */
+    const digits = (CFG.phone || '').replace(/\D/g, '');
+    const auto = {
+      telegram: CFG.telegram,
+      viber:    CFG.viber    || (digits ? 'viber://chat?number=%2B' + digits : ''),
+      whatsapp: CFG.whatsapp || (digits ? 'https://wa.me/' + digits : ''),
+    };
     const list = [
       { key: 'telegram', label: 'Telegram' },
       { key: 'viber',    label: 'Viber' },
       { key: 'whatsapp', label: 'WhatsApp' },
-    ].filter(m => CFG[m.key]);
-    const html = list.map(m =>
-      `<a class="messenger" href="${CFG[m.key]}" target="_blank" rel="noopener" data-messenger="${m.key}">${m.label}</a>`
-    ).join('');
+    ].filter(m => auto[m.key] && auto[m.key] !== 'off');
+
+    /* У WhatsApp і Telegram можна передати готовий текст повідомлення */
+    window.ESTONE_messengerHtml = (text) => list.map(m => {
+      let href = auto[m.key];
+      if (text) {
+        if (m.key === 'whatsapp') href += '?text=' + encodeURIComponent(text);
+        else if (m.key === 'telegram' && /t\.me\//.test(href)) href += '?text=' + encodeURIComponent(text);
+      }
+      return `<a class="messenger messenger-${m.key}" href="${href}" target="_blank" rel="noopener" data-messenger="${m.key}">${m.label}</a>`;
+    }).join('');
+
     /* месенджерів на сторінці може бути кілька блоків */
-    document.querySelectorAll('.messengers').forEach(box => { box.innerHTML = html; });
+    document.querySelectorAll('.messengers').forEach(box => {
+      box.innerHTML = window.ESTONE_messengerHtml(box.dataset.text || '');
+    });
+
+    /* Соцмережі */
+    const socials = [
+      { key: 'instagram', label: 'Instagram' },
+      { key: 'facebook',  label: 'Facebook' },
+    ].filter(x => CFG[x.key]);
+    document.querySelectorAll('[data-socials]').forEach(box => {
+      const block = box.closest('[data-socials-block]') || box;
+      if (!socials.length) { block.hidden = true; return; }
+      box.innerHTML = socials.map(x =>
+        `<a class="social social-${x.key}" href="${CFG[x.key]}" target="_blank" rel="noopener" data-social="${x.key}">${x.label}</a>`
+      ).join('');
+      block.hidden = false;
+    });
   }
   fillContacts();
 
@@ -235,10 +266,17 @@
   /* лайтбокса немає на внутрішніх сторінках — тому все за умовою */
   if (lb) {
     document.getElementById('lightboxClose').addEventListener('click', closeLb);
-    document.getElementById('lightboxCta').addEventListener('click', () => {
-      const field = document.querySelector('.lead-form-main [name="comment"]');
-      if (field && lastModel) field.value = `Цікавить модель ${lastModel}`;
+    document.getElementById('lightboxCta').addEventListener('click', (e) => {
+      e.preventDefault();
+      const code = lastModel;
       closeLb();
+      openPopup({
+        title: code ? `Порахувати модель ${code}` : 'Порахувати модель',
+        sub: 'Залиште телефон — передзвонимо і скажемо ціну саме цієї моделі під ваш розмір.',
+        form: 'popup-model',
+        model: code,
+        compact: true,
+      });
     });
     lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLb(); });
@@ -363,12 +401,14 @@
           </select>
           <input type="text" name="size" placeholder="Розміри або погонні метри">
           <textarea name="comment" rows="2" placeholder="Коментар: матеріал, терміни"></textarea>
+          <input type="hidden" name="model" value="">
           <button type="submit" class="btn btn-primary btn-full">Надіслати</button>
           <p class="form-note">Натискаючи кнопку, ви погоджуєтесь на обробку даних.</p>
         </form>
         <div class="popup-contacts">
-          <a href="#" data-phone-link data-cta="popup-phone"><span data-phone-display></span></a>
-          <div class="messengers"></div>
+          <p class="popup-or">Або напишіть одразу в месенджер</p>
+          <div class="messengers" data-popup-messengers></div>
+          <a href="#" class="popup-phone" data-phone-link data-cta="popup-phone"><span data-phone-display></span></a>
         </div>
       </div>`;
     document.body.appendChild(popup);
@@ -384,14 +424,35 @@
   function openPopup(opts) {
     const el = buildPopup();
     el.querySelector('[data-popup-title]').textContent = opts.title || 'Порахувати вартість';
-    if (opts.sub) el.querySelector('[data-popup-sub]').textContent = opts.sub;
+    el.querySelector('[data-popup-sub]').textContent = opts.sub ||
+      'Напишіть розміри — назвемо ціну з доставкою і монтажем протягом години в робочий час.';
     const form = el.querySelector('form');
     form.dataset.form = opts.form || 'popup';
+    form.querySelector('[name="model"]').value = opts.model || '';
+
+    /* Коротка форма: тільки ім'я і телефон. Решту питати нема про що —
+       модель уже обрана, і зайві поля тільки відлякують. */
+    const compact = !!opts.compact;
+    el.classList.toggle('popup-compact', compact);
+    ['product', 'size', 'comment'].forEach(n => {
+      const f = form.querySelector(`[name="${n}"]`);
+      if (f) f.hidden = compact;
+    });
+
     /* якщо відкрили з розділу — одразу підставляємо напрям */
     const sel = form.querySelector('[data-product-select]');
     if (sel && opts.product) {
       const match = [...sel.options].find(o => o.value === opts.product || o.textContent === opts.product);
       if (match) sel.value = match.value;
+    }
+
+    /* месенджери з готовим текстом під конкретний запит */
+    const box = el.querySelector('[data-popup-messengers]');
+    if (box && window.ESTONE_messengerHtml) {
+      const text = opts.model
+        ? `Добрий день! Цікавить модель ${opts.model} з сайту estone.com.ua`
+        : 'Добрий день! Хочу прорахувати виріб з каменю';
+      box.innerHTML = window.ESTONE_messengerHtml(text);
     }
     el.classList.add('is-open');
     document.body.style.overflow = 'hidden';
