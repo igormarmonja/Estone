@@ -3,6 +3,7 @@
    Посадкові й галерея: ES у корені (/<slug>/, /galeria/), RU і UK у /ru/…, /uk/…
    + sitemap.xml (з hreflang і картинками галереї), robots.txt */
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SITE, LANGS, LANDING_LANGS } from './src/data.mjs';
@@ -11,7 +12,14 @@ import { renderLanding } from './src/landing-template.mjs';
 import { renderGallery } from './src/gallery-template.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const write = (rel, html) => { const out = join(root, rel); mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, html); };
+/* Версія файлу (?v=хеш вмісту) до стилів і скриптів: після кожної зміни браузер бере свіжий файл,
+   а не той, що закешований (у _headers кеш assets довгий). */
+const ver = {};
+const bust = (html) => html.replace(/(assets\/(?:css|js)\/[\w.-]+\.(?:css|js))"/g, (m, f) => {
+  ver[f] ??= createHash('md5').update(readFileSync(join(root, f))).digest('hex').slice(0, 8);
+  return `${f}?v=${ver[f]}"`;
+});
+const write = (rel, html) => { const out = join(root, rel); mkdirSync(dirname(out), { recursive: true }); writeFileSync(out, bust(html)); };
 
 /* Посадкові/галерея кожної мови */
 const LP = {};

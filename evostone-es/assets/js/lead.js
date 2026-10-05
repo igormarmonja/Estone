@@ -117,6 +117,8 @@
   document.addEventListener('click', (e) => {
     const opener = e.target.closest('[data-lead]');
     if (!opener || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    /* Стилі попапу не завантажились (старий кеш, збій мережі) — кнопка працює як звичайне посилання на форму */
+    if (getComputedStyle(modal).position !== 'fixed') return;
     e.preventDefault();
     e.stopPropagation();
     const ui = UI();
