@@ -3,11 +3,34 @@
    Усе інлайн-стилями й таблицями, бо поштові клієнти не знають CSS-змінних. */
 import { C } from './data.mjs';
 
-export const F = {
-  display: "'Jost','Futura','Century Gothic','Trebuchet MS',Arial,sans-serif",
-  text: "'Manrope','Helvetica Neue',Helvetica,Arial,sans-serif",
-  mono: "'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace",
+/* Набори шрифтів. Кожен шаблон на початку викликає useFonts(...):
+   landing — шрифти лендингу evostone.es (Jost / Manrope / IBM Plex Mono, Google Fonts);
+   fixel   — український Fixel від MacPaw (OFL), файли в email/fonts/, підвантажуються з base.
+   Gmail і Outlook веб-шрифтів не підтримують і показують запасні (Helvetica / Arial). */
+const SANS = "'Helvetica Neue',Helvetica,Arial,sans-serif";
+const FONT_SETS = {
+  landing: () => ({
+    display: "'Jost','Futura','Century Gothic','Trebuchet MS',Arial,sans-serif",
+    text: `'Manrope',${SANS}`,
+    mono: "'IBM Plex Mono','SFMono-Regular',Menlo,Consolas,monospace",
+    head: '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Jost:wght@300;400;500&family=Manrope:wght@400;500&display=swap" rel="stylesheet">',
+  }),
+  fixel: (base) => ({
+    display: `'Fixel Display',${SANS}`,
+    text: `'Fixel Text',${SANS}`,
+    mono: `'Fixel Text',${SANS}`, // мітки — тим самим Fixel, великими літерами з розрядкою
+    head: `<style>
+${[['Fixel Display', 300, 'FixelDisplay-Light'], ['Fixel Display', 400, 'FixelDisplay-Regular'], ['Fixel Display', 500, 'FixelDisplay-Medium'],
+   ['Fixel Text', 400, 'FixelText-Regular'], ['Fixel Text', 500, 'FixelText-Medium']]
+  .map(([f, w, file]) => `  @font-face{font-family:'${f}';font-style:normal;font-weight:${w};font-display:swap;src:url('${base}${file}.woff2') format('woff2');}`).join('\n')}
+</style>`,
+  }),
 };
+
+/* Поточні шрифти (об'єкт мутується useFonts, тому імпорт F завжди бачить актуальний набір) */
+export const F = {};
+export const useFonts = (name, base = '') => Object.assign(F, FONT_SETS[name](base));
+useFonts('landing');
 
 /* Кольори розділу за значенням data-bg з лендингу */
 export const THEME = {
@@ -111,7 +134,7 @@ export const doc = ({ lang, title, preheader, top = '', body }) => `<!DOCTYPE ht
 <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
 <style>h1,h2,p,td,a,span{font-family:Arial,sans-serif !important;}</style><![endif]-->
 <!--[if !mso]><!-->
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=Jost:wght@300;400;500&family=Manrope:wght@400;500&display=swap" rel="stylesheet">
+${F.head}
 <!--<![endif]-->
 <style>
   body{margin:0;padding:0;width:100%!important;background:${C.dark};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}

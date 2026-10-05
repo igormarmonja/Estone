@@ -3,11 +3,12 @@
    ширина 600px, на телефоні колонки стають в стовпчик (<style> у <head>).
    Послідовність фону розділів повторює лендинг: dark → paper → sand → paper → dark → sand → brand → paper → dark. */
 import { SITE, LANGS, CAMPAIGN, IMG_BASE, MERGE, C, SERIES, PRICES } from './data.mjs';
-import { F, THEME, esc, pad2, spacer, label, h, makeBtn, section, grid, doc, more, logo, giant } from './parts.mjs';
+import { F, useFonts, THEME, esc, pad2, spacer, label, h, makeBtn, section, grid, doc, more, logo, giant } from './parts.mjs';
 
 const img = (f) => IMG_BASE + f;
 
 export function render(t, lang) {
+  useFonts('landing');
   const L = LANGS.find((l) => l.code === lang);
   const utm = (content) => `utm_source=newsletter&utm_medium=email&utm_campaign=${CAMPAIGN.id}&utm_content=${content}`;
   const page = (hash = '', content = 'link', path = L.path) => `${SITE.domain}${path}?${utm(content)}${hash}`;
