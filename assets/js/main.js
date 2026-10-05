@@ -114,13 +114,18 @@
     'Комерційний об’єкт',
     'Інше / ще не визначився',
   ];
-  document.querySelectorAll('[data-product-select]').forEach(sel => {
-    PRODUCT_OPTIONS.forEach(v => {
-      const o = document.createElement('option');
-      o.value = v; o.textContent = v;
-      sel.appendChild(o);
+  function fillProductSelects(root) {
+    (root || document).querySelectorAll('[data-product-select]').forEach(sel => {
+      if (sel.dataset.filled) return;
+      PRODUCT_OPTIONS.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v; o.textContent = v;
+        sel.appendChild(o);
+      });
+      sel.dataset.filled = '1';
     });
-  });
+  }
+  fillProductSelects();
 
   /* Кнопка «Прорахувати X» у секції продукту підставляє напрям у форму */
   const CTA_TO_PRODUCT = {
@@ -249,6 +254,38 @@
     `).join('');
     grid.querySelectorAll('[data-reveal]').forEach(observe);
 
+    /* На головній показуємо не всі моделі одразу */
+    const limit = parseInt(grid.dataset.limit || '0', 10);
+    let expanded = !limit;
+    const cards = () => grid.querySelectorAll('.product-card');
+    const moreBtn = grid.parentElement.querySelector('[data-catalog-more]');
+    const moreBox = moreBtn ? moreBtn.closest('.catalog-more') || moreBtn : null;
+
+    function applyLimit() {
+      if (expanded) {
+        cards().forEach(c => c.classList.remove('is-over-limit'));
+        if (moreBox) moreBox.hidden = true;
+        return;
+      }
+      let shown = 0;
+      cards().forEach(c => {
+        const hiddenByFilter = c.classList.contains('is-hidden');
+        if (hiddenByFilter) { c.classList.remove('is-over-limit'); return; }
+        shown += 1;
+        c.classList.toggle('is-over-limit', shown > limit);
+      });
+      if (moreBox) moreBox.hidden = shown <= limit;
+    }
+
+    if (moreBtn) {
+      moreBtn.addEventListener('click', () => {
+        expanded = true;
+        applyLimit();
+        track('catalog_expand', { total: products.length });
+      });
+    }
+    applyLimit();
+
     document.querySelectorAll('.filter-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('is-active'));
@@ -257,6 +294,7 @@
         grid.querySelectorAll('.product-card').forEach(card => {
           card.classList.toggle('is-hidden', f !== 'all' && card.dataset.series !== f);
         });
+        applyLimit();
         track('catalog_filter', { series: f });
       });
     });
@@ -269,15 +307,19 @@
 
   /* ── Карусель робіт ─────────────────────────────────────── */
   const worksViewport = document.getElementById('worksTrack');
-  if (worksViewport && products.length) {
+  const works = window.WORKS || [];
+  if (worksViewport && works.length) {
     const line = worksViewport.querySelector('.works-line');
-    const slide = (p, i) => `
-      <button class="works-item" type="button" data-index="${i}" aria-label="${p.code}">
-        <img src="${imgBase}${p.img}" alt="Умивальник ${p.code} з каменю" loading="lazy">
-        <span class="works-code">${p.code}</span>
-      </button>`;
+    const slide = (w) => `
+      <figure class="works-item">
+        <img src="${imgBase}${w.img}" alt="${w.title} — робота ESTONE" loading="lazy">
+        <figcaption class="works-caption">
+          <span class="works-title">${w.title}</span>
+          <span class="works-meta">${w.meta}</span>
+        </figcaption>
+      </figure>`;
     /* двічі — щоб стрічка зациклювалась без стрибка */
-    line.innerHTML = products.map(slide).join('') + products.map(slide).join('');
+    line.innerHTML = works.map(slide).join('') + works.map(slide).join('');
 
     const step = () => worksViewport.clientWidth * 0.6;
     document.querySelectorAll('[data-works]').forEach(btn => {
@@ -293,12 +335,76 @@
       if (worksViewport.scrollLeft >= half) worksViewport.scrollLeft -= half;
       else if (worksViewport.scrollLeft <= 0) worksViewport.scrollLeft += half;
     }, { passive: true });
-
-    line.addEventListener('click', (e) => {
-      const item = e.target.closest('.works-item');
-      if (item) openModel(products[Number(item.dataset.index)]);
-    });
   }
+
+  /* ── Попап із формою ────────────────────────────────────── */
+  /* Кнопки «порахувати» більше не кидають користувача в кінець сторінки:
+     відкривається вікно з формою і заголовком під конкретну кнопку. */
+  let popup = null;
+
+  function buildPopup() {
+    if (popup) return popup;
+    popup = document.createElement('div');
+    popup.className = 'popup';
+    popup.id = 'leadPopup';
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-modal', 'true');
+    popup.innerHTML = `
+      <div class="popup-card" role="document">
+        <button class="popup-close" type="button" aria-label="Закрити">&times;</button>
+        <p class="label" data-popup-eyebrow>Прорахунок за 1 годину</p>
+        <h2 class="popup-title" data-popup-title>Порахувати вартість</h2>
+        <p class="popup-sub" data-popup-sub>Напишіть розміри — назвемо ціну з доставкою і монтажем протягом години в робочий час.</p>
+        <form class="lead-form" data-form="popup" novalidate>
+          <input type="text" name="name" placeholder="Ім'я" autocomplete="name" required>
+          <input type="tel" name="phone" placeholder="Телефон" autocomplete="tel" required>
+          <select name="product" data-product-select>
+            <option value="">Що вас цікавить</option>
+          </select>
+          <input type="text" name="size" placeholder="Розміри або погонні метри">
+          <textarea name="comment" rows="2" placeholder="Коментар: матеріал, терміни"></textarea>
+          <button type="submit" class="btn btn-primary btn-full">Надіслати</button>
+          <p class="form-note">Натискаючи кнопку, ви погоджуєтесь на обробку даних.</p>
+        </form>
+        <div class="popup-contacts">
+          <a href="#" data-phone-link data-cta="popup-phone"><span data-phone-display></span></a>
+          <div class="messengers"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(popup);
+
+    popup.querySelector('.popup-close').addEventListener('click', closePopup);
+    popup.addEventListener('click', (e) => { if (e.target === popup) closePopup(); });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && popup.classList.contains('is-open')) closePopup();
+    });
+    return popup;
+  }
+
+  function openPopup(opts) {
+    const el = buildPopup();
+    el.querySelector('[data-popup-title]').textContent = opts.title || 'Порахувати вартість';
+    if (opts.sub) el.querySelector('[data-popup-sub]').textContent = opts.sub;
+    const form = el.querySelector('form');
+    form.dataset.form = opts.form || 'popup';
+    /* якщо відкрили з розділу — одразу підставляємо напрям */
+    const sel = form.querySelector('[data-product-select]');
+    if (sel && opts.product) {
+      const match = [...sel.options].find(o => o.value === opts.product || o.textContent === opts.product);
+      if (match) sel.value = match.value;
+    }
+    el.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => form.querySelector('[name="name"]').focus(), 120);
+    track('popup_open', { form: form.dataset.form });
+  }
+
+  function closePopup() {
+    if (!popup) return;
+    popup.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+  window.ESTONE_closePopup = closePopup;
 
   /* ── Форми ──────────────────────────────────────────────── */
   const thanks = document.getElementById('thanks');
@@ -317,6 +423,10 @@
       gtag('event', 'conversion', { send_to: `${CFG.googleAdsId}/${CFG.googleAdsLabel}` });
     }
   }
+
+  buildPopup();
+  fillProductSelects(popup);   /* у попапі свій список напрямів */
+  fillContacts();              /* і свій телефон з месенджерами */
 
   document.querySelectorAll('.lead-form').forEach(form => {
     form.addEventListener('submit', async (e) => {
@@ -384,6 +494,7 @@
 
       track('lead_submit', { form: payload.form, source: utm.utm_source || 'direct' });
       form.reset();
+      if (form.closest('.popup')) closePopup();
       showThanks();
     });
   });
@@ -391,4 +502,21 @@
   /* ── Рік у підвалі ──────────────────────────────────────── */
   const year = document.getElementById('year');
   if (year) year.textContent = new Date().getFullYear();
+
+  /* Кнопки на #lead відкривають попап замість стрибка вниз.
+     Винятки: сама секція з формою, кнопка з лайтбокса і меню. */
+  document.querySelectorAll('a[href$="#lead"]').forEach(link => {
+    if (link.closest('.lead') || link.id === 'lightboxCta' || link.closest('.main-nav')) return;
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const section = link.closest('section');
+      const label = link.textContent.trim();
+      openPopup({
+        title: link.dataset.popupTitle || (label.length >= 14 ? label : 'Порахувати вартість'),
+        form: 'popup-' + (link.dataset.cta || section?.id || 'other'),
+        product: link.dataset.popupProduct || '',
+      });
+    });
+  });
+
 })();
