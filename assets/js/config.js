@@ -15,12 +15,12 @@ window.ESTONE_CONFIG = {
   // ── Месенджери ────────────────────────────────────────────
   // Viber і WhatsApp будуються автоматично з номера phone.
   // Щоб вимкнути якийсь — впишіть 'off'. Щоб задати свій — вставте посилання.
-  telegram: '',   // ОБОВ'ЯЗКОВО ВПИСАТИ: https://t.me/ваш_логін
+  telegram: 'https://t.me/keramika_estone_bot',
   viber:    '',   // авто з phone
   whatsapp: '',   // авто з phone
 
   // ── Соцмережі (порожнє — блок не показується) ─────────────
-  instagram: '',  // ВПИШІТЬ: https://www.instagram.com/ваш_акаунт/
+  instagram: 'https://www.instagram.com/stonekiev/',
   facebook:  '',  // https://www.facebook.com/ваша_сторінка
 
   // ── Куди відправляти заявки ───────────────────────────────

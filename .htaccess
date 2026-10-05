@@ -1,5 +1,5 @@
 # Файл із заявками не має відкриватись з браузера
-<FilesMatch "^leads\.csv$">
+<FilesMatch "^(leads\.csv|send\.config\.php)$">
   Require all denied
 </FilesMatch>
 

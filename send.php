@@ -36,6 +36,42 @@ $CSV_FILE = __DIR__ . '/leads.csv';
 // --- Обмеження: не більше N заявок з однієї IP за годину ---
 $RATE_LIMIT = 10;
 
+// Приватні налаштування окремим файлом (не потрапляє в git і в архів із кодом)
+if (is_readable(__DIR__ . '/send.config.php')) { require __DIR__ . '/send.config.php'; }
+
+// ── Разова допомога: дізнатись свій chat_id ──────────────────
+// Відкрийте в браузері estone.com.ua/send.php?chatid=1
+// Працює тільки поки $TELEGRAM_CHAT порожній — потім вимикається сам.
+if (isset($_GET['chatid']) && $TELEGRAM_TOKEN && !$TELEGRAM_CHAT) {
+    header('Content-Type: text/plain; charset=utf-8');
+    $url = "https://api.telegram.org/bot{$TELEGRAM_TOKEN}/getUpdates";
+    $raw = @file_get_contents($url);
+    if ($raw === false && function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10]);
+        $raw = curl_exec($ch); curl_close($ch);
+    }
+    $data = json_decode((string)$raw, true);
+    if (empty($data['ok'])) {
+        echo "Не вдалось звʼязатись з Telegram. Перевірте токен.\n\n" . substr((string)$raw, 0, 500);
+        exit;
+    }
+    $found = [];
+    foreach (($data['result'] ?? []) as $u) {
+        $chat = $u['message']['chat'] ?? $u['channel_post']['chat'] ?? null;
+        if ($chat) { $found[$chat['id']] = trim(($chat['title'] ?? '') . ' ' . ($chat['first_name'] ?? '') . ' @' . ($chat['username'] ?? '')); }
+    }
+    if (!$found) {
+        echo "Повідомлень не знайдено.\n\n"
+           . "Напишіть своєму боту будь-що в Telegram і оновіть цю сторінку.\n"
+           . "Якщо потрібна група — додайте туди бота і напишіть повідомлення в групі.\n";
+        exit;
+    }
+    echo "Знайдені чати. Візьміть потрібний id і впишіть у send.config.php:\n\n";
+    foreach ($found as $id => $who) { echo "  \$TELEGRAM_CHAT = '$id';   // $who\n"; }
+    exit;
+}
+
 // ══════════════════ ДАЛІ НІЧОГО МІНЯТИ НЕ ТРЕБА ══════════════════
 
 header('Content-Type: application/json; charset=utf-8');
