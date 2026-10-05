@@ -560,6 +560,53 @@
     });
   });
 
+
+  /* ── Список файлів для завантаження ─────────────────────── */
+  const dlBox = document.getElementById('downloadList');
+  if (dlBox && window.DOWNLOADS) {
+    const base = dlBox.dataset.base || '';
+    const groups = {};
+    window.DOWNLOADS.forEach(d => { (groups[d.group || 'Файли'] ||= []).push(d); });
+
+    dlBox.innerHTML = Object.entries(groups).map(([name, items]) => `
+      <h3 class="sub-h" data-reveal>${name}</h3>
+      <div class="downloads">
+        ${items.map(d => `
+          <article class="dl-card" data-reveal data-file="${base}${d.file}">
+            <div class="dl-main">
+              <span class="dl-ext">${(d.meta || d.file.split('.').pop()).toUpperCase()}</span>
+              <h4>${d.title}</h4>
+              <p>${d.desc || ''}</p>
+            </div>
+            <div class="dl-action">
+              <a class="btn btn-primary dl-link" href="${base}${d.file}" download data-cta="download">Завантажити</a>
+              <span class="dl-soon" hidden>Скоро</span>
+              <span class="dl-size"></span>
+            </div>
+          </article>`).join('')}
+      </div>`).join('');
+
+    dlBox.querySelectorAll('[data-reveal]').forEach(observe);
+
+    /* Перевіряємо, чи файл уже лежить на сервері: якщо ні —
+       показуємо «Скоро» замість битого посилання */
+    dlBox.querySelectorAll('.dl-card').forEach(async card => {
+      const link = card.querySelector('.dl-link');
+      const soon = card.querySelector('.dl-soon');
+      const size = card.querySelector('.dl-size');
+      try {
+        const r = await fetch(card.dataset.file, { method: 'HEAD' });
+        const type = r.headers.get('content-type') || '';
+        /* деякі хостинги віддають 200 і сторінку помилки — це теж «немає файлу» */
+        if (!r.ok || /text\/html/i.test(type)) throw new Error('немає');
+        const len = Number(r.headers.get('content-length') || 0);
+        if (len) size.textContent = (len / 1048576).toFixed(1).replace('.', ',') + ' МБ';
+      } catch (_) {
+        link.hidden = true; soon.hidden = false; card.classList.add('is-soon');
+      }
+    });
+  }
+
   /* ── Рік у підвалі ──────────────────────────────────────── */
   const year = document.getElementById('year');
   if (year) year.textContent = new Date().getFullYear();

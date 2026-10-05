@@ -42,34 +42,80 @@ if (is_readable(__DIR__ . '/send.config.php')) { require __DIR__ . '/send.config
 // ── Разова допомога: дізнатись свій chat_id ──────────────────
 // Відкрийте в браузері estone.com.ua/send.php?chatid=1
 // Працює тільки поки $TELEGRAM_CHAT порожній — потім вимикається сам.
-if (isset($_GET['chatid']) && $TELEGRAM_TOKEN && !$TELEGRAM_CHAT) {
-    header('Content-Type: text/plain; charset=utf-8');
-    $url = "https://api.telegram.org/bot{$TELEGRAM_TOKEN}/getUpdates";
-    $raw = @file_get_contents($url);
-    if ($raw === false && function_exists('curl_init')) {
+// ── Автовизначення чату ──────────────────────────────────────
+// Щоб не змушувати вас шукати chat_id вручну: якщо він не заданий,
+// скрипт сам питає Telegram, кому писати. Беремо перший приватний
+// чат, який написав боту, і запамʼятовуємо його назавжди у файлі.
+// Далі значення не змінюється, навіть якщо боту напише хтось інший.
+$CHAT_LOCK = __DIR__ . '/.estone_chat';
+
+if ($TELEGRAM_TOKEN && !$TELEGRAM_CHAT && is_readable($CHAT_LOCK)) {
+    $TELEGRAM_CHAT = trim((string)file_get_contents($CHAT_LOCK));
+}
+
+function tg_api($token, $method, $params = []) {
+    $url = "https://api.telegram.org/bot{$token}/{$method}";
+    $body = http_build_query($params);
+    if (function_exists('curl_init')) {
         $ch = curl_init($url);
-        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10]);
-        $raw = curl_exec($ch); curl_close($ch);
+        curl_setopt_array($ch, [
+            CURLOPT_POST => (bool)$params, CURLOPT_POSTFIELDS => $body,
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10,
+        ]);
+        $res = curl_exec($ch); curl_close($ch);
+        return json_decode((string)$res, true);
     }
-    $data = json_decode((string)$raw, true);
-    if (empty($data['ok'])) {
-        echo "Не вдалось звʼязатись з Telegram. Перевірте токен.\n\n" . substr((string)$raw, 0, 500);
-        exit;
+    $opts = ['timeout' => 10];
+    if ($params) {
+        $opts['method'] = 'POST';
+        $opts['header'] = "Content-Type: application/x-www-form-urlencoded\r\n";
+        $opts['content'] = $body;
     }
-    $found = [];
+    return json_decode((string)@file_get_contents($url, false, stream_context_create(['http' => $opts])), true);
+}
+
+/** Знаходить і запамʼятовує чат. Повертає id або '' */
+function tg_lock_chat($token, $lockFile) {
+    $data = tg_api($token, 'getUpdates');
+    if (empty($data['ok'])) { return ''; }
     foreach (($data['result'] ?? []) as $u) {
-        $chat = $u['message']['chat'] ?? $u['channel_post']['chat'] ?? null;
-        if ($chat) { $found[$chat['id']] = trim(($chat['title'] ?? '') . ' ' . ($chat['first_name'] ?? '') . ' @' . ($chat['username'] ?? '')); }
+        $chat = $u['message']['chat'] ?? null;
+        if (!$chat) { continue; }
+        /* тільки приватний чат або група, куди бота додали свідомо */
+        if (!in_array($chat['type'] ?? '', ['private', 'group', 'supergroup'], true)) { continue; }
+        $id = (string)$chat['id'];
+        @file_put_contents($lockFile, $id);
+        tg_api($token, 'sendMessage', [
+            'chat_id' => $id,
+            'text' => "✅ Сповіщення увімкнено. Заявки з estone.com.ua приходитимуть сюди.",
+        ]);
+        return $id;
     }
-    if (!$found) {
-        echo "Повідомлень не знайдено.\n\n"
-           . "Напишіть своєму боту будь-що в Telegram і оновіть цю сторінку.\n"
-           . "Якщо потрібна група — додайте туди бота і напишіть повідомлення в групі.\n";
-        exit;
+    return '';
+}
+
+// ── Сторінка налаштування: estone.com.ua/send.php?chatid=1 ───
+if (isset($_GET['chatid']) && $TELEGRAM_TOKEN) {
+    header('Content-Type: text/plain; charset=utf-8');
+    if ($TELEGRAM_CHAT) {
+        exit("Сповіщення вже працюють. Чат: {$TELEGRAM_CHAT}\n\n"
+           . "Щоб змінити отримувача — видаліть файл .estone_chat у корені сайту\n"
+           . "і напишіть боту з потрібного акаунта або групи.\n");
     }
-    echo "Знайдені чати. Візьміть потрібний id і впишіть у send.config.php:\n\n";
-    foreach ($found as $id => $who) { echo "  \$TELEGRAM_CHAT = '$id';   // $who\n"; }
-    exit;
+    $id = tg_lock_chat($TELEGRAM_TOKEN, $CHAT_LOCK);
+    if ($id) {
+        exit("Готово. Заявки приходитимуть у чат {$id}.\n"
+           . "Перевірте Telegram — має прийти підтвердження.\n");
+    }
+    $probe = tg_api($TELEGRAM_TOKEN, 'getMe');
+    if (empty($probe['ok'])) {
+        exit("Не вдалось звʼязатись з Telegram. Перевірте токен у send.config.php.\n");
+    }
+    exit("Бот на звʼязку (@" . ($probe['result']['username'] ?? '?') . "), але йому ще ніхто не писав.\n\n"
+       . "Відкрийте Telegram, знайдіть бота, натисніть «Запустити» або напишіть йому будь-що,\n"
+       . "потім оновіть цю сторінку.\n\n"
+       . "Якщо заявки має бачити кілька людей — створіть групу, додайте туди бота,\n"
+       . "напишіть повідомлення в групі й оновіть цю сторінку.\n");
 }
 
 // ══════════════════ ДАЛІ НІЧОГО МІНЯТИ НЕ ТРЕБА ══════════════════
@@ -169,6 +215,15 @@ if ($fh = @fopen($CSV_FILE, 'a')) {
 
 // ── 2. Telegram ───────────────────────────────────────────────
 $tgOk = null;
+if ($TELEGRAM_TOKEN && !$TELEGRAM_CHAT) {
+    /* пробуємо знайти чат не частіше ніж раз на 5 хвилин,
+       щоб недоступний Telegram не гальмував кожну заявку */
+    $try = sys_get_temp_dir() . '/estone_chat_try';
+    if (!is_readable($try) || (time() - (int)filemtime($try)) > 300) {
+        @touch($try);
+        $TELEGRAM_CHAT = tg_lock_chat($TELEGRAM_TOKEN, $CHAT_LOCK);
+    }
+}
 if ($TELEGRAM_TOKEN && $TELEGRAM_CHAT) {
     $lines = ["🔔 <b>Нова заявка з сайту</b>", ''];
     $lines[] = "👤 <b>" . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . "</b>";
@@ -186,28 +241,10 @@ if ($TELEGRAM_TOKEN && $TELEGRAM_CHAT) {
 }
 
 function tg_send($token, $chat, $text) {
-    $url  = "https://api.telegram.org/bot{$token}/sendMessage";
-    $body = http_build_query(['chat_id' => $chat, 'text' => $text, 'parse_mode' => 'HTML']);
-    if (function_exists('curl_init')) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $body,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 8,
-        ]);
-        $res  = curl_exec($ch);
-        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        return $code === 200;
-    }
-    $ctx = stream_context_create(['http' => [
-        'method'  => 'POST',
-        'header'  => "Content-Type: application/x-www-form-urlencoded\r\n",
-        'content' => $body,
-        'timeout' => 8,
-    ]]);
-    return @file_get_contents($url, false, $ctx) !== false;
+    $r = tg_api($token, 'sendMessage', [
+        'chat_id' => $chat, 'text' => $text, 'parse_mode' => 'HTML',
+    ]);
+    return !empty($r['ok']);
 }
 
 // ── 3. Пошта ──────────────────────────────────────────────────

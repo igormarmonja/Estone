@@ -1,5 +1,5 @@
 # Файл із заявками не має відкриватись з браузера
-<FilesMatch "^(leads\.csv|send\.config\.php)$">
+<FilesMatch "^(leads\.csv|send\.config\.php|\.estone_chat)$">
   Require all denied
 </FilesMatch>
 
