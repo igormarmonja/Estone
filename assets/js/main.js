@@ -234,7 +234,13 @@
   const grid = document.getElementById('productGrid');
   const products = window.PRODUCTS || [];
   /* на внутрішніх сторінках шлях до фото інший — задається в IMG_BASE */
-  const imgBase = window.IMG_BASE || 'assets/img/';
+  /* Шлях до картинок рахуємо з посилання на стилі — працює на будь-якій
+     глибині вкладеності й не потребує IMG_BASE на кожній сторінці. */
+  const imgBase = window.IMG_BASE || (() => {
+    const link = document.querySelector('link[rel="stylesheet"][href*="assets/css/"]');
+    if (!link) return 'assets/img/';
+    return link.getAttribute('href').split('assets/css/')[0] + 'assets/img/';
+  })();
 
   /* Лайтбокс моделі: спільний для каталогу і каруселі */
   const lb = document.getElementById('lightbox');
@@ -348,6 +354,8 @@
   const works = window.WORKS || [];
   let gallery = null;
   let galleryIndex = 0;
+  let galleryList = works;      /* який набір фото зараз відкритий */
+  let galleryThumbsFor = null;  /* для якого набору вже намальовані мініатюри */
 
   if (worksViewport && works.length) {
     const line = worksViewport.querySelector('.works-line');
@@ -404,7 +412,7 @@
     line.addEventListener('click', e => {
       const item = e.target.closest('[data-gallery]');
       if (!item || moved > 6) return;         /* не відкриваємо після перетягування */
-      openGallery(Number(item.dataset.gallery) % works.length);
+      openGallery(Number(item.dataset.gallery) % works.length, works);
     });
   }
 
@@ -457,23 +465,29 @@
       x0 = null;
     }, { passive: true });
 
-    gallery.querySelector('.gallery-thumbs').innerHTML = works.map((w, i) =>
+    return gallery;
+  }
+
+  function renderThumbs(el) {
+    if (galleryThumbsFor === galleryList) return;
+    galleryThumbsFor = galleryList;
+    el.querySelector('.gallery-thumbs').innerHTML = galleryList.map((w, i) =>
       `<button class="gallery-thumb" type="button" data-thumb="${i}" aria-label="${w.title}">
          <img src="${imgBase}${w.img}" alt="" loading="lazy">
        </button>`).join('');
-    return gallery;
   }
 
   function showGallery(i) {
     const el = buildGallery();
-    galleryIndex = (i + works.length) % works.length;
-    const w = works[galleryIndex];
+    renderThumbs(el);
+    galleryIndex = (i + galleryList.length) % galleryList.length;
+    const w = galleryList[galleryIndex];
     const img = el.querySelector('.gallery-stage img');
     img.src = imgBase + w.img;
     img.alt = w.title + ' — робота ESTONE';
     el.querySelector('.gallery-title').textContent = w.title;
     el.querySelector('.gallery-meta').textContent = w.meta || '';
-    el.querySelector('.gallery-counter').textContent = (galleryIndex + 1) + ' / ' + works.length;
+    el.querySelector('.gallery-counter').textContent = (galleryIndex + 1) + ' / ' + galleryList.length;
     el.querySelectorAll('[data-thumb]').forEach(t => {
       t.classList.toggle('is-active', Number(t.dataset.thumb) === galleryIndex);
     });
@@ -481,7 +495,8 @@
     if (active) active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
   }
 
-  function openGallery(i) {
+  function openGallery(i, list) {
+    galleryList = (list && list.length) ? list : works;
     const el = buildGallery();
     showGallery(i);
     el.classList.add('is-open');
@@ -494,6 +509,27 @@
     gallery.classList.remove('is-open');
     document.body.style.overflow = '';
   }
+
+  /* ── Галерея робіт на тематичній сторінці ───────────────── */
+  /* <div class="page-gallery" data-gallery-tag="pidvikonnia"></div>
+     Фото беруться з works.js за міткою tag — один список на весь сайт. */
+  document.querySelectorAll('[data-gallery-tag]').forEach(box => {
+    const tag = box.dataset.galleryTag;
+    const list = works.filter(w => w.tag === tag);
+    if (!list.length) { box.hidden = true; return; }
+    box.innerHTML = list.map((w, i) => `
+      <button class="page-gallery-item" type="button" data-pg="${i}" aria-label="${w.title}">
+        <img src="${imgBase}${w.img}" alt="${w.title} — ${w.meta}, робота ESTONE" loading="lazy">
+        <span class="works-caption">
+          <span class="works-title">${w.title}</span>
+          <span class="works-meta">${w.meta}</span>
+        </span>
+      </button>`).join('');
+    box.addEventListener('click', e => {
+      const it = e.target.closest('[data-pg]');
+      if (it) openGallery(Number(it.dataset.pg), list);
+    });
+  });
 
   /* ── Попап із формою ────────────────────────────────────── */
   /* Кнопки «порахувати» більше не кидають користувача в кінець сторінки:
