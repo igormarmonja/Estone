@@ -8,9 +8,10 @@ const BOT_TOKEN      = 'ВСТАВ_ТОКЕН_НОВОГО_БОТА';
 const WEBAPP_URL     = 'ВСТАВ_URL_ПІСЛЯ_РОЗГОРТАННЯ';   // закінчується на /exec
 const OWNER_ID       = 0;                                // твій Telegram ID (бот підкаже на /start)
 const GEMINI_API_KEY = 'ВСТАВ_КЛЮЧ_GEMINI';
-const GEMINI_MODEL   = 'gemini-3.1-flash-lite';
-// Якщо основна модель недоступна — бот сам пробує ці (…-latest Google оновлює сам)
-const GEMINI_FALLBACKS = ['gemini-flash-lite-latest', 'gemini-flash-latest', 'gemini-2.5-flash'];
+const GEMINI_MODEL   = 'gemini-3.8-flash';
+// Якщо модель вимкнули — бот пробує ці, а потім сам питає в Google список доступних моделей і бере робочу
+const GEMINI_FALLBACKS = ['gemini-flash-latest', 'gemini-flash-lite-latest'];
+const MOTIVATION_IMAGE = true;   // ранкова мотиваційна картинка (якщо ключ Gemini дозволяє генерувати зображення)
 const DASH_KEY       = 'ВСТАВ_ПАРОЛЬ_ДАШБОРДА';          // будь-який набір літер і цифр
 const TZ             = 'Europe/Madrid';
 const CURRENCY       = '€';
@@ -52,10 +53,11 @@ const WORDS_PER_DAY = 5;
 
 // ----- Розклад (години за Мадридом) -----
 const MORNING_HOUR = 7;    // ранковий план
-const NUDGE_HOUR   = 15;   // нагадування, якщо за день нічого не записано
+const NUDGE_HOUR   = 16;   // контроль після роботи (робота до 16:00)
 const EVENING_HOUR = 21;   // вечірня перевірка
 const REVIEW_HOUR  = 19;   // недільний огляд
 const LATE_HOUR    = 23;   // пізнє нагадування, якщо немає підсумку дня
+const CHECKIN_HOURS = [17, 18, 19, 20, 22];   // щогодинне «що зробив?» для графіка дня (16 і 21 — свої повідомлення)
 
 // ----- Цілі на тиждень і місяць -----
 const DEV_TARGETS = {
@@ -98,16 +100,20 @@ const SNAPSHOTS = ['Вага', 'Підтягування', 'Instagram', 'Сай�
 const HABITS_START = '2026-09-27';   // з цього дня бот рахує звички і пропуски
 const IDENTITY = 'Я людина, яка тримає слово, дане собі.';
 // mini — версія на 2 хвилини для поганого дня; hint — що робити, якщо звичку не відмітити кнопкою
+// main — основні (продажі, іспанська, дисципліна): жорсткий контроль і бал тижня;
+// решта — допоміжні: відстежуються, але м'якше і окремо
 const HABITS = [
-  { k: 'План',        icon: '📝', mini: 'одна головна справа і час', hint: 'Задай план: /plan' },
-  { k: 'Продажі',     icon: '💼', mini: 'одне повідомлення клієнту', hint: 'Напиши або надиктуй, що зробив: «написав 5 дизайнерам»' },
-  { k: 'Іспанська',   icon: '🇪🇸', mini: '5 хвилин або слова дня' },
+  { k: 'План',        icon: '📝', main: true, mini: 'одна головна справа і час', hint: 'Задай план: кнопка 📝 План' },
+  { k: 'Продажі',     icon: '💼', main: true, mini: 'одне повідомлення клієнту', hint: 'Напиши або надиктуй, що зробив: «написав 5 дизайнерам»' },
+  { k: 'Іспанська',   icon: '🇪🇸', main: true, mini: '5 хвилин або слова дня' },
+  { k: 'Підсумок',    icon: '🌙', main: true, mini: 'три речення', hint: 'Натисни 🌙 Підсумок і надиктуй' },
   { k: 'Англійська',  icon: '🇬🇧', mini: '5 хвилин подкасту' },
   { k: 'Читання',     icon: '📖', mini: 'одна сторінка' },
   { k: 'Музика',      icon: '🎹', mini: '2 хвилини в Suno' },
   { k: 'Без сигарет', icon: '🚭', mini: 'відкласти наступну сигарету на 30 хв' },
-  { k: 'Підсумок',    icon: '🌙', mini: 'три речення', hint: 'Напиши підсумок: #підсумок … або надиктуй після вечірньої перевірки' },
 ];
+const MAIN_HABITS = HABITS.filter(h => h.main);
+const AUX_HABITS  = HABITS.filter(h => !h.main);
 const QUICK_HABITS = { 'Іспанська': 15, 'Англійська': 15, 'Читання': 15, 'Музика': 15, 'Без сигарет': 1 };  // кнопка = запис
 const SALES_DAY_MIN = 10;    // мінімум продажних дій на день; поки менше — нові ідеї чекають
 const SLEEP_GOAL    = 7;     // годин
@@ -140,6 +146,7 @@ const SHEET_WORDS  = 'Слова';
 const SHEET_JOURNAL = 'Щоденник';
 const SHEET_IDEAS  = 'Ідеї';
 const SHEET_OTHER  = 'Інші справи';   // корисні справи поза показниками — тільки в таблиці, не в графіках
+const SHEET_TIMELINE = 'Графік дня';  // що і коли робив — з голосових протягом дня
 const WORD_TOPICS = [
   'камінь, кухні й ванні кімнати (для продажів Estone): матеріали, вироби, монтаж',
   'розмова з клієнтом: ціна, терміни, замір, доставка, передоплата',
@@ -309,17 +316,22 @@ function process_(chatId, text, audio) {
   const entries = (r.entries || []).map(cleanEntry_).filter(Boolean);
   const idea = r.idea ? String(r.idea).trim() : '';
   const others = cleanOthers_(r.other);
+  const said = (audio ? r.transcript : text) || '';
   const heard = audio && r.transcript ? '🎙 «' + String(r.transcript).slice(0, 300) + '»\n\n' : '';
   if (!entries.length && !idea && !others.length) {
-    send_(chatId, heard + 'Не знайшов, що записати 🤔\nПриклад: «написав 15 дизайнерам, 20 хвилин іспанської, був у залі»');
+    // Нічого записувати — значить, це розмова з коучем
+    chatReply_(chatId, said, heard);
     return;
   }
   entries.forEach(e => saveEntry_(e, audio ? 'голос' : 'текст'));
+  const fresh = entries.some(e => !e.days_ago) || others.some(o => !o.days_ago);
+  if (r.log && fresh) addTimeline_(String(r.log), entries.concat(others).reduce((a, x) => a + (x.minutes || 0), 0));
   const parts = [];
   if (entries.length) parts.push(confirm_(entries));
   if (others.length) parts.push(saveOthers_(others, 0));
   if (idea) parts.push(saveIdea_(idea));
   send_(chatId, heard + parts.join('\n\n'));
+  if (r.chat) chatReply_(chatId, said, '');
 }
 
 // ======================= ШВИДКИЙ ЗАПИС # =======================
@@ -382,6 +394,8 @@ const HELP =
   '✅ Звички — відмітити звички дня\n📝 План · 🌙 Підсумок — ранок і вечір\n' +
   '🗣 Клієнту — переклад для WhatsApp іспанською чи англійською\n' +
   '💡 Ідея — записати ідею на потім, щоб не відволікатися\n' +
+  '💬 Можна просто писати мені питання — я відповім як коуч, у межах челенджу\n' +
+  '🕐 Після роботи щогодини питаю «що зробив?» — так складається графік дня\n' +
   '🔧 Перевірка — чи працює Gemini (коуч, слова, голосові)\n\n' +
   '📊 Дашборд відкривається кнопкою 📱 Дашборд. Щось записав помилково — ➕ Записати → ↩️ Скасувати.\n' +
   '(Старі швидкі записи через # теж працюють: #дотик 20, #сон 7 …)';
@@ -399,7 +413,7 @@ function command_(chatId, text) {
 
     case '/habits': {
       const t = today_(), done = habitDay_(daySums_(devRows_()), t, planDates_());
-      send_(chatId, '🧱 Звички · ' + done.filter(Boolean).length + '/' + HABITS.length + ' — натисни, що зроблено:',
+      send_(chatId, '🧱 ' + habitsHead_(done) + ' — натисни, що зроблено:',
         { reply_markup: { inline_keyboard: habitsKeyboard_(t, done) } });
       break;
     }
@@ -472,6 +486,13 @@ function handleCallback_(cq) {
     return;
   }
   if (parts[0] === 'hb') { habitCallback_(cq, parts[1], Number(parts[2])); return; }
+  if (parts[0] === 'noop') return;
+  if (parts[0] === 'tl') {
+    const what = parts[1] === 'rest' ? '😴 відпочивав' : '🏠 сімʼя / побут';
+    addTimeline_(what, 0);
+    editMenu_(cq, '🕐 Записав у графік: ' + what + '. Наступна година — твоя 😉', []);
+    return;
+  }
   if (parts[0] === 'lg') { logCallback_(cq, parts); return; }
   if (parts[0] === 'pp') { planCallback_(cq, parts[1]); return; }
   if (parts[0] === 'mn') {
@@ -504,14 +525,16 @@ function morningPush() {
   const rows = devRows_(), plans = planDates_(), m = daySums_(rows);
   const yd = addDays_(today_(), -1);
   const yLine = sumLine_(m[yd] || {});
-  const yDone = yd >= HABITS_START ? habitDay_(m, yd, plans).filter(Boolean).length : null;
+  const yDone = yd >= HABITS_START ? habitDay_(m, yd, plans) : null;
   const miss = missed_(m, plans);
   let msg = '☀️ Доброго ранку! ' + dayLine_() + '\n🪪 ' + IDENTITY +
     (yLine ? '\n\nВчора: ' + yLine : '') +
-    (yDone !== null ? '\n🧱 Звички вчора: ' + yDone + '/' + HABITS.length : '');
+    (yDone ? '\n🧱 Вчора: ' + habitsHead_(yDone) : '');
   if (miss.twice.length) msg += '\n\n🚨 ' + pick_(DOUBLE_MISS).replace('{h}', miss.twice.map(h => h.icon + ' ' + h.k).join(', '));
   if (miss.once.length) msg += '\n\n⚠️ Вчора пропустив: ' + miss.once.map(h => h.icon + ' ' + h.k).join(', ') +
     '.\nПравило одне: ніколи не пропускай двічі. Сьогодні — хоча б мінімальна версія.';
+  if (miss.aux.length) msg += '\n🌱 Допоміжні вчора без відмітки: ' + miss.aux.map(h => h.icon).join(' ');
+  if (MOTIVATION_IMAGE) sendMotivation_(OWNER_ID);
   send_(OWNER_ID, msg);
   proposePlan_(OWNER_ID);
   const w = botWordsToday_().length ? botWordsToday_() : newDailyWords_();
@@ -522,13 +545,15 @@ function middayNudge() {
   const today = today_();
   const rows = devRows_(), plans = planDates_(), m = daySums_(rows);
   const done = habitDay_(m, today, plans);
-  const todo = HABITS.filter((h, i) => !done[i] && h.k !== 'Підсумок');
+  const todo = HABITS.filter((h, i) => !done[i] && h.main && h.k !== 'Підсумок');
+  const todoAux = HABITS.filter((h, i) => !done[i] && !h.main);
   const sales = salesCount_(m[today] || {});
-  if (!todo.length && sales >= SALES_DAY_MIN) return;
+  if (!todo.length && !todoAux.length && sales >= SALES_DAY_MIN) return;
   const nothing = !rows.some(r => r.day === today);
-  let msg = nothing ? '👀 Вже ' + NUDGE_HOUR + ':00, а в тебе сьогодні нуль записів.\n' + pick_(TAUNTS) : '⏰ Перевірка о ' + NUDGE_HOUR + ':00.';
+  let msg = nothing ? '👀 Робота закінчилась, а в тебе сьогодні нуль записів.\n' + pick_(TAUNTS) : '⏰ Робота закінчилась — час на своє.';
   if (sales < SALES_DAY_MIN) msg += '\n\n💼 Продажних дій сьогодні: ' + sales + '/' + SALES_DAY_MIN;
-  if (todo.length) msg += '\n\nЩе не зроблено. Мінімальна версія на 2 хвилини:\n' + todo.map(h => '⬜ ' + h.icon + ' ' + h.k + ' → ' + h.mini).join('\n');
+  if (todo.length) msg += '\n\n🎯 Основне ще не зроблено. Мінімальна версія на 2 хвилини:\n' + todo.map(h => '⬜ ' + h.icon + ' ' + h.k + ' → ' + h.mini).join('\n');
+  if (todoAux.length) msg += '\n\n🌱 Допоміжне: ' + todoAux.map(h => h.icon + ' ' + h.k).join(', ');
   msg += '\n\nПочни з найменшого. Прямо зараз, а не «після».';
   send_(OWNER_ID, msg, { reply_markup: { inline_keyboard: habitsKeyboard_(today, done) } });
 }
@@ -538,16 +563,28 @@ function eveningPush() {
   const rows = devRows_(), plans = planDates_(), m = daySums_(rows);
   const line = sumLine_(m[today] || {});
   const done = habitDay_(m, today, plans);
-  const n = done.filter(Boolean).length;
+  const n = groupCount_(done, true);
+  const tl = timelineText_(today);
   send_(OWNER_ID, '🌙 Вечірня перевірка · ' + dayLine_() + '\n\n' +
     (line ? 'Сьогодні записано: ' + line : 'Сьогодні нічого не записано.') +
-    '\n\n🧱 Звички: ' + n + '/' + HABITS.length + ' — натисни, що ще зробив:',
+    (tl ? '\n\n' + tl : '') +
+    '\n\n🧱 ' + habitsHead_(done) + ' — натисни, що ще зробив:',
     { reply_markup: { inline_keyboard: habitsKeyboard_(today, done) } });
   if (getPlan_(today).length) send_(OWNER_ID, '📝 План дня — що виконано?', { reply_markup: { inline_keyboard: planKeyboard_(today) } });
   setMode_('evening', 6);
   send_(OWNER_ID, '✍️ Підсумок дня — текстом або голосом 🎙\n1. Що зробив?\n2. Де злився і чому? Чесно.\n3. Що завтра робиш ПЕРШИМ?' +
-    (n < HABITS.length / 2 ? '\n\n' + pick_(TAUNTS) : ''));
+    (n < MAIN_HABITS.length - 1 ? '\n\n' + pick_(TAUNTS) : ''));
   wordsQuiz_();
+}
+
+/** Щогодини після роботи: «що зробив?» — для графіка дня. */
+function hourlyCheckin() {
+  const hour = Number(Utilities.formatDate(new Date(), TZ, 'H'));
+  if (CHECKIN_HOURS.indexOf(hour) === -1) return;
+  const last = lastTimelineAt_();
+  if (last && Date.now() - last < 40 * 60000) return;   // нещодавно вже розповідав — не смикаємо
+  send_(OWNER_ID, '🕐 ' + hour + ':00 — що зробив за останню годину? Надиктуй коротко 🎙\nЗапишу в графік дня і в показники.',
+    { reply_markup: { inline_keyboard: [[{ text: '😴 Відпочивав', callback_data: 'tl:rest' }, { text: '🏠 Сімʼя / побут', callback_data: 'tl:home' }]] } });
 }
 
 function lateNudge() {
@@ -602,9 +639,11 @@ const PARSE_PROMPT =
   'days_ago: 0 якщо сьогодні, 1 якщо «вчора», 2 якщо «позавчора».\n' +
   'Записуй тільки те, що вже зроблено. Плани на майбутнє («завтра напишу…») — не записуй.\n' +
   'other: зроблені справи поза показниками — [{"what": "що зробив, до 10 слів", "minutes": хвилини або null, "area": "сайт|бізнес|документи|навчання|особисте|інше", "days_ago": 0}].\n' +
+  'log: коротко, що Ігор зробив (до 12 слів, для графіка дня), або null, якщо нічого не зроблено.\n' +
+  'chat: true, якщо в повідомленні є питання, прохання поради чи розмова з коучем (а не тільки звіт про зроблене), інакше false.\n' +
   'idea: якщо Ігор описує нову ідею, проєкт чи інструмент, який хоче зробити (сайт, дизайн, бот, рекламу, новий напрям) — коротко перекажи її (до 12 слів), інакше null.\n' +
   'Якщо в повідомленні немає нічого з цього, entries = [].\n' +
-  'Відповідай ТІЛЬКИ JSON: {"transcript": "дослівний текст повідомлення", "entries": [{"metric": "Дотик", "qty": 1, "value": null, "margin": null, "note": "до 6 слів", "days_ago": 0}], "other": [], "idea": null}';
+  'Відповідай ТІЛЬКИ JSON: {"transcript": "дослівний текст повідомлення", "entries": [{"metric": "Дотик", "qty": 1, "value": null, "margin": null, "note": "до 6 слів", "days_ago": 0}], "other": [], "log": null, "chat": false, "idea": null}';
 
 const PLAN_PROMPT =
   'Ігор диктує план на день. Виділи до 3 головних справ, кожну коротко (до 8 слів), українською.\n' +
@@ -618,18 +657,27 @@ function geminiOn_() { return GEMINI_API_KEY && GEMINI_API_KEY.indexOf('ВСТА
 function gemini_(parts, json, maxTokens) {
   const p = PropertiesService.getScriptProperties();
   const good = p.getProperty('GEMINI_OK');
-  const models = [good, GEMINI_MODEL].concat(GEMINI_FALLBACKS).filter((m, i, a) => m && a.indexOf(m) === i);
-  const noThink = {};
-  let lastErr = '';
-  for (let i = 0; i < models.length; i++) {
-    const model = models[i];
+  const queue = [good, GEMINI_MODEL].concat(GEMINI_FALLBACKS);
+  const tried = {}, noThink = {}, errs = [];
+  let discovered = false;
+  while (Object.keys(tried).length < 8) {
+    let model = queue.shift();
+    if (model === undefined) {
+      if (discovered) break;
+      discovered = true;   // відомі назви не спрацювали — питаємо в Google, які моделі зараз доступні
+      discoverModels_(true).text.forEach(m => queue.push(m));
+      continue;
+    }
+    if (!model || (tried[model] && !noThink[model + '?'])) continue;
+    tried[model] = 1;
+    delete noThink[model + '?'];
     try {
       // Моделі Gemini 3 «думають» перед відповіддю, і думки з'їдають ліміт — тому ліміт великий
       const cfg = { temperature: json ? 0 : 0.6, maxOutputTokens: Math.max(maxTokens || 0, 8192) };
       if (json) cfg.responseMimeType = 'application/json';
       // Менше «роздумів» = швидша відповідь: розбір фраз — мінімум, коуч — трохи
       if (/^gemini-3/.test(model) && !noThink[model]) cfg.thinkingConfig = { thinkingLevel: json ? 'minimal' : 'low' };
-      else if (/^gemini-2\.5/.test(model)) cfg.thinkingConfig = { thinkingBudget: json ? 0 : 512 };
+      else if (/^gemini-2\.5/.test(model) && !noThink[model]) cfg.thinkingConfig = { thinkingBudget: json ? 0 : 512 };
       const res = UrlFetchApp.fetch(
         'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent', {
           method: 'post', contentType: 'application/json', muteHttpExceptions: true,
@@ -638,27 +686,56 @@ function gemini_(parts, json, maxTokens) {
         });
       const d = JSON.parse(res.getContentText());
       if (d.error) {
-        lastErr = model + ': ' + d.error.message;
-        if (/thinking/i.test(d.error.message) && !noThink[model]) { noThink[model] = 1; i--; continue; }  // модель не знає цього налаштування — ще раз без нього
-        if (/API key|API_KEY|PERMISSION_DENIED|location is not supported/i.test(d.error.message + ' ' + d.error.status)) break;  // інша модель не допоможе
+        const msg = String(d.error.message || '');
+        errs.push(model + ': ' + msg);
+        if (/thinking/i.test(msg) && !noThink[model]) { noThink[model] = 1; noThink[model + '?'] = 1; queue.unshift(model); continue; }
+        if (/API key|API_KEY|PERMISSION_DENIED|location is not supported/i.test(msg + ' ' + d.error.status)) break;  // інша модель не допоможе
+        const sug = msg.match(/use (?:models\/)?(gemini-[\w.\-]+[\w])/i);   // Google сам підказує нову модель
+        if (sug && !tried[sug[1]]) queue.unshift(sug[1]);
         continue;
       }
       const c = (d.candidates || [])[0];
       const out = c && c.content && c.content.parts ? c.content.parts.filter(x => !x.thought).map(x => x.text || '').join('') : '';
       if (!out) {
-        lastErr = model + ': порожня відповідь (' + ((c && c.finishReason) || (d.promptFeedback && d.promptFeedback.blockReason) || '?') + ')';
+        errs.push(model + ': порожня відповідь (' + ((c && c.finishReason) || (d.promptFeedback && d.promptFeedback.blockReason) || '?') + ')');
         continue;
       }
       if (good !== model) p.setProperty('GEMINI_OK', model);
       p.deleteProperty('GEMINI_ERR');
       return out;
     } catch (err) {
-      lastErr = model + ': ' + err.message;
+      errs.push(model + ': ' + err.message);
     }
   }
+  const lastErr = errs.length ? errs[errs.length - 1] + (errs.length > 1 ? ' (спробував моделей: ' + errs.length + ')' : '') : 'немає доступних моделей';
   p.setProperty('GEMINI_ERR', String(lastErr).slice(0, 500));
-  console.error('Gemini: ' + lastErr);
+  p.deleteProperty('GEMINI_OK');
+  console.error('Gemini: ' + errs.join(' | '));
   return null;
+}
+
+/** Список моделей, доступних для ключа (кеш на добу): text — для розмов, image — для картинок, найновіші першими. */
+function discoverModels_(force) {
+  const p = PropertiesService.getScriptProperties();
+  const cached = p.getProperty('GEMINI_LIST');
+  if (cached && !force && Date.now() - Number(p.getProperty('GEMINI_LIST_AT') || 0) < 864e5) return JSON.parse(cached);
+  let names = [];
+  try {
+    const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000', {
+      muteHttpExceptions: true, headers: { 'x-goog-api-key': GEMINI_API_KEY } });
+    names = (JSON.parse(res.getContentText()).models || [])
+      .filter(m => (m.supportedGenerationMethods || []).indexOf('generateContent') !== -1)
+      .map(m => String(m.name).replace(/^models\//, ''));
+  } catch (e) { console.error('ListModels: ' + e.message); }
+  const ver = n => { const x = n.match(/(\d+(?:\.\d+)?)/); return x ? Number(x[1]) : 0; };
+  const rank = n => (/preview|exp/.test(n) ? 2 : 0) + (/lite/.test(n) ? 0 : 1);   // стабільні й швидкі «lite» — першими
+  const sort = a => a.sort((x, y) => ver(y) - ver(x) || rank(x) - rank(y));
+  const out = {
+    text: sort(names.filter(n => /flash/.test(n) && !/image|banana|tts|audio|live|embed|vision|robotics|computer/i.test(n))).slice(0, 6),
+    image: sort(names.filter(n => /image|banana/i.test(n) && !/imagen/i.test(n))).slice(0, 4),
+  };
+  if (names.length) { p.setProperty('GEMINI_LIST', JSON.stringify(out)); p.setProperty('GEMINI_LIST_AT', String(Date.now())); }
+  return out;
 }
 
 /** Людський опис останньої помилки Gemini. */
@@ -679,7 +756,10 @@ function diagText_() {
   if (!geminiOn_()) return '❌ Ключ Gemini не вписано (GEMINI_API_KEY). Візьми його на aistudio.google.com/apikey.';
   const out = gemini_([{ text: 'Відповідай одним словом: працює' }], false, 50);
   const model = PropertiesService.getScriptProperties().getProperty('GEMINI_OK');
-  return out ? '✅ Gemini працює · модель ' + model + '\nКоуч, слова і голосові мають працювати.' : '❌ Gemini не відповідає.\n' + geminiErr_();
+  if (!out) return '❌ Gemini не відповідає.\n' + geminiErr_();
+  const img = PropertiesService.getScriptProperties().getProperty('IMAGE_ERR');
+  return '✅ Gemini працює · модель ' + model + '\nКоуч, план, слова і голосові мають працювати.' +
+    (img ? '\n\n🖼 Картинки поки не генеруються: ' + img : '');
 }
 
 function ai_(instruction, text, audio) {
@@ -698,7 +778,7 @@ function coach_(reviewAnswer) {
   const d = devData_();
   const ctx = {
     день_челенджу: dayNum_(), всього_днів: CHALLENGE_DAYS, цілі_на_90_днів: GOALS_90.trim(),
-    тиждень: { з: d.ws, по: d.we, бал: d.score, відсотки_цілей: d.goals, дії_факт_ціль: d.actions,
+    тиждень: { з: d.ws, по: d.we, бал_основних_цілей: d.score, відсотки_цілей: d.goals, дії_факт_ціль: d.actions,
       іспанська_хв: d.spanish, англійська_хв: d.english, спорт: d.sport,
       звички: d.habits.list.map((h, i) => h.k + ': ' + d.habits.grid[i].filter(x => x === true).length + ' днів, серія ' + d.habits.streaks[i]),
       життя: d.life },
@@ -711,6 +791,7 @@ function coach_(reviewAnswer) {
     'Ти — чесний і жорсткий коуч Ігоря в 90-денному челенджі. Ігорю 40. Він працює оператором ЧПУ в Іспанії (часто вночі), ' +
     'паралельно розвиває Estone (декоративний камінь і кераміка для дизайнерів та архітекторів в Україні й Іспанії), ' +
     'вчить іспанську (A2) та англійську, тренується, читає, пише музику в Suno, кидає курити. Живе за системою «Атомних звичок».\n' +
+    'ОСНОВНІ цілі: продажі Estone, іспанська, спорт — на них фокус і жорсткість. Допоміжні (англійська, читання, музика, сон, сигарети) — згадуй коротко.\n' +
     'Його відомі пастки: слабка дисципліна; будувати інструменти й «упаковку» замість продажів; розпорошуватися на нові ідеї. ' +
     'В Іспанії замовлень майже немає, бо він нікому про себе не розказує; гальмує через страх спілкування з клієнтами іспанською — ' +
     'нагадуй, що команди /es і /en перекладають повідомлення для клієнтів. В Україні головний показник B2B — кількість прорахунків ' +
@@ -944,7 +1025,7 @@ const MAIN_KB = { is_persistent: false, resize_keyboard: true, keyboard: [
   [{ text: '➕ Записати' }, { text: '✅ Звички' }, { text: '📊 Сьогодні' }],
   [{ text: '📝 План' }, { text: '🌙 Підсумок' }, { text: '☰ Ще' }],
 ] };
-const MORE_ITEMS = ['📈 Тиждень', '🧠 Коуч', '📚 Слова', '🗣 Клієнту', '💡 Ідея', '📱 Дашборд', '🔧 Перевірка', '❓ Довідка'];
+const MORE_ITEMS = ['📈 Тиждень', '🧠 Коуч', '💬 Поговорити', '📚 Слова', '🗣 Клієнту', '💡 Ідея', '🖼 Мотивація', '🕐 Графік дня', '📱 Дашборд', '🔧 Перевірка', '❓ Довідка'];
 
 const MENU = {
   '➕ Записати': c => send_(c, LOG_ROOT_TEXT, { reply_markup: { inline_keyboard: logRootKb_() } }),
@@ -964,6 +1045,10 @@ const MENU = {
   '📱 Дашборд': c => command_(c, '/dash'),
   '🔧 Перевірка': c => { tg_('sendChatAction', { chat_id: c, action: 'typing' }); send_(c, diagText_()); },
   '❓ Довідка': c => send_(c, HELP, { reply_markup: MAIN_KB }),
+  '💬 Поговорити': c => send_(c, '💬 Пиши або надиктовуй що завгодно про челендж: питання, сумніви, «що робити далі?», «як написати клієнту?». ' +
+    'Я відповідаю тільки в межах наших 90 днів 😉'),
+  '🖼 Мотивація': c => { if (!sendMotivation_(c)) send_(c, '🖼 Не вдалося згенерувати картинку 😕\n' + (PropertiesService.getScriptProperties().getProperty('IMAGE_ERR') || '')); },
+  '🕐 Графік дня': c => send_(c, timelineText_(today_()) || '🕐 Сьогодні в графіку ще порожньо. Надиктуй, що робиш, — і він заповниться.'),
   '☰ Ще': c => {
     const b = MORE_ITEMS.map((t, i) => ({ text: t, callback_data: 'mn:' + i }));
     const kb = [];
@@ -1167,6 +1252,7 @@ function habitDone_(k, s, date, plans) {
 }
 
 function habitDay_(m, date, plans) { return HABITS.map(h => habitDone_(h.k, m[date] || {}, date, plans)); }
+function groupCount_(done, main) { return HABITS.filter((h, i) => !!h.main === main && done[i]).length; }
 
 function habitStreak_(m, plans, k) {
   let d = today_(), n = 0;
@@ -1176,12 +1262,15 @@ function habitStreak_(m, plans, k) {
 }
 
 /** % виконаних звичок за період (до сьогодні включно); null, якщо звички ще не рахувались. */
-function habitPct_(m, plans, from, to) {
+function habitPct_(m, plans, from, to, main) {
   const today = today_();
   let d = from < HABITS_START ? HABITS_START : from, total = 0, done = 0;
   const end = to > today ? today : to;
   for (; d <= end; d = addDays_(d, 1)) {
-    habitDay_(m, d, plans).forEach(x => { total++; if (x) done++; });
+    habitDay_(m, d, plans).forEach((x, i) => {
+      if (main !== undefined && !!HABITS[i].main !== main) return;
+      total++; if (x) done++;
+    });
   }
   return total ? Math.round(done / total * 100) : null;
 }
@@ -1189,21 +1278,30 @@ function habitPct_(m, plans, from, to) {
 /** Пропуски: once — пропущено вчора, twice — вчора і позавчора. */
 function missed_(m, plans) {
   const y = addDays_(today_(), -1), y2 = addDays_(today_(), -2);
-  const out = { once: [], twice: [] };
+  const out = { once: [], twice: [], aux: [] };
   if (y < HABITS_START) return out;
   HABITS.forEach(h => {
     if (habitDone_(h.k, m[y] || {}, y, plans)) return;
-    if (y2 >= HABITS_START && !habitDone_(h.k, m[y2] || {}, y2, plans)) out.twice.push(h);
+    if (!h.main) out.aux.push(h);
+    else if (y2 >= HABITS_START && !habitDone_(h.k, m[y2] || {}, y2, plans)) out.twice.push(h);
     else out.once.push(h);
   });
   return out;
 }
 
 function habitsKeyboard_(date, done) {
-  const btns = HABITS.map((h, i) => ({ text: (done[i] ? '✅ ' : '⬜ ') + h.icon + ' ' + h.k, callback_data: 'hb:' + date + ':' + i }));
   const kb = [];
-  for (let i = 0; i < btns.length; i += 2) kb.push(btns.slice(i, i + 2));
+  [true, false].forEach(main => {
+    kb.push([{ text: main ? '— 🎯 Основні —' : '— 🌱 Допоміжні —', callback_data: 'noop' }]);
+    const btns = HABITS.map((h, i) => ({ h: h, b: { text: (done[i] ? '✅ ' : '⬜ ') + h.icon + ' ' + h.k, callback_data: 'hb:' + date + ':' + i } }))
+      .filter(x => !!x.h.main === main).map(x => x.b);
+    for (let i = 0; i < btns.length; i += 2) kb.push(btns.slice(i, i + 2));
+  });
   return kb;
+}
+
+function habitsHead_(done) {
+  return '🎯 Основні ' + groupCount_(done, true) + '/' + MAIN_HABITS.length + ' · 🌱 допоміжні ' + groupCount_(done, false) + '/' + AUX_HABITS.length;
 }
 
 function habitCallback_(cq, date, idx) {
@@ -1228,11 +1326,14 @@ function habitCallback_(cq, date, idx) {
 /** Підсумок звичок за день + реакція в тоні коуча. */
 function habitVerdict_(date) {
   const done = habitDay_(daySums_(devRows_()), date, planDates_());
-  const miss = HABITS.filter((h, i) => !done[i]);
-  const head = '🧱 Звички: ' + (HABITS.length - miss.length) + '/' + HABITS.length;
-  if (!miss.length) return head + '\n🔥 Все закрито. Отак і виглядає людина, яка тримає слово.';
-  return head + '\nНе зроблено: ' + miss.map(h => h.icon + ' ' + h.k).join(', ') +
-    (miss.length > 2 ? '\n\n' + pick_(TAUNTS) : '\n\nЗавтра — не пропускати вдруге.');
+  const missMain = HABITS.filter((h, i) => h.main && !done[i]);
+  const missAux = HABITS.filter((h, i) => !h.main && !done[i]);
+  let out = '🧱 ' + habitsHead_(done);
+  if (!missMain.length) out += '\n🔥 Основне закрито. Отак і виглядає людина, яка тримає слово.';
+  else out += '\n🎯 Не зроблено: ' + missMain.map(h => h.icon + ' ' + h.k).join(', ') +
+    (missMain.length > 1 ? '\n\n' + pick_(TAUNTS) : '\n\nЗавтра — не пропускати вдруге.');
+  if (missAux.length) out += '\n🌱 Допоміжні пропущено: ' + missAux.map(h => h.icon).join(' ');
+  return out;
 }
 
 function saveJournal_(text, date) {
@@ -1260,6 +1361,125 @@ function saveIdea_(idea) {
   return '💡 Ідею записав: «' + idea + '». Розберемо в неділю, не зараз.' +
     (sales < SALES_DAY_MIN ? '\n\nА тепер чесно: продажних дій сьогодні ' + sales + '/' + SALES_DAY_MIN +
       '. Нова ідея — найзручніший спосіб не писати клієнтам. Спочатку клієнти, потім фантазії.' : '');
+}
+
+// ======================= ГРАФІК ДНЯ =======================
+
+function addTimeline_(what, minutes) {
+  const now = new Date();
+  sheet_(SHEET_TIMELINE).appendRow([today_(), Utilities.formatDate(now, TZ, 'HH:mm'), what, minutes || '']);
+  PropertiesService.getScriptProperties().setProperty('TL_AT', String(now.getTime()));
+}
+
+function lastTimelineAt_() { return Number(PropertiesService.getScriptProperties().getProperty('TL_AT') || 0); }
+
+function timelineText_(date) {
+  const sh = sheet_(SHEET_TIMELINE);
+  const n = sh.getLastRow();
+  if (n < 2) return '';
+  const rows = sh.getRange(2, 1, n - 1, 3).getDisplayValues().filter(r => r[0] === date);
+  return rows.length ? '🕐 Графік дня:\n' + rows.map(r => r[1] + ' — ' + r[2]).join('\n') : '';
+}
+
+// ======================= ЧАТ З КОУЧЕМ =======================
+
+/** Відповідь у розмові: пам'ятає останні репліки, бачить дані челенджу, не виходить за його межі. */
+function chatReply_(chatId, said, prefix) {
+  if (!said) { send_(chatId, (prefix || '') + 'Не почув 🤔 Спробуй ще раз.'); return; }
+  tg_('sendChatAction', { chat_id: chatId, action: 'typing' });
+  const cache = CacheService.getScriptCache();
+  const hist = JSON.parse(cache.get('chat_hist') || '[]');
+  const rows = devRows_(), m = daySums_(rows), today = today_();
+  const d = devData_();
+  const ctx = {
+    сьогодні: today, день_челенджу: dayNum_(), цілі: GOALS_90.trim(),
+    сьогодні_зроблено: sumLine_(m[today] || {}) || 'нічого', план_сьогодні: getPlan_(today).map(p => (p.done ? '✅ ' : '⬜ ') + p.text),
+    потрібно_сьогодні: dailyNeeds_(rows), бал_тижня: d.score, відсотки_цілей: d.goals, графік_дня: timelineText_(today),
+  };
+  const prompt =
+    'Ти — особистий коуч Ігоря в 90-денному челенджі, спілкуєшся з ним у Telegram. Ігорю 40, оператор ЧПУ в Іспанії (робота до 16:00), ' +
+    'розвиває Estone (стільниці, раковини, вироби з каменю й кераміки для дизайнерів та архітекторів в Україні та Іспанії).\n' +
+    'ОСНОВНІ цілі: продажі Estone, іспанська, спорт. Допоміжні: англійська, читання, музика (Suno), сон, кинути курити, щоденне планування.\n' +
+    'Межі: говори ТІЛЬКИ про те, що допомагає досягти цілей челенджу — продажі й клієнти, іспанська/англійська, тренування, звички, ' +
+    'сон, куріння, планування, мотивація, дисципліна. Можеш давати практичні поради (як написати клієнту, як тренувати підтягування, ' +
+    'як перестати відкладати). Якщо питання не про це — одним реченням поверни до цілей. Не вигадуй даних, яких немає.\n' +
+    'Тон: чесний, прямий, з підколками, коли Ігор відмазується (він сам просив жорсткий стиль), але по-людськи. ' +
+    'Якщо він хворий, виснажений чи в кризі — без підколок, підтримай. Відповідай українською, коротко (до 120 слів), простим текстом без markdown. ' +
+    'Закінчуй конкретною наступною дією, коли це доречно.\n\n' +
+    'Дані челенджу: ' + JSON.stringify(ctx) + '\n\n' +
+    (hist.length ? 'Попередні репліки:\n' + hist.map(h => (h.r === 'u' ? 'Ігор: ' : 'Коуч: ') + h.t).join('\n') + '\n\n' : '') +
+    'Ігор: ' + said + '\nКоуч:';
+  const out = gemini_([{ text: prompt }], false, 1200);
+  if (!out) { send_(chatId, (prefix || '') + 'Коуч зараз недоступний 😕\n' + geminiErr_()); return; }
+  const answer = out.replace(/\*\*/g, '').replace(/^#+\s*/gm, '').replace(/^Коуч:\s*/, '').trim();
+  hist.push({ r: 'u', t: said.slice(0, 500) }, { r: 'c', t: answer.slice(0, 700) });
+  cache.put('chat_hist', JSON.stringify(hist.slice(-12)), 21600);
+  send_(chatId, (prefix || '') + '🧠 ' + answer);
+}
+
+// ======================= МОТИВАЦІЙНА КАРТИНКА =======================
+
+const MOTIVATION_SCENES = [
+  'a stone workshop at dawn, a craftsman polishing a quartz kitchen countertop, sparks of light, cinematic',
+  'a man doing pull-ups on an outdoor bar on a Spanish beach at sunrise, silhouette, epic sky',
+  'a mountain trail at sunrise, a lone hiker almost at the summit, golden light',
+  'a modern Spanish kitchen with a beautiful natural stone countertop, warm evening light, architectural photo',
+  'a notebook with a handwritten plan next to a coffee cup and a phone, morning light on a desk',
+  'a boxer wrapping hands in a quiet gym before training, dramatic light',
+  'a bridge being built over a canyon, workers at sunrise, sense of progress',
+  'a guitar and studio headphones on a desk at night, city lights behind the window',
+  'a runner on an empty Madrid street at dawn',
+  'an elegant bathroom with a stone washbasin with a slot drain, luxury interior photo',
+  'a staircase going up into bright light, minimalism',
+  'a seed sprouting through cracked concrete, macro photo',
+  'a chess board mid-game with a determined hand moving a piece, dramatic light',
+  'a CNC machine cutting marble with water spray, industrial cinematic',
+  'a man looking at the Mediterranean sea from a cliff in Andalusia, sunrise',
+];
+
+/** Генерує нову картинку і шле її з підписом. true — якщо вдалося. */
+function sendMotivation_(chatId) {
+  if (!geminiOn_()) return false;
+  const scene = pick_(MOTIVATION_SCENES);
+  const img = geminiImage_('Create a powerful, beautiful motivational image, photorealistic, no text on the image, vertical 4:5. Scene: ' + scene + '. ' +
+    'Also write ONE short motivational line in Ukrainian (max 15 words) for a 40-year-old man who builds his stone business, learns Spanish ' +
+    'and trains — about discipline and keeping promises to himself. Reply with the image and only that line of text.');
+  if (!img) return false;
+  const caption = (img.text || pick_(TAUNTS)).replace(/\*\*/g, '').trim().slice(0, 900);
+  const res = UrlFetchApp.fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendPhoto', {
+    method: 'post', muteHttpExceptions: true, payload: { chat_id: String(chatId), caption: '🔥 ' + caption, photo: img.blob },
+  });
+  return JSON.parse(res.getContentText()).ok === true;
+}
+
+function geminiImage_(prompt) {
+  const p = PropertiesService.getScriptProperties();
+  const models = [p.getProperty('IMAGE_OK')].concat(discoverModels_(false).image)
+    .filter((m, i, a) => m && a.indexOf(m) === i).slice(0, 4);
+  let err = models.length ? '' : 'для цього ключа немає моделей для зображень';
+  for (let i = 0; i < models.length; i++) {
+    try {
+      const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + models[i] + ':generateContent', {
+        method: 'post', contentType: 'application/json', muteHttpExceptions: true, headers: { 'x-goog-api-key': GEMINI_API_KEY },
+        payload: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } }),
+      });
+      const d = JSON.parse(res.getContentText());
+      if (d.error) { err = models[i] + ': ' + d.error.message; continue; }
+      const parts = ((d.candidates || [])[0] || {}).content;
+      const ps = parts && parts.parts ? parts.parts : [];
+      const im = ps.find(x => x.inlineData && /^image/.test(x.inlineData.mimeType || ''));
+      if (!im) { err = models[i] + ': без зображення'; continue; }
+      p.setProperty('IMAGE_OK', models[i]);
+      p.deleteProperty('IMAGE_ERR');
+      return {
+        blob: Utilities.newBlob(Utilities.base64Decode(im.inlineData.data), im.inlineData.mimeType, 'motivation.png'),
+        text: ps.filter(x => x.text && !x.thought).map(x => x.text).join(' ').trim(),
+      };
+    } catch (e) { err = models[i] + ': ' + e.message; }
+  }
+  p.setProperty('IMAGE_ERR', String(err).slice(0, 400));
+  console.error('Image: ' + err);
+  return null;
 }
 
 // ======================= ІНШІ СПРАВИ (поза показниками) =======================
@@ -1380,8 +1600,9 @@ function todayText_() {
   const plan = getPlan_(today);
   const done = habitDay_(daySums_(devRows_()), today, planDates_());
   return dayLine_() + '\n\n' + (sumLine_(s) ? 'Записано: ' + sumLine_(s) : 'Сьогодні ще нічого не записано.') +
-    '\n\n🧱 Звички ' + done.filter(Boolean).length + '/' + HABITS.length + ': ' +
-    HABITS.map((h, i) => (done[i] ? '✅' : '⬜') + h.icon).join(' ') +
+    '\n\n🎯 ' + MAIN_HABITS.map(h => (done[HABITS.indexOf(h)] ? '✅' : '⬜') + h.icon).join(' ') +
+    '\n🌱 ' + AUX_HABITS.map(h => (done[HABITS.indexOf(h)] ? '✅' : '⬜') + h.icon).join(' ') +
+    (timelineText_(today) ? '\n\n' + timelineText_(today) : '') +
     (plan.length ? '\n\n📝 План:\n' + plan.map(p => (p.done ? '✅ ' : '⬜ ') + p.text).join('\n') : '');
 }
 
@@ -1393,24 +1614,22 @@ function devReport_() {
   if (d.month.turnoverT) lines.push('Місяць: оборот ' + fmt_(d.month.turnover) + ' з ' + fmt_(d.month.turnoverT) + ' (мін. ' + fmt_(d.month.turnoverMin) + '), угод ' + d.month.deals);
   lines.push('Челендж: ' + fmt_(d.challenge.turnover) + ' з ' + fmt_(d.challenge.goal) + '  ' + bar_(d.challenge.turnover, d.challenge.goal));
   if (d.challenge.quotesSum) lines.push('Прорахунків на ' + fmt_(d.challenge.quotesSum) + ' → прогноз продажів ≈ ' + fmt_(d.challenge.forecast));
-  lines.push('', '🗣 Мови · ' + d.goals.es + '%',
-    '🇪🇸 ' + d.spanish.min + '/' + d.spanish.t + ' хв  ' + bar_(d.spanish.min, d.spanish.t) + ' · серія ' + d.spanish.streak + ' дн.',
-    'Слова: ' + d.words.week + '/' + d.words.t + ' · всього ' + d.words.total + '/' + d.words.goal,
-    '🇬🇧 ' + d.english.min + '/' + d.english.t + ' хв  ' + bar_(d.english.min, d.english.t) + ' · серія ' + d.english.streak + ' дн.');
+  lines.push('', '🇪🇸 Іспанська · ' + d.goals.es + '%',
+    d.spanish.min + '/' + d.spanish.t + ' хв  ' + bar_(d.spanish.min, d.spanish.t) + ' · серія ' + d.spanish.streak + ' дн.',
+    'Слова: ' + d.words.week + '/' + d.words.t + ' · всього ' + d.words.total + '/' + d.words.goal);
   lines.push('', '💪 Спорт · ' + d.goals.sport + '%', d.sport.n + '/' + d.sport.t + ' тренувань  ' + bar_(d.sport.n, d.sport.t));
   if (d.body.weight) lines.push('Вага: ' + d.body.weight.value + ' кг (ціль ' + WEIGHT_GOAL + ')');
   if (d.body.pullups) lines.push('Підтягування: ' + d.body.pullups.value + '/' + PULLUP_GOAL);
-  if (d.goals.habits !== null) {
-    lines.push('', '🧱 Звички · ' + d.goals.habits + '%');
-    d.habits.list.forEach((h, i) => {
-      const g = d.habits.grid[i].filter(x => x !== null);
-      lines.push(h.icon + ' ' + h.k + ': ' + g.filter(Boolean).length + '/' + g.length + (d.habits.streaks[i] ? ' · серія ' + d.habits.streaks[i] : ''));
-    });
-  }
+  const hl = (main) => d.habits.list.map((h, i) => {
+    if (!!h.main !== main) return null;
+    const g = d.habits.grid[i].filter(x => x !== null);
+    return h.icon + ' ' + h.k + ': ' + g.filter(Boolean).length + '/' + g.length + (d.habits.streaks[i] ? ' · серія ' + d.habits.streaks[i] : '');
+  }).filter(Boolean);
+  if (d.goals.habits !== null) lines.push('', '🎯 Дисципліна (основні звички) · ' + d.goals.habits + '%', ...hl(true));
   const L = d.life;
-  lines.push('', '🌱 Сон: ' + (L.sleepAvg ? L.sleepAvg + ' год у середньому' : 'немає даних (#сон 7)') +
-    ' · 🚬 сигарет ' + L.cigs + ' · 🚭 днів без ' + L.smokeFree +
-    '\n📖 читання ' + L.reading + '/' + L.readingT + ' хв · 🎹 музика ' + L.music + '/' + L.musicT + ' хв');
+  lines.push('', '🌱 Допоміжне' + (d.goals.aux !== null ? ' · ' + d.goals.aux + '%' : ''), ...(d.goals.aux !== null ? hl(false) : []),
+    '🇬🇧 англійська ' + d.english.min + '/' + d.english.t + ' хв · 📖 читання ' + L.reading + '/' + L.readingT + ' хв · 🎹 музика ' + L.music + '/' + L.musicT + ' хв',
+    '😴 сон ' + (L.sleepAvg ? L.sleepAvg + ' год у середньому' : '— (надиктуй «спав 7 годин»)') + ' · 🚬 сигарет ' + L.cigs + ' · 🚭 днів без ' + L.smokeFree);
   const oth = othersBetween_(d.ws, d.we);
   if (oth.length) {
     const mins = oth.reduce((a, o) => a + (o.minutes || 0), 0);
@@ -1431,7 +1650,8 @@ function devData_(ws) {
   const s = devSum_(rows, ws, we);
   const g = goalPct_(s);
   const plans = planDates_(), m = daySums_(rows);
-  g.habits = habitPct_(m, plans, ws, we);
+  g.habits = habitPct_(m, plans, ws, we, true);
+  g.aux = habitPct_(m, plans, ws, we, false);
   const month = (isCurrent ? today : we).slice(0, 7);
   const ms = devSum_(rows, month + '-01', month + '-31');
   const f4 = devSum_(rows, addDays_(ws, -21), we);
@@ -1444,7 +1664,7 @@ function devData_(ws) {
   for (let i = 7; i >= 0; i--) {
     const w = addDays_(ws, -7 * i);
     const gp = goalPct_(devSum_(rows, w, addDays_(w, 6)));
-    gp.habits = habitPct_(m, plans, w, addDays_(w, 6));
+    gp.habits = habitPct_(m, plans, w, addDays_(w, 6), true);
     trend.push({ w: w, fin: gp.fin, es: gp.es, sport: gp.sport, habits: gp.habits, score: score_(gp) });
   }
   const day = dayNum_();
@@ -1473,7 +1693,7 @@ function devData_(ws) {
       forecast: Math.round(q_(chal, 'Прорахунок', 'value') * QUOTE_CONV), conv: QUOTE_CONV,
     },
     habits: {
-      list: HABITS.map(h => ({ k: h.k, icon: h.icon })),
+      list: HABITS.map(h => ({ k: h.k, icon: h.icon, main: !!h.main })),
       grid: HABITS.map(h => days.map(x => x.d > today || x.d < HABITS_START ? null : habitDone_(h.k, m[x.d] || {}, x.d, plans))),
       streaks: HABITS.map(h => habitStreak_(m, plans, h.k)),
     },
@@ -1516,15 +1736,12 @@ function q_(s, k, f) { return s[k] ? Math.round(s[k][f || 'qty'] * 100) / 100 : 
 function pct_(v, t) { return t ? Math.min(100, Math.round(v / t * 100)) : 0; }
 function goalPct_(s) {
   const fin = Math.round(FIN_KEYS.reduce((a, k) => a + pct_(q_(s, k), DEV_TARGETS[k]), 0) / FIN_KEYS.length);
-  // Мови: іспанська (хвилини + слова) важить 2/3, англійська — 1/3
-  const es = Math.round((pct_(q_(s, 'Іспанська'), DEV_TARGETS['Іспанська']) + pct_(q_(s, 'Слова'), DEV_TARGETS['Слова']) +
-    pct_(q_(s, 'Англійська'), DEV_TARGETS['Англійська'])) / 3);
+  // Основна ціль — іспанська: хвилини + слова (англійська — допоміжна звичка)
+  const es = Math.round((pct_(q_(s, 'Іспанська'), DEV_TARGETS['Іспанська']) + pct_(q_(s, 'Слова'), DEV_TARGETS['Слова'])) / 2);
   return { fin: fin, es: es, sport: pct_(q_(s, 'Спорт'), DEV_TARGETS['Спорт']) };
 }
-function score_(g) {
-  const p = [g.fin, g.es, g.sport].concat(g.habits === null || g.habits === undefined ? [] : [g.habits]);
-  return Math.round(p.reduce((a, x) => a + x, 0) / p.length);
-}
+/** Бал тижня — тільки три основні цілі: продажі, іспанська, спорт. */
+function score_(g) { return Math.round((g.fin + g.es + g.sport) / 3); }
 function firstSnap_(rows, metric) {
   const r = rows.find(x => x.metric === metric);
   return r ? r.value : null;
@@ -1579,6 +1796,7 @@ const HEADERS = {
   'Щоденник': ['Дата', 'Підсумок'],
   'Ідеї':   ['Дата', 'Ідея', 'Статус'],
   'Інші справи': ['Дата', 'Справа', 'Хвилини', 'Напрям'],
+  'Графік дня': ['Дата', 'Час', 'Що робив', 'Хвилини'],
 };
 
 function sheet_(name) {
@@ -1589,7 +1807,7 @@ function sheet_(name) {
     sh.appendRow(HEADERS[name]);
     sh.setFrozenRows(1);
     sh.getRange('1:1').setFontWeight('bold');
-    if (name === SHEET_PLAN || name === SHEET_JOURNAL || name === SHEET_OTHER) sh.getRange('A:A').setNumberFormat('@');
+    if ([SHEET_PLAN, SHEET_JOURNAL, SHEET_OTHER, SHEET_TIMELINE].indexOf(name) !== -1) sh.getRange('A:B').setNumberFormat('@');
     else if (name === SHEET_WORDS) sh.getRange('E:H').setNumberFormat('@');
     else sh.getRange('A:A').setNumberFormat('dd.MM.yyyy HH:mm');
   }
@@ -1615,7 +1833,7 @@ function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   PropertiesService.getScriptProperties().setProperty('SS_ID', ss.getId());
   ss.setSpreadsheetTimeZone(TZ);
-  const names = [SHEET_LOG, SHEET_PLAN, SHEET_REVIEW, SHEET_WORDS, SHEET_JOURNAL, SHEET_IDEAS, SHEET_OTHER];
+  const names = [SHEET_LOG, SHEET_PLAN, SHEET_REVIEW, SHEET_WORDS, SHEET_JOURNAL, SHEET_IDEAS, SHEET_OTHER, SHEET_TIMELINE];
   names.forEach(sheet_);
   ss.getSheets().forEach(s => {
     if (names.indexOf(s.getName()) === -1 && s.getLastRow() === 0) ss.deleteSheet(s);
@@ -1651,6 +1869,7 @@ function installTriggers() {
   ScriptApp.newTrigger('morningPush').timeBased().atHour(MORNING_HOUR).nearMinute(30).everyDays(1).inTimezone(TZ).create();
   ScriptApp.newTrigger('middayNudge').timeBased().atHour(NUDGE_HOUR).everyDays(1).inTimezone(TZ).create();
   ScriptApp.newTrigger('eveningPush').timeBased().atHour(EVENING_HOUR).everyDays(1).inTimezone(TZ).create();
+  ScriptApp.newTrigger('hourlyCheckin').timeBased().everyHours(1).create();
   ScriptApp.newTrigger('lateNudge').timeBased().atHour(LATE_HOUR).nearMinute(30).everyDays(1).inTimezone(TZ).create();
   ScriptApp.newTrigger('weeklyReview').timeBased().onWeekDay(ScriptApp.WeekDay.SUNDAY).atHour(REVIEW_HOUR).inTimezone(TZ).create();
   console.log('Розклад увімкнено: ' + ScriptApp.getProjectTriggers().length + ' тригери.');

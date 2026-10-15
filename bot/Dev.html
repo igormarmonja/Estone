@@ -166,11 +166,12 @@
 
   <div class="grid g2">
     <div class="card">
-      <h2>🧱 Звички <span class="tag" id="habitTag"></span></h2>
+      <h2>🎯 Основні звички <span class="tag" id="habitTag"></span></h2>
       <div class="hg" id="habits"></div>
     </div>
     <div class="card">
-      <h2>🌱 Життя <span class="tag">тиждень</span></h2>
+      <h2>🌱 Допоміжне <span class="tag" id="auxTag">тиждень</span></h2>
+      <div class="hg" id="auxHabits" style="margin-bottom:14px"></div>
       <div class="tiles" id="life" style="grid-template-columns:1fr 1fr"></div>
     </div>
   </div>
@@ -193,10 +194,10 @@
       <div class="fn" id="funnel"></div>
     </div>
     <div class="card">
-      <h2>🗣 Мови по днях <span class="pill" id="streak"></span></h2>
+      <h2>🇪🇸 Іспанська по днях <span class="pill" id="streak"></span></h2>
       <div class="row"><div class="bignum" id="esMin"></div><div class="muted" id="esAvg"></div></div>
       <div class="chart sm"><canvas id="esChart"></canvas></div>
-      <div class="tiles" id="words" style="margin-top:14px"></div>
+      <div class="tiles" id="words" style="grid-template-columns:1fr 1fr;margin-top:14px"></div>
     </div>
   </div>
 
@@ -279,7 +280,7 @@
     const touches = d.actions[0];
     const cards = [
       { cls: 'k-blue', name: 'Estone<br>дії з клієнтами', num: num(touches.v), of: '/ ' + touches.t + ' дотиків', p: d.goals.fin, prev: prev.fin },
-      { cls: 'k-orange', name: 'Мови<br>🇪🇸 + 🇬🇧', num: num(d.spanish.min + d.english.min), of: '/ ' + (d.spanish.t + d.english.t) + ' хв', p: d.goals.es, prev: prev.es },
+      { cls: 'k-orange', name: 'Іспанська<br>мова', num: num(d.spanish.min), of: '/ ' + d.spanish.t + ' хв', p: d.goals.es, prev: prev.es },
       { cls: 'k-cyan', name: 'Спорт<br>тренування', num: d.sport.n, of: '/ ' + d.sport.t, p: d.goals.sport, prev: prev.sport },
     ];
     $('kpis').innerHTML = cards.map(c => {
@@ -311,17 +312,21 @@
 
     // Habits
     const H = d.habits;
-    $('habitTag').textContent = d.goals.habits === null ? 'старт ' + dm(d.today) : d.goals.habits + '% · ' + H.list.length + ' звичок';
-    $('habits').innerHTML = '<div></div>' + DAYS.map((x, i) => '<div class="h">' + x + '</div>').join('') + '<div class="h">🔥</div>' +
-      H.list.map((h, i) => '<div class="n">' + h.icon + ' ' + h.k + '</div>' +
+    $('habitTag').textContent = d.goals.habits === null ? 'старт' : d.goals.habits + '% дисципліни';
+    $('auxTag').textContent = d.goals.aux === null || d.goals.aux === undefined ? 'тиждень' : d.goals.aux + '% · тиждень';
+    const grid = main => '<div></div>' + DAYS.map(x => '<div class="h">' + x + '</div>').join('') + '<div class="h">🔥</div>' +
+      H.list.map((h, i) => !!h.main !== main ? '' : '<div class="n">' + h.icon + ' ' + h.k + '</div>' +
         H.grid[i].map(v => '<div class="c ' + (v === true ? 'y' : v === false ? 'x' : 'f') + '"></div>').join('') +
         '<div class="s">' + (H.streaks[i] || '') + '</div>').join('');
+    $('habits').innerHTML = grid(true);
+    $('auxHabits').innerHTML = grid(false);
 
     // Life
-    const L = d.life, rp = pct(L.reading, L.readingT), mu = pct(L.music, L.musicT);
+    const L = d.life, rp = pct(L.reading, L.readingT), mu = pct(L.music, L.musicT), ep = pct(d.english.min, d.english.t);
     const lt = (l, v, s, p, bg) => '<div class="tile"><div class="l">' + l + '</div><div class="v">' + v + '</div><div class="s">' + s + '</div>' +
       (p === null ? '' : '<div class="mini"><div style="width:' + p + '%;background:' + bg + '"></div></div>') + '</div>';
     $('life').innerHTML =
+      lt('🇬🇧 Англійська', num(d.english.min) + ' <span class="muted">/ ' + d.english.t + '</span>', 'хвилин', ep, barColor(ep)) +
       lt('😴 Сон', L.sleepAvg ? num(L.sleepAvg) + ' <span class="muted">год</span>' : '—', 'середнє · ціль ' + L.sleepGoal, L.sleepAvg ? pct(L.sleepAvg, L.sleepGoal) : 0, 'linear-gradient(90deg,#a66bff,#1e8bff)') +
       lt('🚭 Без сигарет', L.smokeFree + ' <span class="muted">дн.</span>', 'сигарет за тиждень: ' + L.cigs, pct(L.smokeFree, 7), 'linear-gradient(90deg,#10c6d4,#22c55e)') +
       lt('📖 Читання', num(L.reading) + ' <span class="muted">/ ' + L.readingT + '</span>', 'хвилин', rp, barColor(rp)) +
@@ -344,22 +349,19 @@
     }).join('');
 
     // Spanish
-    $('esMin').innerHTML = num(d.spanish.min) + ' <small>/ ' + d.spanish.t + ' хв 🇪🇸</small>';
+    $('esMin').innerHTML = num(d.spanish.min) + ' <small>/ ' + d.spanish.t + ' хв</small>';
     $('streak').textContent = d.spanish.streak ? '🔥 ' + d.spanish.streak + ' дн. поспіль' : 'серії ще немає';
     $('esAvg').textContent = d.days.filter(x => x.es > 0).length + ' з 7 днів';
-    const wp = pct(d.words.total, d.words.goal), ww = pct(d.words.week, d.words.t), ep = pct(d.english.min, d.english.t);
+    const wp = pct(d.words.total, d.words.goal), ww = pct(d.words.week, d.words.t);
     $('words').innerHTML =
       '<div class="tile"><div class="l">Слова за тиждень</div><div class="v">' + d.words.week + ' <span class="muted">/ ' + d.words.t + '</span></div>' +
         '<div class="mini"><div style="width:' + ww + '%;background:' + barColor(ww) + '"></div></div></div>' +
       '<div class="tile"><div class="l">Словник</div><div class="v">' + d.words.total + ' <span class="muted">/ ' + d.words.goal + '</span></div>' +
-        '<div class="mini"><div style="width:' + wp + '%;background:linear-gradient(90deg,#ffb01f,#ff7a00)"></div></div></div>' +
-      '<div class="tile"><div class="l">🇬🇧 Англійська</div><div class="v">' + num(d.english.min) + ' <span class="muted">/ ' + d.english.t + '</span></div>' +
-        '<div class="mini"><div style="width:' + ep + '%;background:linear-gradient(90deg,#a66bff,#1e8bff)"></div></div></div>';
+        '<div class="mini"><div style="width:' + wp + '%;background:linear-gradient(90deg,#ffb01f,#ff7a00)"></div></div></div>';
     drawChart('esChart', {
       type: 'bar',
       data: { labels: DAYS, datasets: [
-        { label: 'Іспанська', data: d.days.map(x => x.es), borderRadius: 6, maxBarThickness: 26, backgroundColor: '#ff9a1f' },
-        { label: 'Англійська', data: d.days.map(x => x.en || 0), borderRadius: 6, maxBarThickness: 26, backgroundColor: '#a66bff' }] },
+        { label: 'Іспанська', data: d.days.map(x => x.es), borderRadius: 6, maxBarThickness: 26, backgroundColor: '#ff9a1f' }] },
       options: { maintainAspectRatio: false, plugins: { legend: { display: false },
           tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + c.parsed.y + ' хв' } } },
         scales: { x: { stacked: true, grid: { display: false }, ticks: { color: '#8391ad', font: { weight: 700 } } },
@@ -390,7 +392,7 @@
         '<div class="mini"><div style="width:' + pp + '%;background:' + barColor(pp) + '"></div></div></div>';
 
     // Trend (area)
-    const series = [['Estone', 'fin', '#1e8bff'], ['Мови', 'es', '#ff9a1f'], ['Спорт', 'sport', '#10c6d4'], ['Звички', 'habits', '#22c55e']];
+    const series = [['Estone', 'fin', '#1e8bff'], ['Іспанська', 'es', '#ff9a1f'], ['Спорт', 'sport', '#10c6d4'], ['Дисципліна', 'habits', '#22c55e']];
     drawChart('trend', {
       type: 'line',
       data: { labels: d.trend.map(t => dm(t.w)), datasets: series.map(s => ({
