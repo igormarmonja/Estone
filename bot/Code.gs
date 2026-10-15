@@ -690,7 +690,7 @@ function gemini_(parts, json, maxTokens) {
         const msg = String(d.error.message || '');
         errs.push(model + ': ' + msg);
         if (/thinking/i.test(msg) && !noThink[model]) { noThink[model] = 1; noThink[model + '?'] = 1; queue.unshift(model); continue; }
-        if (/API key|API_KEY|PERMISSION_DENIED|location is not supported/i.test(msg + ' ' + d.error.status)) break;  // інша модель не допоможе
+        if (/API key|API_KEY|PERMISSION_DENIED|location is not supported|prepay|credits|billing/i.test(msg + ' ' + d.error.status)) break;  // інша модель не допоможе
         const sug = msg.match(/use (?:models\/)?(gemini-[\w.\-]+[\w])/i);   // Google сам підказує нову модель
         if (sug && !tried[sug[1]]) queue.unshift(sug[1]);
         continue;
@@ -744,7 +744,9 @@ function geminiErr_() {
   const e = PropertiesService.getScriptProperties().getProperty('GEMINI_ERR') || '';
   if (!e) return '';
   let hint = '';
-  if (/API key not valid|API_KEY_INVALID/i.test(e)) hint = 'Ключ неправильний. Створи новий на aistudio.google.com/apikey і встав у GEMINI_API_KEY.';
+  if (/prepay|credits are depleted|billing/i.test(e)) hint = 'Закінчились гроші на рахунку Gemini. Варіанти: поповнити баланс на aistudio.google.com (Billing), ' +
+    'або створити НОВИЙ проєкт без оплати в AI Studio і новий ключ у ньому — він працює на безкоштовних лімітах. Новий ключ встав у GEMINI_API_KEY.';
+  else if (/API key not valid|API_KEY_INVALID/i.test(e)) hint = 'Ключ неправильний. Створи новий на aistudio.google.com/apikey і встав у GEMINI_API_KEY.';
   else if (/quota|RESOURCE_EXHAUSTED|rate/i.test(e)) hint = 'Вичерпано ліміт безкоштовних запитів. Зачекай або перевір ліміти в aistudio.google.com.';
   else if (/location is not supported/i.test(e)) hint = 'Google не пускає з цього регіону.';
   else if (/PERMISSION_DENIED|has not been used|disabled/i.test(e)) hint = 'Для ключа не ввімкнено Gemini API. Створи ключ саме в aistudio.google.com/apikey.';
