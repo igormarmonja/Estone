@@ -10,6 +10,33 @@
 # Службові файли
 RedirectMatch 404 ^/docs/
 
+# ── Одна адреса для кожної сторінки ──────────────────────────
+# Без цього Google бачить /kukhnia/ і /kukhnia/index.html як дві
+# різні сторінки і половину з них викидає з індексу як копію.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Завжди https
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://estone.com.ua/$1 [R=301,L]
+
+  # Завжди без www
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^(.*)$ https://estone.com.ua/$1 [R=301,L]
+
+  # /сторінка/index.html -> /сторінка/
+  RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
+  RewriteRule ^(.*/)?index\.html$ /$1 [R=301,L]
+
+  # Старі адреси карти сайту зі старого сайту
+  RewriteRule ^sitemapsindex\.xml$ /sitemap.xml [R=301,L]
+  RewriteRule ^sitemap_index\.xml$ /sitemap.xml [R=301,L]
+</IfModule>
+
+ErrorDocument 404 /404.html
+DirectoryIndex index.html
+
 # ── Кешування ────────────────────────────────────────────────
 # HTML не кешуємо: зміни на сайті видно одразу, без інкогніто.
 # Стилі, скрипти й фото кешуємо надовго — у їхніх адресах є ?v=,
