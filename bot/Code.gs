@@ -115,7 +115,8 @@ const HABITS = [
 const MAIN_HABITS = HABITS.filter(h => h.main);
 const AUX_HABITS  = HABITS.filter(h => !h.main);
 const QUICK_HABITS = { 'Іспанська': 15, 'Англійська': 15, 'Читання': 15, 'Музика': 15, 'Без сигарет': 1 };  // кнопка = запис
-const SALES_DAY_MIN = 10;    // мінімум продажних дій на день; поки менше — нові ідеї чекають
+const SALES_DAY_MIN = 10;    // мінімум продажних дій на робочий день; поки менше — нові ідеї чекають
+const SALES_DAYS    = [1, 2, 3, 4, 5];   // дні продажів (пн–пт): у вихідні КП не надсилаються — продажі не вимагаються
 const SLEEP_GOAL    = 7;     // годин
 const QUOTE_CONV    = 0.175; // конверсія прорахунків у продажі (15–20%)
 
@@ -545,9 +546,9 @@ function middayNudge() {
   const today = today_();
   const rows = devRows_(), plans = planDates_(), m = daySums_(rows);
   const done = habitDay_(m, today, plans);
-  const todo = HABITS.filter((h, i) => !done[i] && h.main && h.k !== 'Підсумок');
-  const todoAux = HABITS.filter((h, i) => !done[i] && !h.main);
-  const sales = salesCount_(m[today] || {});
+  const todo = HABITS.filter((h, i) => done[i] === false && h.main && h.k !== 'Підсумок');
+  const todoAux = HABITS.filter((h, i) => done[i] === false && !h.main);
+  const sales = isSalesDay_(today) ? salesCount_(m[today] || {}) : SALES_DAY_MIN;   // у вихідні продажі не вимагаємо
   if (!todo.length && !todoAux.length && sales >= SALES_DAY_MIN) return;
   const nothing = !rows.some(r => r.day === today);
   let msg = nothing ? '👀 Робота закінчилась, а в тебе сьогодні нуль записів.\n' + pick_(TAUNTS) : '⏰ Робота закінчилась — час на своє.';
@@ -573,7 +574,7 @@ function eveningPush() {
   if (getPlan_(today).length) send_(OWNER_ID, '📝 План дня — що виконано?', { reply_markup: { inline_keyboard: planKeyboard_(today) } });
   setMode_('evening', 6);
   send_(OWNER_ID, '✍️ Підсумок дня — текстом або голосом 🎙\n1. Що зробив?\n2. Де злився і чому? Чесно.\n3. Що завтра робиш ПЕРШИМ?' +
-    (n < MAIN_HABITS.length - 1 ? '\n\n' + pick_(TAUNTS) : ''));
+    (n < groupTotal_(done, true) - 1 ? '\n\n' + pick_(TAUNTS) : ''));
   wordsQuiz_();
 }
 
@@ -792,6 +793,7 @@ function coach_(reviewAnswer) {
     'паралельно розвиває Estone (декоративний камінь і кераміка для дизайнерів та архітекторів в Україні й Іспанії), ' +
     'вчить іспанську (A2) та англійську, тренується, читає, пише музику в Suno, кидає курити. Живе за системою «Атомних звичок».\n' +
     'ОСНОВНІ цілі: продажі Estone, іспанська, спорт — на них фокус і жорсткість. Допоміжні (англійська, читання, музика, сон, сигарети) — згадуй коротко.\n' +
+    'Продажі можливі тільки в будні (пн–пт): у вихідні КП не надсилаються, тижневі норми продажів розраховані на 5 днів.\n' +
     'Його відомі пастки: слабка дисципліна; будувати інструменти й «упаковку» замість продажів; розпорошуватися на нові ідеї. ' +
     'В Іспанії замовлень майже немає, бо він нікому про себе не розказує; гальмує через страх спілкування з клієнтами іспанською — ' +
     'нагадуй, що команди /es і /en перекладають повідомлення для клієнтів. В Україні головний показник B2B — кількість прорахунків ' +
@@ -1149,6 +1151,8 @@ const PROPOSE_PROMPT =
   'Не став щоденні звички (читання, музика, англійська, без сигарет) — вони відстежуються окремо.\n' +
   '4) Кожна справа — до 12 слів, з числом і часом доби («Ранок:», «Обід:», «Вечір:»), бо Ігор працює змінами, часто вночі.\n' +
   '5) Якщо вчорашній план не виконано — не збільшуй навантаження, а зроби план реальним.\n' +
+  '6) Якщо вихідний = true — Ігор НЕ може надсилати КП і продавати: жодних продажних дій. Перша справа тоді — іспанська або спорт; ' +
+  'можна одну легку підготовку до тижня продажів (наприклад, скласти список 20 дизайнерів на понеділок), якщо це доречно.\n' +
   'why — одне коротке жорстке речення, чому саме це сьогодні.\n' +
   'Відповідай ТІЛЬКИ JSON: {"plan": ["Ранок: …", "Обід: …", "Вечір: …"], "why": "…"}';
 
@@ -1157,13 +1161,18 @@ function dailyNeeds_(rows) {
   const today = today_(), ws = weekStart_(today);
   const s = devSum_(rows, ws, addDays_(ws, 6));
   const daysLeft = 7 - Math.round((Date.parse(today) - Date.parse(ws)) / 864e5);
+  let salesLeft = 0;   // скільки днів продажів (пн–пт) лишилось, включно з сьогодні
+  for (let d = today; d <= addDays_(ws, 6); d = addDays_(d, 1)) if (isSalesDay_(d)) salesLeft++;
   const out = {};
   // Тільки те, що залежить від Ігоря; не більше ніж 1,5 звичайної денної норми — щоб план був реальним
   const unit = { 'Іспанська': ' хв', 'Спорт': ' тренування' };
   ['Дотик', 'Дзвінок', 'Прорахунок', 'Іспанська', 'Слова', 'Спорт'].forEach(k => {
     const left = DEV_TARGETS[k] - q_(s, k);
     if (left <= 0) return;
-    const n = Math.min(Math.ceil(left / daysLeft), Math.ceil(DEV_TARGETS[k] / 7 * 1.5));
+    const sales = FIN_KEYS.indexOf(k) !== -1;
+    if (sales && !isSalesDay_(today)) return;   // у вихідні продажі не плануємо
+    const days = sales ? salesLeft : daysLeft;
+    const n = Math.min(Math.ceil(left / days), Math.ceil(DEV_TARGETS[k] / (sales ? SALES_DAYS.length : 7) * 1.5));
     out[k] = n + (unit[k] || '') + ' (тиждень ' + q_(s, k) + '/' + DEV_TARGETS[k] + ')';
   });
   return out;
@@ -1186,7 +1195,7 @@ function proposePlan_(chatId) {
   const yPlan = getPlan_(yd);
   const ctx = {
     сьогодні: today_(), день_тижня: ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'пʼятниця', 'субота'][new Date(Date.parse(today_())).getUTCDay()],
-    день_челенджу: dayNum_(), цілі: GOALS_90.trim(), потрібно_сьогодні: dailyNeeds_(rows),
+    день_челенджу: dayNum_(), вихідний: !isSalesDay_(today_()), цілі: GOALS_90.trim(), потрібно_сьогодні: dailyNeeds_(rows),
     вже_зроблено_сьогодні: sumLine_(m[today_()] || {}) || 'нічого',
     вчорашній_план: yPlan.length ? yPlan.map(p => (p.done ? '✅ ' : '❌ ') + p.text) : 'не було',
     вчорашній_підсумок: lastJournal_() || 'не було',
@@ -1241,10 +1250,16 @@ function daySums_(rows) {
 
 function salesCount_(s) { return FIN_KEYS.reduce((a, k) => a + q_(s, k), 0); }
 
+/** Чи день продажів (пн–пт). */
+function isSalesDay_(date) {
+  return SALES_DAYS.indexOf(new Date(Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10))).getUTCDay()) !== -1;
+}
+
+/** true — зроблено, false — не зроблено, null — цього дня не вимагається (продажі у вихідні). */
 function habitDone_(k, s, date, plans) {
   switch (k) {
     case 'План': return !!plans[date];
-    case 'Продажі': return salesCount_(s) > 0 || q_(s, 'Угода') > 0;
+    case 'Продажі': return salesCount_(s) > 0 || q_(s, 'Угода') > 0 || (isSalesDay_(date) ? false : null);
     case 'Іспанська': return q_(s, 'Іспанська') > 0 || q_(s, 'Слова') > 0;
     case 'Без сигарет': return q_(s, 'Без сигарет') > 0 && !q_(s, 'Сигарети');
     default: return q_(s, k) > 0;
@@ -1253,11 +1268,17 @@ function habitDone_(k, s, date, plans) {
 
 function habitDay_(m, date, plans) { return HABITS.map(h => habitDone_(h.k, m[date] || {}, date, plans)); }
 function groupCount_(done, main) { return HABITS.filter((h, i) => !!h.main === main && done[i]).length; }
+function groupTotal_(done, main) { return HABITS.filter((h, i) => !!h.main === main && done[i] !== null).length; }
 
 function habitStreak_(m, plans, k) {
   let d = today_(), n = 0;
   if (!habitDone_(k, m[d] || {}, d, plans)) d = addDays_(d, -1);
-  while (d >= HABITS_START && habitDone_(k, m[d] || {}, d, plans)) { n++; d = addDays_(d, -1); }
+  while (d >= HABITS_START) {
+    const x = habitDone_(k, m[d] || {}, d, plans);
+    if (x === false) break;
+    if (x) n++;   // null (вихідний без продажів) серію не рве
+    d = addDays_(d, -1);
+  }
   return n;
 }
 
@@ -1269,6 +1290,7 @@ function habitPct_(m, plans, from, to, main) {
   for (; d <= end; d = addDays_(d, 1)) {
     habitDay_(m, d, plans).forEach((x, i) => {
       if (main !== undefined && !!HABITS[i].main !== main) return;
+      if (x === null) return;
       total++; if (x) done++;
     });
   }
@@ -1281,9 +1303,9 @@ function missed_(m, plans) {
   const out = { once: [], twice: [], aux: [] };
   if (y < HABITS_START) return out;
   HABITS.forEach(h => {
-    if (habitDone_(h.k, m[y] || {}, y, plans)) return;
+    if (habitDone_(h.k, m[y] || {}, y, plans) !== false) return;
     if (!h.main) out.aux.push(h);
-    else if (y2 >= HABITS_START && !habitDone_(h.k, m[y2] || {}, y2, plans)) out.twice.push(h);
+    else if (y2 >= HABITS_START && habitDone_(h.k, m[y2] || {}, y2, plans) === false) out.twice.push(h);
     else out.once.push(h);
   });
   return out;
@@ -1293,7 +1315,7 @@ function habitsKeyboard_(date, done) {
   const kb = [];
   [true, false].forEach(main => {
     kb.push([{ text: main ? '— 🎯 Основні —' : '— 🌱 Допоміжні —', callback_data: 'noop' }]);
-    const btns = HABITS.map((h, i) => ({ h: h, b: { text: (done[i] ? '✅ ' : '⬜ ') + h.icon + ' ' + h.k, callback_data: 'hb:' + date + ':' + i } }))
+    const btns = HABITS.map((h, i) => ({ h: h, b: { text: (done[i] ? '✅ ' : done[i] === null ? '➖ ' : '⬜ ') + h.icon + ' ' + h.k, callback_data: 'hb:' + date + ':' + i } }))
       .filter(x => !!x.h.main === main).map(x => x.b);
     for (let i = 0; i < btns.length; i += 2) kb.push(btns.slice(i, i + 2));
   });
@@ -1301,7 +1323,7 @@ function habitsKeyboard_(date, done) {
 }
 
 function habitsHead_(done) {
-  return '🎯 Основні ' + groupCount_(done, true) + '/' + MAIN_HABITS.length + ' · 🌱 допоміжні ' + groupCount_(done, false) + '/' + AUX_HABITS.length;
+  return '🎯 Основні ' + groupCount_(done, true) + '/' + groupTotal_(done, true) + ' · 🌱 допоміжні ' + groupCount_(done, false) + '/' + groupTotal_(done, false);
 }
 
 function habitCallback_(cq, date, idx) {
@@ -1326,8 +1348,8 @@ function habitCallback_(cq, date, idx) {
 /** Підсумок звичок за день + реакція в тоні коуча. */
 function habitVerdict_(date) {
   const done = habitDay_(daySums_(devRows_()), date, planDates_());
-  const missMain = HABITS.filter((h, i) => h.main && !done[i]);
-  const missAux = HABITS.filter((h, i) => !h.main && !done[i]);
+  const missMain = HABITS.filter((h, i) => h.main && done[i] === false);
+  const missAux = HABITS.filter((h, i) => !h.main && done[i] === false);
   let out = '🧱 ' + habitsHead_(done);
   if (!missMain.length) out += '\n🔥 Основне закрито. Отак і виглядає людина, яка тримає слово.';
   else out += '\n🎯 Не зроблено: ' + missMain.map(h => h.icon + ' ' + h.k).join(', ') +
@@ -1359,7 +1381,7 @@ function saveIdea_(idea) {
   sheet_(SHEET_IDEAS).appendRow([new Date(), idea, 'нова']);
   const sales = salesCount_(devSum_(devRows_(), today_(), today_()));
   return '💡 Ідею записав: «' + idea + '». Розберемо в неділю, не зараз.' +
-    (sales < SALES_DAY_MIN ? '\n\nА тепер чесно: продажних дій сьогодні ' + sales + '/' + SALES_DAY_MIN +
+    (isSalesDay_(today_()) && sales < SALES_DAY_MIN ? '\n\nА тепер чесно: продажних дій сьогодні ' + sales + '/' + SALES_DAY_MIN +
       '. Нова ідея — найзручніший спосіб не писати клієнтам. Спочатку клієнти, потім фантазії.' : '');
 }
 
@@ -1392,7 +1414,7 @@ function chatReply_(chatId, said, prefix) {
   const rows = devRows_(), m = daySums_(rows), today = today_();
   const d = devData_();
   const ctx = {
-    сьогодні: today, день_челенджу: dayNum_(), цілі: GOALS_90.trim(),
+    сьогодні: today, день_челенджу: dayNum_(), вихідний_без_продажів: !isSalesDay_(today), цілі: GOALS_90.trim(),
     сьогодні_зроблено: sumLine_(m[today] || {}) || 'нічого', план_сьогодні: getPlan_(today).map(p => (p.done ? '✅ ' : '⬜ ') + p.text),
     потрібно_сьогодні: dailyNeeds_(rows), бал_тижня: d.score, відсотки_цілей: d.goals, графік_дня: timelineText_(today),
   };
@@ -1400,6 +1422,7 @@ function chatReply_(chatId, said, prefix) {
     'Ти — особистий коуч Ігоря в 90-денному челенджі, спілкуєшся з ним у Telegram. Ігорю 40, оператор ЧПУ в Іспанії (робота до 16:00), ' +
     'розвиває Estone (стільниці, раковини, вироби з каменю й кераміки для дизайнерів та архітекторів в Україні та Іспанії).\n' +
     'ОСНОВНІ цілі: продажі Estone, іспанська, спорт. Допоміжні: англійська, читання, музика (Suno), сон, кинути курити, щоденне планування.\n' +
+    'У вихідні (субота, неділя) Ігор не може надсилати КП і продавати — не вимагай продажів у ці дні.\n' +
     'Межі: говори ТІЛЬКИ про те, що допомагає досягти цілей челенджу — продажі й клієнти, іспанська/англійська, тренування, звички, ' +
     'сон, куріння, планування, мотивація, дисципліна. Можеш давати практичні поради (як написати клієнту, як тренувати підтягування, ' +
     'як перестати відкладати). Якщо питання не про це — одним реченням поверни до цілей. Не вигадуй даних, яких немає.\n' +
@@ -1600,7 +1623,7 @@ function todayText_() {
   const plan = getPlan_(today);
   const done = habitDay_(daySums_(devRows_()), today, planDates_());
   return dayLine_() + '\n\n' + (sumLine_(s) ? 'Записано: ' + sumLine_(s) : 'Сьогодні ще нічого не записано.') +
-    '\n\n🎯 ' + MAIN_HABITS.map(h => (done[HABITS.indexOf(h)] ? '✅' : '⬜') + h.icon).join(' ') +
+    '\n\n🎯 ' + MAIN_HABITS.map(h => { const x = done[HABITS.indexOf(h)]; return (x ? '✅' : x === null ? '➖' : '⬜') + h.icon; }).join(' ') +
     '\n🌱 ' + AUX_HABITS.map(h => (done[HABITS.indexOf(h)] ? '✅' : '⬜') + h.icon).join(' ') +
     (timelineText_(today) ? '\n\n' + timelineText_(today) : '') +
     (plan.length ? '\n\n📝 План:\n' + plan.map(p => (p.done ? '✅ ' : '⬜ ') + p.text).join('\n') : '');
